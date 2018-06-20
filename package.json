@@ -28,12 +28,14 @@
     "css-vars-ponyfill": "^1.7.2",
     "flag-icon-css": "^3.0.0",
     "font-awesome": "^4.7.0",
+    "ol": "^4.6.5",
     "perfect-scrollbar": "^1.4.0",
     "simple-line-icons": "^2.4.1",
     "vue": "^2.5.16",
     "vue-chartjs": "^3.3.1",
     "vue-perfect-scrollbar": "^0.1.0",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^8.6.0",
