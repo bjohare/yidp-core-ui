@@ -10,7 +10,6 @@ import App from "./App";
 import router from "./router";
 import VueAxios from "vue-axios";
 import axios from "axios";
-
 // todo
 // cssVars()
 

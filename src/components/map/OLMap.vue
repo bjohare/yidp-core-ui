@@ -36,6 +36,17 @@ export default {
         minZoom: this.minZoom
       })
     });
+    const config = {
+      auth: {
+        username: "admin",
+        password: "geoserver"
+      }
+    };
+    this.axios
+      .get("http://localhost/geoserver/rest/layers.json", config)
+      .then(resp => {
+        console.log(resp);
+      });
   }
 };
 </script>

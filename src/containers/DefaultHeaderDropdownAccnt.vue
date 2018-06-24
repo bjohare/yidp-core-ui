@@ -59,7 +59,8 @@ export default {
   },
   methods: {
     login() {
-      console.log(process.env.NODE_ENV);
+      console.log(process.env.CLIENT_ID);
+      console.log(process.env.CLIENT_SECRET);
       const auth = oauth2.create({
         client: {
           id: process.env.CLIENT_ID,
@@ -67,35 +68,31 @@ export default {
         },
         auth: {
           tokenHost: "http://localhost/geonode/",
-          tokenPath: "/geonode//o/token",
-          authorizePath: "/geonode/o/authorize"
+          tokenPath: "/o/token/"
+          // authorizePath: "/o/authorize/"
         }
       });
-      console.log(auth);
-      const authorizationUri = auth.authorizationCode.authorizeURL({
-        redirect_uri: "http://localhost/dashboard",
-        scope: "write"
-      });
-      console.log(authorizationUri);
-      window.location = authorizationUri;
-      // this.axios.get(authorizationUri).then(response => {
-      //   console.log(response);
-      // });
-
-      // Get the access token object (the authorization code is given from the previous step).
       const tokenConfig = {
-        code: "<code>",
-        redirect_uri: "http://localhost:3000/dashboard",
-        scope: "<scope>" // also can be an array of multiple scopes, ex. ['<scope1>, '<scope2>', '...']
+        username: "bjohare",
+        password: "x3791x3791",
+        scope: "write" // also can be an array of multiple scopes, ex. ['<scope1>, '<scope2>', '...']
       };
 
-      // Save the access token
-      // try {
-      //   const result = await oauth2.authorizationCode.getToken(tokenConfig)
-      //   const accessToken = oauth2.accessToken.create(result);
-      // } catch (error) {
-      //   console.log('Access Token Error', error.message);
-      // }
+      const result = auth.ownerPassword.getToken(tokenConfig);
+      result.then(resp => {
+        console.log(resp);
+        const accessToken = auth.accessToken.create(resp);
+        localStorage.token = accessToken.token.access_token;
+        localStorage.authorization = btoa("bjohare:x3791x3791");
+        console.log(localStorage.token);
+        console.log(localStorage.authorization);
+        this.$router.replace(this.$route.query.redirect || "/map");
+        console.log(accessToken);
+      });
+      result.catch(err => {
+        console.log(err);
+        this.$router.replace(this.$route.query.redirect || "/pages/login");
+      });
     }
   }
 };
