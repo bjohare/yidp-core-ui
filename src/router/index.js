@@ -80,6 +80,10 @@ export default new Router({
           path: "/map",
           name: "Map",
           component: Map
+        },
+        {
+          path: "/catalog",
+          redirect: "/geonode/"
         }
         // {
         //   path: "theme",

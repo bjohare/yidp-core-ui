@@ -41,6 +41,7 @@ export default {
 </script>
 <style>
 @import "ol/ol.css";
+
 html,
 body {
   margin: 0;

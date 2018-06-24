@@ -12,7 +12,7 @@
         <div>Yemen Integrated Data Portal</div>
         <b-nav-item class="px-3">Home</b-nav-item>
         <b-nav-item class="px-3">Maps</b-nav-item>
-        <b-nav-item class="px-3">Documents</b-nav-item>
+        <b-nav-item class="px-3" href="/geonode/">GeoNode</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <!-- <b-nav-item class="d-md-down-none">
