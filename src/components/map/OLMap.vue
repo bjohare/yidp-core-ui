@@ -6,7 +6,9 @@ import Map from "ol/map";
 import View from "ol/view";
 import TileLayer from "ol/layer/tile";
 import XYZ from "ol/source/xyz";
+import TileWMS from "ol/source/tilewms";
 import proj from "ol/proj";
+import WMSCapabilities from "ol/format/wmscapabilities";
 
 export default {
   data() {
@@ -36,6 +38,8 @@ export default {
         minZoom: this.minZoom
       })
     });
+
+    const parser = new WMSCapabilities();
     const config = {
       auth: {
         username: "admin",
@@ -43,10 +47,36 @@ export default {
       }
     };
     this.axios
-      .get("http://localhost/geoserver/rest/layers.json", config)
+      .get("http://yidp-geonode.geoweb.io/geoserver/rest/layers.json", config)
       .then(resp => {
         console.log(resp);
       });
+    this.axios
+      .get(
+        "http://yidp-geonode.geoweb.io/geoserver/geonode/ows?service=WMS&version=1.0.0&request=GetCapabilities"
+      )
+      .then(resp => {
+        const result = parser.read(resp.data);
+        const Layers = result.Capability.Layer.Layer;
+        console.log(Layers);
+      });
+    this.axios
+      .get("http://yidp-geonode.geoweb.io/api/maps?title=YemenMap")
+      .then(resp => {
+        console.log(resp);
+      });
+    var yemenAdmin = new TileLayer({
+      source: new TileWMS({
+        url: "http://yidp-geonode.geoweb.io/geoserver/geonode/ows?service=WMS?",
+        params: {
+          LAYERS: "geonode:yem_admin1",
+          VERSION: "1.1.1",
+          FORMAT: "image/png",
+          TILED: true
+        }
+      })
+    });
+    this.map.addLayer(yemenAdmin);
   }
 };
 </script>

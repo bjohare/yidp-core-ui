@@ -54,7 +54,9 @@ import Map from "@/components/Map.vue";
 import Page404 from "@/views/pages/Page404";
 import Page500 from "@/views/pages/Page500";
 import Login from "@/views/pages/Login";
+import Logout from "@/views/pages/Logout";
 import Register from "@/views/pages/Register";
+import store from "../store/store";
 
 Vue.use(Router);
 
@@ -79,7 +81,15 @@ export default new Router({
         {
           path: "/map",
           name: "Map",
-          component: Map
+          component: Map,
+          beforeEnter(to, from, next) {
+            console.log("Before map enter..");
+            if (!store.state.authentication.userData) {
+              next("/pages/login");
+            } else {
+              next();
+            }
+          }
         },
         {
           path: "/catalog",
@@ -326,6 +336,11 @@ export default new Router({
           path: "login",
           name: "Login",
           component: Login
+        },
+        {
+          path: "logout",
+          name: "Logout",
+          component: Logout
         },
         {
           path: "register",

@@ -10,6 +10,8 @@ import App from "./App";
 import router from "./router";
 import VueAxios from "vue-axios";
 import axios from "axios";
+
+import store from "@/store/store";
 // todo
 // cssVars()
 
@@ -20,6 +22,7 @@ Vue.use(VueAxios, axios);
 new Vue({
   el: "#app",
   router,
+  store,
   template: "<App/>",
   components: {
     App

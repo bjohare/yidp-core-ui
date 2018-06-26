@@ -246,6 +246,11 @@ export default {
           icon: "icon-star"
         },
         {
+          name: "Logout",
+          url: "/pages/logout",
+          icon: "icon-star"
+        },
+        {
           name: "Register",
           url: "/pages/register",
           icon: "icon-star"
