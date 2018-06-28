@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="map" class="map"></div>
-    <app-overlay :info="info" :showPopover="showPopover"></app-overlay>
+    <app-overlay :info="info" :pixel="pixel"></app-overlay>
   </div>
 </template>
 <script>
@@ -12,7 +12,6 @@ import XYZ from "ol/source/xyz";
 import TileWMS from "ol/source/tilewms";
 import proj from "ol/proj";
 import WMSGetFeatureInfo from "ol/format/wmsgetfeatureinfo";
-import Overlay from "ol/overlay";
 import axios from "axios";
 // import * as methods from "./methods";
 import appOverlay from "./Overlay.vue";
@@ -27,7 +26,7 @@ export default {
       maxExtent: [35, 10, 66, 28],
       minZoom: 5,
       info: null,
-      showPopover: false
+      pixel: {}
     };
   },
   computed: {
@@ -40,10 +39,7 @@ export default {
     })
   },
   methods: {
-    async showGetFeatureInfo(url, coordinate) {
-      this.showPopover = false;
-      const featureInfo = this.map.getOverlayById("featureInfoOverlay");
-      featureInfo.setPosition(coordinate);
+    async showGetFeatureInfo(url, pixel) {
       this.info = null;
       console.log(url);
       const response = await axios.get(url);
@@ -54,7 +50,8 @@ export default {
         const geomName = features[0].getGeometryName();
         delete props[geomName];
         this.info = props;
-        this.showPopover = true;
+        this.pixel = pixel;
+        this.$root.$emit("bv::show::popover", "map");
       }
     }
   },
@@ -100,12 +97,6 @@ export default {
 
     this.map.addLayer(yemen);
 
-    const featureInfo = new Overlay({
-      id: "featureInfoOverlay",
-      element: document.getElementById("featureInfo")
-    });
-    this.map.addOverlay(featureInfo);
-
     this.map.on("moveend", event => {
       const position = {
         zoom: event.map.getView().getZoom(),
@@ -123,7 +114,7 @@ export default {
         { INFO_FORMAT: "text/xml" }
       );
       if (url) {
-        this.showGetFeatureInfo(url, event.coordinate);
+        this.showGetFeatureInfo(url, event.pixel);
       }
     });
   }

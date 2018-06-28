@@ -14,7 +14,7 @@ export default {
       name: "Map",
       url: "/map",
       icon: "icon-globe"
-    },
+    }
     // {
     //   title: true,
     //   name: "Theme",
@@ -235,37 +235,37 @@ export default {
     //   title: true,
     //   name: "Extras"
     // },
-    {
-      name: "Pages",
-      url: "/pages",
-      icon: "icon-star",
-      children: [
-        {
-          name: "Login",
-          url: "/pages/login",
-          icon: "icon-star"
-        },
-        {
-          name: "Logout",
-          url: "/pages/logout",
-          icon: "icon-star"
-        },
-        {
-          name: "Register",
-          url: "/pages/register",
-          icon: "icon-star"
-        },
-        {
-          name: "Error 404",
-          url: "/pages/404",
-          icon: "icon-star"
-        },
-        {
-          name: "Error 500",
-          url: "/pages/500",
-          icon: "icon-star"
-        }
-      ]
-    }
+    // {
+    //   name: "Account",
+    //   url: "/account",
+    //   icon: "icon-star",
+    //   children: [
+    //     {
+    //       name: "Login",
+    //       url: "/account/login",
+    //       icon: "icon-star"
+    //     },
+    //     {
+    //       name: "Logout",
+    //       url: "/account/logout",
+    //       icon: "icon-star"
+    //     }
+    // {
+    //   name: "Register",
+    //   url: "/pages/register",
+    //   icon: "icon-star"
+    // },
+    // {
+    //   name: "Error 404",
+    //   url: "/pages/404",
+    //   icon: "icon-star"
+    // },
+    // {
+    //   name: "Error 500",
+    //   url: "/pages/500",
+    //   icon: "icon-star"
+    // }
+    //   ]
+    // }
   ]
 };

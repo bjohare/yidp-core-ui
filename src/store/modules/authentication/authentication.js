@@ -1,5 +1,5 @@
-import { geonodeAxios, yidpAxios } from "./axios-auth";
-import { apiEndpoints } from "../endpoints";
+import { geonodeAxios, yidpAxios } from "../../axios";
+import { apiEndpoints } from "./endpoints";
 
 const state = {
   accessToken: null,
@@ -23,6 +23,9 @@ const getters = {
   getAccessToken(state) {
     return state.accessToken;
   },
+  getUserData(state) {
+    return state.userData;
+  },
   getUserProfile(state) {
     return state.userProfile;
   }
@@ -37,35 +40,38 @@ const actions = {
     console.log(result);
     commit("accessToken", result.data.data.token);
     try {
-      await dispatch("getUserData");
-      if (state.userData.sub) {
-        // check for oAuth user info
-        await dispatch("getUserProfile");
+      const response = await dispatch("fetchUserData");
+      commit("userData", response.data);
+      if (response.data.sub) {
+        const response = await dispatch("fetchUserProfile");
+        commit("userProfile", response.data);
       }
     } catch (error) {
       console.log("No user data: ", error);
     }
   },
 
-  async getUserData({ commit }) {
+  async fetchUserData({ commit }) {
     const response = await geonodeAxios({
       url: apiEndpoints.userDataUrl,
       headers: {
-        Authorization: "Bearer " + this.getters.getAccessToken.access_token
+        Authorization:
+          "Bearer " + this.getters["authentication/getAccessToken"].access_token
       }
     });
-    commit("userData", response.data);
+    return response;
   },
 
-  async getUserProfile({ commit, state }) {
-    const userId = state.userData.sub;
+  async fetchUserProfile({ commit, state }) {
+    const userId = this.getters["authentication/getUserData"].sub;
     const response = await geonodeAxios({
       url: apiEndpoints.userProfileUrl + userId,
       headers: {
-        Authorization: "Bearer " + this.getters.getAccessToken.access_token
+        Authorization:
+          "Bearer " + this.getters["authentication/getAccessToken"].access_token
       }
     });
-    commit("userProfile", response.data);
+    return response;
   },
 
   logout({ commit }) {
@@ -76,6 +82,7 @@ const actions = {
 };
 
 export default {
+  namespaced: true,
   state,
   mutations,
   getters,

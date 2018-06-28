@@ -36,7 +36,7 @@ export default {
   name: "Logout",
   methods: {
     logout() {
-      this.$store.dispatch("logout");
+      this.$store.dispatch("authentication/logout");
       this.$router.replace("/dashboard");
     }
   }

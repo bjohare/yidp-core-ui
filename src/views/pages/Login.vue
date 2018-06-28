@@ -6,22 +6,29 @@
           <b-card-group>
             <b-card no-body class="p-4">
               <b-card-body>
-                <h1>Login</h1>
+                <h2>Login</h2>
+                <div class="alert alert-danger" v-if="errors.length">
+                  <ul>
+                    <li v-for="error in errors" :key="error">{{ error }}</li>
+                  </ul>
+                </div>
                 <p class="text-muted">Sign In to your account</p>
                 <b-input-group class="mb-3">
                   <b-input-group-prepend><b-input-group-text><i class="icon-user"></i></b-input-group-text></b-input-group-prepend>
-                  <input type="text" class="form-control" placeholder="Username" v-model="username">
+                  <input type="text" class="form-control" placeholder="Username" v-model="username" @focus="clearErrors">
                 </b-input-group>
                 <b-input-group class="mb-4">
                   <b-input-group-prepend><b-input-group-text><i class="icon-lock"></i></b-input-group-text></b-input-group-prepend>
-                  <input type="password" class="form-control" placeholder="Password" v-model="password">
+                  <input type="password" class="form-control"
+                        placeholder="Password" v-model="password"
+                        @focus="clearErrors" @enter="login">
                 </b-input-group>
                 <b-row>
                   <b-col cols="6">
                     <b-button variant="primary" class="px-4" @click="login">Login</b-button>
                   </b-col>
                   <b-col cols="6" class="text-right">
-                    <b-button variant="link" class="px-0">Forgot password?</b-button>
+                    <b-button variant="link" class="px-0" href="http://yidp-geonode.geoweb.io/account/password/reset/">Forgot password?</b-button>
                   </b-col>
                 </b-row>
               </b-card-body>
@@ -48,21 +55,35 @@ export default {
   data() {
     return {
       username: "",
-      password: ""
+      password: "",
+      errors: []
     };
   },
   methods: {
     async login() {
-      try {
-        await this.$store.dispatch("login", {
-          username: this.username,
-          password: this.password
-        });
-        this.$router.replace(this.$route.query.redirect || "/map");
-      } catch (error) {
-        console.log(error);
-        alert("Bad login..");
+      if (this.username && this.password) {
+        try {
+          await this.$store.dispatch("authentication/login", {
+            username: this.username,
+            password: this.password
+          });
+          this.$router.replace(this.$route.query.redirect || "/map");
+        } catch (error) {
+          console.log(error);
+          this.errors.push("Invalid username or password.");
+        }
+      } else {
+        this.errors = [];
+        if (!this.username) {
+          this.errors.push("Username required");
+        }
+        if (!this.password) {
+          this.errors.push("Password required");
+        }
       }
+    },
+    clearErrors() {
+      this.errors = [];
     }
   }
 };

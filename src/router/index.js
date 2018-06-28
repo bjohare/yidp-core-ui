@@ -51,11 +51,12 @@ import Map from "@/components/Map.vue";
 // import Modals from "@/views/notifications/Modals";
 
 // Views - Pages
-import Page404 from "@/views/pages/Page404";
-import Page500 from "@/views/pages/Page500";
+// import Page404 from "@/views/pages/Page404";
+// import Page500 from "@/views/pages/Page500";
 import Login from "@/views/pages/Login";
 import Logout from "@/views/pages/Logout";
-import Register from "@/views/pages/Register";
+// import Register from "@/views/pages/Register";
+
 import store from "../store/store";
 
 Vue.use(Router);
@@ -84,8 +85,8 @@ export default new Router({
           component: Map,
           beforeEnter(to, from, next) {
             console.log("Before map enter..");
-            if (!store.state.authentication.userData) {
-              next("/pages/login");
+            if (!store.getters["authentication/getUserProfile"]) {
+              next("/account/login");
             } else {
               next();
             }
@@ -313,25 +314,25 @@ export default new Router({
       ]
     },
     {
-      path: "/pages",
+      path: "/account",
       redirect: "/pages/404",
-      name: "Pages",
+      name: "Account",
       component: {
         render(c) {
           return c("router-view");
         }
       },
       children: [
-        {
-          path: "404",
-          name: "Page404",
-          component: Page404
-        },
-        {
-          path: "500",
-          name: "Page500",
-          component: Page500
-        },
+        // {
+        //   path: "404",
+        //   name: "Page404",
+        //   component: Page404
+        // },
+        // {
+        //   path: "500",
+        //   name: "Page500",
+        //   component: Page500
+        // },
         {
           path: "login",
           name: "Login",
@@ -341,12 +342,12 @@ export default new Router({
           path: "logout",
           name: "Logout",
           component: Logout
-        },
-        {
-          path: "register",
-          name: "Register",
-          component: Register
         }
+        // {
+        //   path: "register",
+        //   name: "Register",
+        //   component: Register
+        // }
       ]
     }
   ]

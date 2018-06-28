@@ -10,11 +10,17 @@
       <div v-show="isAuthenticated">
         <b-dropdown-header tag="div" class="text-center"><strong>Account</strong></b-dropdown-header>
         <b-dropdown-item><i class="fa fa-user" /> Profile</b-dropdown-item>
-        <b-dropdown-item><i class="fa fa-bell-o" /> Maps
+        <b-dropdown-item>
+          <i class="cui-map icons font-1xl d-inline mt-4"/> Maps
           <b-badge variant="info">{{ numMaps }}</b-badge>
         </b-dropdown-item>
-        <b-dropdown-item><i class="fa fa-envelope-o" /> Layers
-          <b-badge variant="success">{{ numLayers }}</b-badge>
+        <b-dropdown-item>
+          <i class="cui-layers icons font-1xl d-inline mt-4"/> Layers
+          <b-badge variant="info">{{ numLayers }}</b-badge>
+        </b-dropdown-item>
+        <b-dropdown-item>
+          <i class="cui-note icons font-1xl d-inline mt-4"/> Documents
+          <b-badge variant="info">{{ numDocuments }}</b-badge>
         </b-dropdown-item>
         <!-- <b-dropdown-header
           tag="div"
@@ -28,10 +34,10 @@
         <b-dropdown-item><i class="fa fa-file" /> Projects
           <b-badge variant="primary">{{ itemsCount }}</b-badge>
         </b-dropdown-item> -->
-        <b-dropdown-item to="/pages/logout"><i class="fa fa-lock" /> Logout</b-dropdown-item>
+        <b-dropdown-item to="/account/logout"><i class="fa fa-lock" /> Logout</b-dropdown-item>
       </div>
       <div v-show="!isAuthenticated">
-        <b-dropdown-item to="/pages/login"><i class="fa fa-shield"/> Login</b-dropdown-item>
+        <b-dropdown-item to="/account/login"><i class="fa fa-shield"/> Login</b-dropdown-item>
       </div>
 
     </template>
@@ -43,33 +49,34 @@
 
 <script>
 import { HeaderDropdown as AppHeaderDropdown } from "@coreui/vue";
+import { mapState } from "vuex";
 export default {
   name: "DefaultHeaderDropdownAccnt",
   data() {
     return {
-      itemsCount: 42,
-      authentication: this.$store.state.authentication
+      itemsCount: 42
     };
   },
   computed: {
+    ...mapState("authentication", {
+      userProfile: state => state.userProfile
+    }),
     isAuthenticated() {
-      return this.authentication.userData != null;
+      return this.userProfile != null;
     },
     numMaps() {
-      return this.isAuthenticated
-        ? this.authentication.userProfile.maps_count
-        : 0;
+      return this.isAuthenticated ? this.userProfile.maps_count : 0;
     },
     numLayers() {
-      return this.isAuthenticated
-        ? this.authentication.userProfile.layers_count
-        : 0;
+      return this.isAuthenticated ? this.userProfile.layers_count : 0;
+    },
+    numDocuments() {
+      return this.isAuthenticated ? this.userProfile.documents_count : 0;
     },
     fullName() {
       if (this.isAuthenticated) {
-        const firstName = this.$store.state.authentication.userProfile
-          .first_name;
-        const lastName = this.$store.state.authentication.userProfile.last_name;
+        const firstName = this.userProfile.first_name;
+        const lastName = this.userProfile.last_name;
         return firstName + " " + lastName + " ";
       }
     }
