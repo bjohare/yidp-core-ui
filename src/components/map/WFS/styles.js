@@ -1,8 +1,8 @@
-import { Style, Stroke, Circle, Fill } from "ol/style";
+import { Style, Stroke, Circle, Fill, Text } from "ol/style";
 
 const styleCache = {};
 function pointStyle(feature) {
-  // const size = feature.get("features").length;
+  const size = feature.get("features").length;
   let style = styleCache["Point"];
   if (!style) {
     style = new Style({
@@ -15,13 +15,13 @@ function pointStyle(feature) {
         fill: new Fill({
           color: "red"
         })
+      }),
+      text: new Text({
+        text: size.toString(),
+        fill: new Fill({
+          color: "#fff"
+        })
       })
-      // text: new Text({
-      //   text: "point",
-      //   fill: new Fill({
-      //     color: "#fff"
-      //   })
-      // })
     });
     styleCache["Point"] = style;
   }
@@ -35,11 +35,11 @@ function polyStyle(feature) {
       stroke: new Stroke({
         color: "blue",
         width: 2
+      }),
+      fill: new Fill({
+        color: "rgba(0, 64, 255, 0.005)",
+        opacity: 1
       })
-      // fill: new Fill({
-      //   color: "blue",
-      //   opacity: 0.8
-      // }),
       // text: new Text({
       //   text: "A feature",
       //   fill: new Fill({

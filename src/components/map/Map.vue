@@ -1,11 +1,14 @@
 <template>
   <div class="map-view animated fadeIn">
+    <keep-alive>
       <app-map></app-map>
+    </keep-alive>
   </div>
 </template>
 
 <script>
-import OLMap from "./OLMap.vue";
+import OLMap from "./WMS/OLMapWMS.vue";
+// import OLMap from "./WFS/OLMapWFS.vue";
 
 export default {
   components: {

@@ -87,7 +87,7 @@ export default new Router({
         },
         {
           path: "/map/:id",
-          name: "Map",
+          name: "Maps",
           component: Map,
           beforeEnter(to, from, next) {
             console.log("Before map enter..");

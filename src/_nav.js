@@ -14,12 +14,6 @@ export default {
       name: "Maps",
       url: "/maps",
       icon: "icon-globe"
-    },
-    {
-      title: false,
-      name: "Map",
-      url: "/map",
-      icon: "icon-globe"
     }
     // {
     //   title: true,

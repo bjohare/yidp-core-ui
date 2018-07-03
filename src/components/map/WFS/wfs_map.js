@@ -1,13 +1,14 @@
-import { Map, View } from "ol";
+import { Map, View, Overlay } from "ol";
 import { transformExtent, fromLonLat } from "ol/proj";
 import { Tile as TileLayer, Vector } from "ol/layer";
 import { Vector as VectorSource, Cluster, XYZ } from "ol/source";
 import { GeoJSON } from "ol/format";
 import { bbox as bboxStrategy } from "ol/loadingstrategy";
+import { Select } from "ol/interaction";
 
 import { styleMap } from "./styles";
 
-import { geoserverAxios } from "../../store/axios";
+import { geoserverAxios } from "../../../store/axios";
 // import { geonodeEndpoints } from "../../store/endpoints";
 
 export const initMap = vm => {
@@ -37,7 +38,7 @@ export const vectorLoader = async function(
   projection
 ) {
   var url =
-    "http://admin:geoserver@yidp-geonode.geoweb.io/geoserver/geonode/ows?service=WFS&" +
+    "http://yidp-geonode.geoweb.io/geoserver/geonode/ows?service=WFS&" +
     "version=1.1.0&request=GetFeature&typeName=" +
     layer +
     "&outputFormat=application/json&srsname=EPSG:3857&" +
@@ -117,4 +118,28 @@ export const loadVectors = async vm => {
     vectors.push(vector);
     vm.map.addLayer(vector);
   }
+
+  const featureInfo = new Overlay({
+    id: "featureInfoOverlay",
+    element: document.getElementById("featureInfo")
+  });
+  vm.map.addOverlay(featureInfo);
+
+  var select = new Select({ layers: vectors });
+
+  vm.map.addInteraction(select);
+
+  var selectedFeatures = select.getFeatures();
+  selectedFeatures.on("add", function(event) {
+    var feature = event.target.item(0);
+    console.log(feature);
+  });
+
+  // vm.map.on("moveend", event => {
+  //   const position = {
+  //     zoom: event.map.getView().getZoom(),
+  //     center: toLonLat(event.map.getView().getCenter())
+  //   };
+  //   vm.$store.dispatch("map/saveMapPosition", position);
+  // });
 };

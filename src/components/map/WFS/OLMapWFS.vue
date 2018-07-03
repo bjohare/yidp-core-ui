@@ -5,9 +5,9 @@
   </div>
 </template>
 <script>
-import { initMap, loadVectors } from "./map";
+import { initMap, loadVectors } from "./wfs_map";
 
-import appOverlay from "./Overlay.vue";
+import appOverlay from "../Overlay.vue";
 
 import { mapState } from "vuex";
 
