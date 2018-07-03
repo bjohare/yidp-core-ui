@@ -5,16 +5,8 @@
   </div>
 </template>
 <script>
-import Map from "ol/map";
-import View from "ol/view";
-import TileLayer from "ol/layer/tile";
-import XYZ from "ol/source/xyz";
-import TileWMS from "ol/source/tilewms";
-import proj from "ol/proj";
-import WMSGetFeatureInfo from "ol/format/wmsgetfeatureinfo";
-import Overlay from "ol/overlay";
-import axios from "axios";
-// import * as methods from "./methods";
+import { initMap, loadVectors } from "./map";
+
 import appOverlay from "./Overlay.vue";
 
 import { mapState } from "vuex";
@@ -22,110 +14,87 @@ import { mapState } from "vuex";
 export default {
   data() {
     return {
-      map: null,
       layers: [],
-      maxExtent: [35, 10, 66, 28],
-      minZoom: 5,
       info: null,
       showPopover: false
     };
   },
   computed: {
     ...mapState("map", {
-      mapTitle: state => state.title,
+      mapTitle: state => state.geonodeMap.title,
       wmsBaseUrl: state => state.wmsBaseUrl,
       geonodeMap: state => state.map,
       zoom: state => state.zoom,
-      center: state => state.center
+      center: state => state.center,
+      maxExtent: state => state.maxExtent,
+      minZoom: state => state.minZoom
     })
   },
   methods: {
-    async showGetFeatureInfo(url, coordinate) {
-      this.showPopover = false;
-      const featureInfo = this.map.getOverlayById("featureInfoOverlay");
-      featureInfo.setPosition(coordinate);
-      this.info = null;
-      console.log(url);
-      const response = await axios.get(url);
-      const data = response.data;
-      const features = new WMSGetFeatureInfo().readFeatures(data);
-      if (features.length) {
-        const props = features[0].getProperties();
-        const geomName = features[0].getGeometryName();
-        delete props[geomName];
-        this.info = props;
-        this.showPopover = true;
-      }
-    }
+    // async showGetFeatureInfo(url, coordinate) {
+    //   this.showPopover = false;
+    //   const featureInfo = this.map.getOverlayById("featureInfoOverlay");
+    //   featureInfo.setPosition(coordinate);
+    //   this.info = null;
+    //   console.log(url);
+    //   const response = await axios.get(url);
+    //   const data = response.data;
+    //   const features = new WMSGetFeatureInfo().readFeatures(data);
+    //   if (features.length) {
+    //     const props = features[0].getProperties();
+    //     const geomName = features[0].getGeometryName();
+    //     delete props[geomName];
+    //     this.info = props;
+    //     this.showPopover = true;
+    //   }
+    // }
   },
   components: {
     appOverlay
   },
-  created() {
-    this.$store.dispatch("map/fetchGeonodeMap");
-    this.$store.dispatch("map/fetchWMSCapabilities");
-  },
   mounted() {
-    const view = new View({
-      extent: proj.transformExtent(this.maxExtent, "EPSG:4326", "EPSG:3857"),
-      center: proj.fromLonLat(this.center),
-      zoom: this.zoom,
-      minZoom: this.minZoom
-    });
-    this.map = new Map({
-      target: "map",
-      layers: [
-        new TileLayer({
-          source: new XYZ({
-            url: "https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          })
-        })
-      ],
-      view: view
-    });
+    initMap(this);
+    loadVectors(this);
 
-    const wmsSource = new TileWMS({
-      url: this.wmsBaseUrl,
-      params: {
-        LAYERS: "yem_admin1,healthsites",
-        VERSION: "1.3.0",
-        FORMAT: "image/png",
-        TILED: true
-      }
-    });
+    // //
 
-    var yemen = new TileLayer({
-      source: wmsSource
-    });
+    // const featureInfo = new Overlay({
+    //   id: "featureInfoOverlay",
+    //   element: document.getElementById("featureInfo")
+    // });
+    // this.map.addOverlay(featureInfo);
 
-    this.map.addLayer(yemen);
+    // this.map.on("moveend", event => {
+    //   const position = {
+    //     zoom: event.map.getView().getZoom(),
+    //     center: toLonLat(event.map.getView().getCenter())
+    //   };
+    //   this.$store.dispatch("map/saveMapPosition", position);
+    // });
 
-    const featureInfo = new Overlay({
-      id: "featureInfoOverlay",
-      element: document.getElementById("featureInfo")
-    });
-    this.map.addOverlay(featureInfo);
+    // var select = new Select({
+    //   layers: vectors
+    // });
 
-    this.map.on("moveend", event => {
-      const position = {
-        zoom: event.map.getView().getZoom(),
-        center: proj.toLonLat(event.map.getView().getCenter())
-      };
-      this.$store.dispatch("map/saveMapPosition", position);
-    });
+    // this.map.addInteraction(select);
 
-    this.map.on("singleclick", event => {
-      const viewResolution = view.getResolution();
-      const url = wmsSource.getGetFeatureInfoUrl(
-        event.coordinate,
-        viewResolution,
-        "EPSG:3857",
-        { INFO_FORMAT: "text/xml" }
-      );
-      if (url) {
-        this.showGetFeatureInfo(url, event.coordinate);
-      }
-    });
+    // var selectedFeatures = select.getFeatures();
+    // selectedFeatures.on("add", function(event) {
+    //   var feature = event.target.item(0);
+    //   console.log(feature);
+    // });
+    // this.map.on("singleclick", event => {
+    //   const viewResolution = view.getResolution();
+    //   const url = wmsSource.getGetFeatureInfoUrl(
+    //     event.coordinate,
+    //     viewResolution,
+    //     "EPSG:3857",
+    //     { INFO_FORMAT: "text/xml" }
+    //   );
+    //   if (url) {
+    //     this.showGetFeatureInfo(url, event.coordinate);
+    //   }
+    // });
   }
 };
 </script>

@@ -1,17 +1,17 @@
 <template>
   <div>
     <div id="map" class="map"></div>
-    <app-overlay :info="info" :pixel="pixel"></app-overlay>
+    <app-overlay :info="info" :showPopover="showPopover"></app-overlay>
   </div>
 </template>
 <script>
-import Map from "ol/map";
-import View from "ol/view";
-import TileLayer from "ol/layer/tile";
-import XYZ from "ol/source/xyz";
-import TileWMS from "ol/source/tilewms";
-import proj from "ol/proj";
-import WMSGetFeatureInfo from "ol/format/wmsgetfeatureinfo";
+import { Map, View, Overlay } from "ol";
+import TileLayer from "ol/layer/Tile";
+import XYZ from "ol/source/XYZ";
+import TileWMS from "ol/source/TileWMS";
+import { transformExtent, fromLonLat, toLonLat } from "ol/proj";
+import WMSGetFeatureInfo from "ol/format/WMSGetFeatureInfo";
+
 import axios from "axios";
 // import * as methods from "./methods";
 import appOverlay from "./Overlay.vue";
@@ -26,7 +26,7 @@ export default {
       maxExtent: [35, 10, 66, 28],
       minZoom: 5,
       info: null,
-      pixel: {}
+      showPopover: false
     };
   },
   computed: {
@@ -39,7 +39,10 @@ export default {
     })
   },
   methods: {
-    async showGetFeatureInfo(url, pixel) {
+    async showGetFeatureInfo(url, coordinate) {
+      this.showPopover = false;
+      const featureInfo = this.map.getOverlayById("featureInfoOverlay");
+      featureInfo.setPosition(coordinate);
       this.info = null;
       console.log(url);
       const response = await axios.get(url);
@@ -50,8 +53,7 @@ export default {
         const geomName = features[0].getGeometryName();
         delete props[geomName];
         this.info = props;
-        this.pixel = pixel;
-        this.$root.$emit("bv::show::popover", "map");
+        this.showPopover = true;
       }
     }
   },
@@ -64,8 +66,8 @@ export default {
   },
   mounted() {
     const view = new View({
-      extent: proj.transformExtent(this.maxExtent, "EPSG:4326", "EPSG:3857"),
-      center: proj.fromLonLat(this.center),
+      extent: transformExtent(this.maxExtent, "EPSG:4326", "EPSG:3857"),
+      center: fromLonLat(this.center),
       zoom: this.zoom,
       minZoom: this.minZoom
     });
@@ -84,6 +86,7 @@ export default {
     const wmsSource = new TileWMS({
       url: this.wmsBaseUrl,
       params: {
+        // LAYERS: "yem_admin1,healthsites",
         LAYERS: "yem_admin1,healthsites",
         VERSION: "1.3.0",
         FORMAT: "image/png",
@@ -97,10 +100,16 @@ export default {
 
     this.map.addLayer(yemen);
 
+    const featureInfo = new Overlay({
+      id: "featureInfoOverlay",
+      element: document.getElementById("featureInfo")
+    });
+    this.map.addOverlay(featureInfo);
+
     this.map.on("moveend", event => {
       const position = {
         zoom: event.map.getView().getZoom(),
-        center: proj.toLonLat(event.map.getView().getCenter())
+        center: toLonLat(event.map.getView().getCenter())
       };
       this.$store.dispatch("map/saveMapPosition", position);
     });
@@ -114,7 +123,7 @@ export default {
         { INFO_FORMAT: "text/xml" }
       );
       if (url) {
-        this.showGetFeatureInfo(url, event.pixel);
+        this.showGetFeatureInfo(url, event.coordinate);
       }
     });
   }

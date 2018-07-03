@@ -32,7 +32,7 @@ const getters = {
 };
 
 const actions = {
-  async login({ commit, state, dispatch }, payload) {
+  async login({ commit, dispatch }, payload) {
     const result = await yidpAxios.post(apiEndpoints.yidpAuthUrl, {
       username: payload.username,
       password: payload.password
@@ -51,7 +51,7 @@ const actions = {
     }
   },
 
-  async fetchUserData({ commit }) {
+  async fetchUserData() {
     const response = await geonodeAxios({
       url: apiEndpoints.userDataUrl,
       headers: {
@@ -62,7 +62,7 @@ const actions = {
     return response;
   },
 
-  async fetchUserProfile({ commit, state }) {
+  async fetchUserProfile() {
     const userId = this.getters["authentication/getUserData"].sub;
     const response = await geonodeAxios({
       url: apiEndpoints.userProfileUrl + userId,

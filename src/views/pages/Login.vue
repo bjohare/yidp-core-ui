@@ -67,7 +67,7 @@ export default {
             username: this.username,
             password: this.password
           });
-          this.$router.replace(this.$route.query.redirect || "/map");
+          this.$router.replace(this.$route.query.redirect || "/maps");
         } catch (error) {
           console.log(error);
           this.errors.push("Invalid username or password.");

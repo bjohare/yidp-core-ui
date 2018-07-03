@@ -1,0 +1,30 @@
+<template>
+    <b-card
+    :title="map.title" :img-src="map.thumbnail_url"
+    :img-alt="map.title"
+    style="max-width: 20rem;"
+    border-variant="info">
+    <b-badge variant="info" class="mb4">{{ map.category__gn_description }}</b-badge><br>
+    <p class="card-text">
+      {{ map.abstract }}
+    </p>
+
+    <b-button :href="'map/' + map.id" variant="primary">View this Map</b-button>
+    <em slot="footer">
+      {{ map.date_type | capitalize }}: {{ map.date | format-date }}</em>
+    </b-card>
+</template>
+<script>
+export default {
+  props: {
+    map: null
+  }
+};
+</script>
+<style lang="scss" scoped>
+.badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+</style>

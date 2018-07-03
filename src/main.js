@@ -10,6 +10,7 @@ import App from "./App";
 import router from "./router";
 import VueAxios from "vue-axios";
 import axios from "axios";
+import moment from "moment";
 
 import store from "@/store/store";
 // todo
@@ -17,6 +18,17 @@ import store from "@/store/store";
 
 Vue.use(BootstrapVue);
 Vue.use(VueAxios, axios);
+
+Vue.filter("format-date", function(value) {
+  if (!value) return "";
+  return moment(value).format("MMMM Do YYYY, h:mm:ss a");
+});
+
+Vue.filter("capitalize", function(value) {
+  if (!value) return "";
+  value = value.toString();
+  return value.charAt(0).toUpperCase() + value.slice(1);
+});
 
 /* eslint-disable no-new */
 new Vue({

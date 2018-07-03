@@ -11,6 +11,12 @@ export default {
     },
     {
       title: false,
+      name: "Maps",
+      url: "/maps",
+      icon: "icon-globe"
+    },
+    {
+      title: false,
       name: "Map",
       url: "/map",
       icon: "icon-globe"
