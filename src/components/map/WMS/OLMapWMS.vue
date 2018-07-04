@@ -1,6 +1,6 @@
 <template>
       <!-- <aside class="aside-menu-fixed">Map controls here...</aside> -->
-      <div id="map"></div>
+      <div id="map" class="d-flex"></div>
       <!-- <app-overlay :info="info" :showPopover="showPopover"></app-overlay> -->
 </template>
 <script>
@@ -62,10 +62,9 @@ export default {
   }
 };
 </script>
-<style>
-/* @import "leaflet/dist/leaflet.css"; */
-/* #map {
-  min-height: 100vh;
+<style lang="scss" scoped>
+#map {
   width: auto;
-} */
+  height: 100%;
+}
 </style>

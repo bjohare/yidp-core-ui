@@ -1,5 +1,5 @@
 <template>
-<div class="container animated fadeIn">
+<div class="animated fadeIn m-4">
   <app-spinner :loading="loading"></app-spinner>
   <b-card-group deck class="mb-3" v-show="!loading">
     <div v-for="(map, index) in maps" :key="index">

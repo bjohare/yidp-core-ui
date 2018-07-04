@@ -12,8 +12,7 @@
 }
 
 html,
-body,
-#map {
+body {
   width: 100%;
   height: 100%;
   padding: 0;
@@ -29,4 +28,20 @@ main {
 .container,
 .main {
   height: 100%;
+  padding: 0;
+}
+
+.breadcrumb-fixed {
+  .main {
+    $breadcrumb-height: 2.7 * $breadcrumb-padding-y + $font-size-base;
+    padding-top: $breadcrumb-height;
+  }
+
+  .breadcrumb {
+    position: fixed;
+    top: $navbar-height;
+    right: 0;
+    left: 0;
+    z-index: $zindex-sticky - 3;
+  }
 }

@@ -45,6 +45,6 @@ export default {
 </script>
 <style>
 .map-container {
-  height: inherit;
+  height: 100%;
 }
 </style>

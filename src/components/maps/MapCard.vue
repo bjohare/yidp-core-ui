@@ -4,7 +4,7 @@
     :img-alt="map.title"
     style="max-width: 20rem;"
     border-variant="info">
-    <b-badge variant="info" class="mb4">{{ map.category__gn_description }}</b-badge><br>
+    <h5><b-badge variant="primary">{{ map.category__gn_description }}</b-badge></h5><br>
     <p class="card-text">
       {{ map.abstract }}
     </p>

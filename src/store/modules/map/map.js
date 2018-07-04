@@ -5,7 +5,7 @@ const state = {
   title: "",
   zoom: 7,
   minZoom: 5,
-  center: [15, 50.42],
+  center: [15.61, 49.93],
   maxExtent: [41, 12, 55, 19],
   baseLayers: ["https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"],
   wmsBaseUrl: geoserverEndpoints.wmsBaseUrl,

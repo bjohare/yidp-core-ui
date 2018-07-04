@@ -1,5 +1,5 @@
 <template>
-  <div class="container animated fadeIn">
+  <div class="animated fadeIn m-4">
     <h1>Yemen Integrated Data Platform Dashboard</h1>
   </div>
 </template>

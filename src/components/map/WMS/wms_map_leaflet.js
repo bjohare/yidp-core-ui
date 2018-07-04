@@ -32,12 +32,19 @@ export const loadWMSLayers = async vm => {
   var osmAttrib =
     'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
   var osm = new L.TileLayer(osmUrl, {
-    minZoom: vm.minZoom,
-    maxZoom: vm.maxZoom,
     attribution: osmAttrib
   });
   osm.addTo(vm.map);
-  const baseLayers = { OpenStreetMap: osm };
+  const mapLink = '<a href="http://www.esri.com/">Esri</a>';
+  const wholink =
+    "i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community";
+  const esriUrl =
+    "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+  const esri = L.tileLayer(esriUrl, {
+    attribution: "&copy; " + mapLink + ", " + wholink,
+    maxZoom: 17
+  }).addTo(vm.map);
+  const baseLayers = { OpenStreetMap: osm, Esri: esri };
   const layers = await fetchGeonodeLayers(vm);
   let wmsLayers = {};
   const queryLayers = [];
@@ -52,10 +59,20 @@ export const loadWMSLayers = async vm => {
       VERISON: "1.3.0",
       FORMAT: "image/png",
       TRANSPARENT: "true",
-      TILED: true
+      TILED: true,
+      minZoom: vm.minZoom,
+      maxZoom: vm.maxZoom
     };
     wmsLayers[layer.title] = L.tileLayer.wms_auth(wmsUrl, params).addTo(vm.map);
   }
   console.log(wmsLayers);
   L.control.layers(baseLayers, wmsLayers).addTo(vm.map);
+
+  vm.map.on("moveend", event => {
+    const position = {
+      zoom: event.target.getZoom(),
+      center: event.target.getCenter()
+    };
+    console.log(position);
+  });
 };

@@ -31,6 +31,14 @@ Vue.filter("capitalize", function(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 });
 
+// router.beforeEach((to, from, next) => {
+//   if (!store.getters["authentication/getUserProfile"]) {
+//     next("/account/login");
+//   } else {
+//     next();
+//   }
+// });
+
 /* eslint-disable no-new */
 new Vue({
   el: "#app",
