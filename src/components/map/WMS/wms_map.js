@@ -1,7 +1,10 @@
+import "ol/ol.css";
+import "ol-layerswitcher/src/ol-layerswitcher.css";
+
 import { Map, View, Overlay } from "ol";
-import { transformExtent, fromLonLat } from "ol/proj";
+import { transformExtent, fromLonLat, toLonLat } from "ol/proj";
 import { Tile as TileLayer } from "ol/layer";
-import { TileWMS, XYZ } from "ol/source";
+import { TileWMS, OSM } from "ol/source";
 import { geoserverAxios } from "../../../store/axios";
 
 export const initMap = vm => {
@@ -13,11 +16,10 @@ export const initMap = vm => {
   });
   vm.map = new Map({
     target: "map",
+    // layers: [baseLayers],
     layers: [
       new TileLayer({
-        source: new XYZ({
-          url: "https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        })
+        source: new OSM()
       })
     ],
     view: view
@@ -89,5 +91,13 @@ export const loadWMSLayers = async vm => {
     if (url) {
       vm.showGetFeatureInfo(url, event.coordinate);
     }
+  });
+
+  vm.map.on("moveend", event => {
+    const position = {
+      zoom: event.map.getView().getZoom(),
+      center: toLonLat(event.map.getView().getCenter())
+    };
+    console.log(position);
   });
 };

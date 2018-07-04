@@ -1,5 +1,6 @@
 <template>
-  <div class="map-view animated fadeIn">
+  <div  class="animated fadeIn map-container">
+    <app-spinner :loading="loading"></app-spinner>
     <keep-alive>
       <app-map></app-map>
     </keep-alive>
@@ -9,25 +10,41 @@
 <script>
 import OLMap from "./WMS/OLMapWMS.vue";
 // import OLMap from "./WFS/OLMapWFS.vue";
+import appSpinner from "@/components/shared/Spinner.vue";
 
 export default {
-  components: {
-    appMap: OLMap
+  data() {
+    return {
+      loading: false
+    };
   },
-  methods: {},
+  components: {
+    appMap: OLMap,
+    appSpinner
+  },
+  methods: {
+    async setGeonodeMap() {
+      const id = this.$route.params.id;
+      let maps = this.$store.getters["maps/getGeonodeMaps"];
+      if (maps.length === 0) {
+        this.loading = true;
+        await this.$store.dispatch("maps/fetchGeonodeMaps");
+        this.loading = false;
+      }
+      maps = this.$store.getters["maps/getGeonodeMaps"];
+      const map = maps.filter(m => {
+        return m.id === Number.parseInt(id);
+      })[0];
+      this.$store.dispatch("map/setMap", map);
+    }
+  },
   created() {
-    const id = this.$route.params.id;
-    const maps = this.$store.getters["maps/getGeonodeMaps"];
-    const map = maps.filter(m => {
-      return m.id === Number.parseInt(id);
-    })[0];
-    this.$store.dispatch("map/setMap", map);
+    this.setGeonodeMap();
   }
 };
 </script>
 <style>
-.map-view {
-  margin-top: -1.5rem !important;
-  height: 90% !important;
+.map-container {
+  height: inherit;
 }
 </style>

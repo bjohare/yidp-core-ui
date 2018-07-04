@@ -82,7 +82,7 @@ export default new Router({
         },
         {
           path: "/maps",
-          name: "maps",
+          name: "Maps",
           component: Maps
         },
         {

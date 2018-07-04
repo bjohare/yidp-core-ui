@@ -10,3 +10,23 @@
 .container-fluid {
   padding: 0px !important;
 }
+
+html,
+body,
+#map {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+main {
+  height: 100%;
+}
+
+.app,
+.app-body,
+.container-fluid,
+.container,
+.main {
+  height: 100%;
+}

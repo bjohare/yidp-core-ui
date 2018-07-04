@@ -1,15 +1,14 @@
 <template>
-  <div>
-    <div id="map" class="map"></div>
-    <app-overlay :info="info" :showPopover="showPopover"></app-overlay>
-  </div>
+      <!-- <aside class="aside-menu-fixed">Map controls here...</aside> -->
+      <div id="map"></div>
+      <!-- <app-overlay :info="info" :showPopover="showPopover"></app-overlay> -->
 </template>
 <script>
 import WMSGetFeatureInfo from "ol/format/WMSGetFeatureInfo";
-
+import "leaflet/dist/leaflet.css";
 import axios from "axios";
 // import * as methods from "./methods";
-import { initMap, loadWMSLayers } from "./wms_map";
+import { initMap, loadWMSLayers } from "./wms_map_leaflet";
 import appOverlay from "../Overlay.vue";
 
 import { mapState } from "vuex";
@@ -20,7 +19,6 @@ export default {
       map: null,
       layers: [],
       maxExtent: [35, 10, 66, 28],
-      minZoom: 5,
       info: null,
       showPopover: false
     };
@@ -31,7 +29,9 @@ export default {
       wmsBaseUrl: state => state.wmsBaseUrl,
       geonodeMap: state => state.map,
       zoom: state => state.zoom,
-      center: state => state.center
+      center: state => state.center,
+      minZoom: state => state.minZoom,
+      maxZoom: state => state.maxZoom
     })
   },
   methods: {
@@ -63,18 +63,9 @@ export default {
 };
 </script>
 <style>
-@import "ol/ol.css";
-
-html,
-body {
-  margin: 0;
-  height: 100%;
-}
-#map {
-  /* position: absolute; */
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
+/* @import "leaflet/dist/leaflet.css"; */
+/* #map {
+  min-height: 100vh;
+  width: auto;
+} */
 </style>

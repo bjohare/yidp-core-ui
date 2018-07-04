@@ -3,10 +3,10 @@ import * as actions from "./actions";
 
 const state = {
   title: "",
-  zoom: 6,
+  zoom: 7,
   minZoom: 5,
-  center: [50, 18],
-  maxExtent: [35, 10, 66, 28],
+  center: [15, 50.42],
+  maxExtent: [41, 12, 55, 19],
   baseLayers: ["https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"],
   wmsBaseUrl: geoserverEndpoints.wmsBaseUrl,
   geonodeMap: null,
