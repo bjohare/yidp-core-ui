@@ -2,6 +2,7 @@ import { Map, View, Overlay } from "ol";
 import { transformExtent, fromLonLat } from "ol/proj";
 import { Tile as TileLayer } from "ol/layer";
 import { TileWMS, XYZ } from "ol/source";
+import { geoserverAxios } from "../../../store/axios";
 
 export const initMap = vm => {
   const view = new View({
@@ -29,28 +30,43 @@ const fetchGeonodeLayers = async vm => {
 
 export const loadWMSLayers = async vm => {
   const layers = await fetchGeonodeLayers(vm);
-  const layerNames = [];
+  const wmsSources = [];
+  const queryLayers = [];
   for (let layer in layers) {
     let layerName = layers[layer].typename;
-    layerNames.push(layerName);
+    queryLayers.push(layerName);
+    const wmsSource = new TileWMS({
+      url: vm.$store.state.map.wmsBaseUrl,
+      params: {
+        LAYERS: layerName,
+        VERSION: "1.3.0",
+        FORMAT: "image/png",
+        TRANSPARENT: "true",
+        TILED: true
+      },
+      serverType: "geoserver",
+      crossOrigin: "anonymous",
+      tileLoadFunction: function(tile, src) {
+        // required for geoserver authentication
+        geoserverAxios
+          .get(src, {
+            responseType: "arraybuffer"
+          })
+          .then(response => {
+            var arrayBufferView = new Uint8Array(response.data);
+            var blob = new Blob([arrayBufferView], { type: "image/png" });
+            var urlCreator = window.URL || window.webkitURL;
+            var imageUrl = urlCreator.createObjectURL(blob);
+            tile.getImage().src = imageUrl;
+          });
+      }
+    });
+    wmsSources.push(wmsSource);
+    var wms = new TileLayer({
+      source: wmsSource
+    });
+    vm.map.addLayer(wms);
   }
-  const wmsLayers = layerNames.join(",");
-  const wmsSource = new TileWMS({
-    url: vm.$store.state.map.wmsBaseUrl,
-    params: {
-      LAYERS: wmsLayers,
-      VERSION: "1.3.0",
-      FORMAT: "image/png",
-      TRANSPARENT: "true",
-      TILED: true
-    }
-  });
-
-  var wms = new TileLayer({
-    source: wmsSource
-  });
-
-  vm.map.addLayer(wms);
 
   const featureInfo = new Overlay({
     id: "featureInfoOverlay",
@@ -59,15 +75,19 @@ export const loadWMSLayers = async vm => {
   vm.map.addOverlay(featureInfo);
 
   vm.map.on("singleclick", event => {
-    const viewResolution = vm.map.view.getResolution();
-    const url = wmsSource.getGetFeatureInfoUrl(
+    const viewResolution = vm.map.getView().getResolution();
+    const url = wmsSources[0].getGetFeatureInfoUrl(
       event.coordinate,
       viewResolution,
       "EPSG:3857",
-      { INFO_FORMAT: "text/xml" }
+      {
+        INFO_FORMAT: "text/xml",
+        LAYERS: queryLayers.join(","),
+        QUERY_LAYERS: queryLayers.join(",")
+      }
     );
     if (url) {
-      this.showGetFeatureInfo(url, event.coordinate);
+      vm.showGetFeatureInfo(url, event.coordinate);
     }
   });
 };

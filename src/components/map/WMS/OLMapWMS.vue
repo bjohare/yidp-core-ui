@@ -56,10 +56,6 @@ export default {
   components: {
     appOverlay
   },
-  created() {
-    // this.$store.dispatch("map/fetchGeonodeMap");
-    // this.$store.dispatch("map/fetchWMSCapabilities");
-  },
   mounted() {
     initMap(this);
     loadWMSLayers(this);

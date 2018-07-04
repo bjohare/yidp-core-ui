@@ -1,6 +1,7 @@
 <template>
 <div class="container animated fadeIn">
-  <b-card-group deck class="mb-3">
+  <app-spinner :loading="loading"></app-spinner>
+  <b-card-group deck class="mb-3" v-show="!loading">
     <div v-for="(map, index) in maps" :key="index">
       <app-map-card :map="map"></app-map-card>
     </div>
@@ -10,17 +11,33 @@
 
 <script>
 import MapCard from "../maps/MapCard.vue";
+import appSpinner from "@/components/shared/Spinner.vue";
+
 export default {
   data() {
     return {
-      maps: this.$store.getters["maps/getGeonodeMaps"]
+      loading: false
     };
   },
+  computed: {
+    maps() {
+      return this.$store.getters["maps/getGeonodeMaps"];
+    }
+  },
   components: {
-    appMapCard: MapCard
+    appMapCard: MapCard,
+    appSpinner
+  },
+  methods: {
+    async fetchGeonodeMaps() {
+      this.loading = true;
+      await this.$store.dispatch("maps/fetchGeonodeMaps");
+      this.loading = false;
+    }
   },
   created() {
-    this.$store.dispatch("maps/fetchGeonodeMaps");
+    console.log("in maps..");
+    this.fetchGeonodeMaps();
   }
 };
 </script>

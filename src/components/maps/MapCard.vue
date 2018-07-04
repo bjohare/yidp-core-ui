@@ -9,7 +9,11 @@
       {{ map.abstract }}
     </p>
 
-    <b-button :href="'map/' + map.id" variant="primary">View this Map</b-button>
+    <router-link :to="{ name: 'map', params: {id: map.id}}">
+      <b-button variant="primary">
+        View this Map
+      </b-button>
+    </router-link>
     <em slot="footer">
       {{ map.date_type | capitalize }}: {{ map.date | format-date }}</em>
     </b-card>

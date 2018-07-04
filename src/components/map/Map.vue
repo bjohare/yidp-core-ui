@@ -18,7 +18,9 @@ export default {
   created() {
     const id = this.$route.params.id;
     const maps = this.$store.getters["maps/getGeonodeMaps"];
-    const map = maps.filter(map => String(map.id) === id)[0];
+    const map = maps.filter(m => {
+      return m.id === Number.parseInt(id);
+    })[0];
     this.$store.dispatch("map/setMap", map);
   }
 };
