@@ -1,9 +1,10 @@
 import * as L from "leaflet";
 
-import { geoserverAxios } from "../../../store/axios";
+import { geoserverAxios } from "../../store/axios";
 
 export const initMap = vm => {
-  vm.map = L.map("map").setView(vm.center, vm.zoom);
+  resetGlobalMapBus(vm.$map);
+  vm.$map.map = L.map("map").setView(vm.center, vm.zoom);
 };
 
 const fetchGeonodeLayers = async vm => {
@@ -32,9 +33,10 @@ export const loadWMSLayers = async vm => {
   var osmAttrib =
     'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
   var osm = new L.TileLayer(osmUrl, {
-    attribution: osmAttrib
+    attribution: osmAttrib,
+    zIndex: 200
   });
-  osm.addTo(vm.map);
+  osm.addTo(vm.$map.map);
   const mapLink = '<a href="http://www.esri.com/">Esri</a>';
   const wholink =
     "i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community";
@@ -42,15 +44,33 @@ export const loadWMSLayers = async vm => {
     "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const esri = L.tileLayer(esriUrl, {
     attribution: "&copy; " + mapLink + ", " + wholink,
-    maxZoom: 17
-  }).addTo(vm.map);
-  const baseLayers = { OpenStreetMap: osm, Esri: esri };
+    maxZoom: 17,
+    zIndex: 200
+  });
+  const baseLayers = [
+    {
+      name: "OpenStreetMap",
+      layer: osm,
+      opacity: 1,
+      checked: "checked",
+      enabled: true
+    },
+    {
+      name: "Esri World Imagery",
+      layer: esri,
+      opacity: 1,
+      checked: "",
+      enabled: false
+    }
+  ];
   const layers = await fetchGeonodeLayers(vm);
-  let wmsLayers = {};
+  let wmsLayers = [];
   const queryLayers = [];
   const wmsUrl = vm.wmsBaseUrl;
   console.log(wmsUrl);
+  let zIndex = 400;
   for (let idx in layers) {
+    zIndex++;
     let layer = layers[idx];
     let typename = layer.typename;
     queryLayers.push(layer.typename);
@@ -63,16 +83,32 @@ export const loadWMSLayers = async vm => {
       minZoom: vm.minZoom,
       maxZoom: vm.maxZoom
     };
-    wmsLayers[layer.title] = L.tileLayer.wms_auth(wmsUrl, params).addTo(vm.map);
+    wmsLayers.push({
+      name: layer.title,
+      checked: "checked",
+      enabled: true,
+      opacity: 1,
+      layer: L.tileLayer
+        .wms_auth(wmsUrl, params)
+        .addTo(vm.$map.map)
+        .setZIndex(zIndex)
+    });
   }
-  console.log(wmsLayers);
-  L.control.layers(baseLayers, wmsLayers).addTo(vm.map);
+  vm.$map.overlays = wmsLayers;
+  vm.$map.baseLayers = baseLayers;
+  vm.triggerLayersAdded();
 
-  vm.map.on("moveend", event => {
+  vm.$map.map.on("moveend", event => {
     const position = {
       zoom: event.target.getZoom(),
       center: event.target.getCenter()
     };
     console.log(position);
   });
+};
+
+const resetGlobalMapBus = map => {
+  map.map = null;
+  map.baseLayers = null;
+  map.overlays = null;
 };

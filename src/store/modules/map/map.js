@@ -5,12 +5,13 @@ const state = {
   title: "",
   zoom: 7,
   minZoom: 5,
-  center: [15.61, 49.93],
+  center: [15.51, 48.47],
   maxExtent: [41, 12, 55, 19],
-  baseLayers: ["https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"],
   wmsBaseUrl: geoserverEndpoints.wmsBaseUrl,
   geonodeMap: null,
-  layers: []
+  geonodeLayers: [],
+  baseLayers: [],
+  overlays: []
 };
 
 const mutations = {
@@ -20,17 +21,20 @@ const mutations = {
   geonodeMap(state, map) {
     state.geonodeMap = map;
   },
+  geonodeLayers(state, layers) {
+    state.geonodeLayers = layers;
+  },
   zoom(state, zoom) {
     state.zoom = zoom;
   },
   center(state, center) {
     state.center = center;
   },
-  capabilities(state, capabilities) {
-    state.wmsCapabilities = capabilities;
+  baseLayers(state, layers) {
+    state.baseLayers = layers;
   },
-  layers(state, layers) {
-    state.layers = layers;
+  overlays(state, layers) {
+    state.overlays = layers;
   }
 };
 
@@ -41,8 +45,8 @@ const getters = {
   getGeonodeMap(state) {
     return state.geonodeMap;
   },
-  getLayers(state) {
-    return state.layers;
+  getGeonodeLayers(state) {
+    return state.geonodeLayers;
   }
 };
 

@@ -6,6 +6,16 @@ export const saveMapPosition = ({ commit }, payload) => {
   commit("center", payload.center);
 };
 
+// save the available baselayers
+export const saveBaseLayers = ({ commit }, payload) => {
+  commit("baseLayers", payload);
+};
+
+// save the available overlays
+export const saveOverlays = ({ commit }, payload) => {
+  commit("overlays", payload);
+};
+
 // export const fetchGeonodeMap = async ({ commit, state }) => {
 //   const response = await geonodeAxios.get(
 //     geonodeEndpoints.mapsUrl + "?title=" + state.title
@@ -13,7 +23,7 @@ export const saveMapPosition = ({ commit }, payload) => {
 //   commit("map", response.data.objects[0]);
 // };
 
-export const setMap = async ({ commit }, map) => {
+export const setGeonodeMap = async ({ commit }, map) => {
   commit("geonodeMap", map);
   commit("title", map.title);
 };
@@ -42,6 +52,6 @@ export const fetchGeonodeLayers = async ({ commit, state }, vm) => {
     );
     layers.push(response.data.objects[0]);
   }
-  commit("layers", layers);
+  commit("geonodeLayers", layers);
   return layers;
 };

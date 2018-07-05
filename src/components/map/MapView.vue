@@ -1,7 +1,8 @@
 <template>
-      <!-- <aside class="aside-menu-fixed">Map controls here...</aside> -->
+  <div style="height: inherit;">
       <div id="map" class="d-flex"></div>
       <!-- <app-overlay :info="info" :showPopover="showPopover"></app-overlay> -->
+  </div>
 </template>
 <script>
 import WMSGetFeatureInfo from "ol/format/WMSGetFeatureInfo";
@@ -9,7 +10,7 @@ import "leaflet/dist/leaflet.css";
 import axios from "axios";
 // import * as methods from "./methods";
 import { initMap, loadWMSLayers } from "./wms_map_leaflet";
-import appOverlay from "../Overlay.vue";
+import appOverlay from "./Overlay.vue";
 
 import { mapState } from "vuex";
 
@@ -51,14 +52,23 @@ export default {
         this.info = props;
         this.showPopover = true;
       }
+    },
+    initializeMap() {
+      initMap(this);
+    },
+    async loadInitalLayers() {
+      await loadWMSLayers(this);
+    },
+    triggerLayersAdded() {
+      this.$map.$emit("layers-added");
     }
   },
   components: {
     appOverlay
   },
   mounted() {
-    initMap(this);
-    loadWMSLayers(this);
+    this.initializeMap();
+    this.loadInitalLayers();
   }
 };
 </script>

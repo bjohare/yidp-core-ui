@@ -8,8 +8,7 @@
 </template>
 
 <script>
-import OLMap from "./WMS/OLMapWMS.vue";
-// import OLMap from "./WFS/OLMapWFS.vue";
+import OLMap from "./MapView.vue";
 import appSpinner from "@/components/shared/Spinner.vue";
 
 export default {
@@ -35,11 +34,15 @@ export default {
       const map = maps.filter(m => {
         return m.id === Number.parseInt(id);
       })[0];
-      this.$store.dispatch("map/setMap", map);
+      this.$store.dispatch("map/setGeonodeMap", map);
     }
   },
   created() {
     this.setGeonodeMap();
+  },
+  beforeRouteLeave(to, from, next) {
+    this.$map.$emit("map-destroy");
+    next();
   }
 };
 </script>

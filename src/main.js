@@ -39,6 +39,21 @@ Vue.filter("capitalize", function(value) {
 //   }
 // });
 
+const EventBus = new Vue({
+  map: null,
+  baseLayers: [],
+  overlays: []
+});
+
+// event bus to handle cross-component map access
+Object.defineProperties(Vue.prototype, {
+  $map: {
+    get: function() {
+      return EventBus;
+    }
+  }
+});
+
 /* eslint-disable no-new */
 new Vue({
   el: "#app",
