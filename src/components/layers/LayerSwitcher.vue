@@ -13,43 +13,67 @@
       </b-list-group>
     </div>
     <div v-show="show">
-      <b-list-group class="list-group-accent">
-        <b-list-group-item class="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
+      <b-list-group  class="list-group-accent">
+        <b-list-group-item class="list-group-item-accent-danger bg-light text-center font-weight-bold text-muted text-uppercase small">
+          <div v-b-toggle.baseLayers>
+            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left"></i>
+            <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left"></i>
+          </div>
           Base Layers
         </b-list-group-item>
-        <b-list-group-item v-for="(item, index) in baseLayers" :key="item.name + index"
-          class="list-group-item-accent-primary list-group-item-divider">
-          <div><strong>{{ item.name }}</strong>
-            <label class="switch switch-sm float-right switch-pill switch-success">
-              <input type="checkbox" class="switch-input" v-model="item.checked" @click="toggleLayer(item, index)">
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-          <div class="mt-1">
-            <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
-              @drag-end="setLayerOpacity(item)">
-            </app-slider>
-          </div>
-          <!-- <b-col sm="9"><b-form-input type="range"></b-form-input></b-col> -->
-        </b-list-group-item>
+        <b-collapse id="baseLayers" visible>
+          <b-list-group-item v-for="(item, index) in baseLayers" :key="item.name + index"
+            class="list-group-item-accent-primary list-group-item-divider">
+            <div><strong>{{ item.name }}</strong>
+              <label class="switch switch-sm float-right switch-pill switch-success">
+                <input type="checkbox" class="switch-input" v-model="item.checked" @click="toggleLayer(item, index)">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+            <div class="mt-1">
+              <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
+                @drag-end="setLayerOpacity(item)">
+              </app-slider>
+            </div>
+          </b-list-group-item>
+        </b-collapse>
+
         <hr class="transparent mx-3 my-0">
-        <b-list-group-item class="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
+        <b-list-group-item class="list-group-item-accent-danger bg-light text-center font-weight-bold text-muted text-uppercase small">
+          <div v-b-toggle.defaultOverlays>
+            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left"></i>
+          <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left"></i>
+          </div>
           Default Overlays
         </b-list-group-item>
-        <b-list-group-item v-for="(item, index) in overlays" :key="item.name + index"
+        <b-collapse id="defaultOverlays" visible>
+          <b-list-group-item v-for="(item, index) in overlays" :key="item.name + index"
           class="list-group-item-accent-success list-group-item-divider">
-          <div><strong>{{ item.name }}</strong>
-            <label class="switch switch-sm float-right switch-pill switch-success">
-              <input type="checkbox" class="switch-input" checked @click="toggleLayer(item, index)">
-              <span class="switch-slider"></span>
-            </label>
+            <div><strong>{{ item.name }}</strong>
+              <label class="switch switch-sm float-right switch-pill switch-success">
+                <input type="checkbox" class="switch-input" checked @click="toggleLayer(item, index)">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+            <div>
+              <app-slider v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
+                @drag-end="setLayerOpacity(item)">
+              </app-slider>
+            </div>
+          </b-list-group-item>
+        </b-collapse>
+        <hr class="transparent mx-3 my-0">
+        <b-list-group-item class="list-group-item-accent-danger bg-light text-center font-weight-bold text-muted text-uppercase small">
+          <div v-b-toggle.overlays>
+            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left"></i>
+            <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left"></i>
           </div>
-          <div>
-            <app-slider v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
-              @drag-end="setLayerOpacity(item)">
-            </app-slider>
-          </div>
+          Other Overlays
+          <i style="cursor: pointer;" class="fa fa-cog fa-lg float-right"></i>
         </b-list-group-item>
+        <b-collapse id="overlays" visible>
+          other overlays here..
+        </b-collapse>
       </b-list-group>
     </div>
   </div>
@@ -125,4 +149,8 @@ export default {
 };
 </script>
 <style scoped>
+.collapsed > .open,
+:not(.collapsed) > .closed {
+  display: none;
+}
 </style>
