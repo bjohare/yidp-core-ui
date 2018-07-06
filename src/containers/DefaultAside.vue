@@ -168,13 +168,6 @@ export default {
   components: {
     cSwitch,
     appLayerSwitcher
-  },
-  created() {
-    const _vm = this;
-    this.$map.$on("destroy", $event => {
-      console.log("hiding layers tab..");
-      _vm.showLayersTab = false;
-    });
   }
 };
 </script>

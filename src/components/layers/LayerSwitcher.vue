@@ -134,6 +134,7 @@ export default {
       _vm.overlays = this.$map.overlays;
       _vm.map = this.$map.map;
       _vm.show = true;
+      document.body.classList.add("aside-menu-show");
     });
     this.$map.$on("map-destroy", $event => {
       console.log("destroy map");
@@ -144,7 +145,9 @@ export default {
       this.map = null;
       this.baseLayers = null;
       this.overlays = null;
+      document.body.classList.remove("aside-menu-show");
     });
+    console.log(this);
   }
 };
 </script>

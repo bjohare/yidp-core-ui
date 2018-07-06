@@ -58,6 +58,7 @@
 <script>
 import nav from "../_nav";
 import {
+  AsideToggler,
   Header as AppHeader,
   SidebarToggler,
   Sidebar as AppSidebar,
@@ -67,7 +68,6 @@ import {
   SidebarMinimizer,
   SidebarNav,
   Aside as AppAside,
-  AsideToggler,
   Footer as TheFooter,
   Breadcrumb
 } from "@coreui/vue";
