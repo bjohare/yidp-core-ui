@@ -14,91 +14,104 @@
     </div>
     <div v-show="show">
       <b-list-group  class="list-group-accent">
-        <b-list-group-item class="list-group-item-accent-danger bg-light text-center font-weight-bold text-muted text-uppercase small">
+        <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-muted text-uppercase small">
           <div v-b-toggle.baseLayers>
-            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left"></i>
-            <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left"></i>
+            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
+            <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
           </div>
           Base Layers
         </b-list-group-item>
         <b-collapse id="baseLayers" visible>
           <b-list-group-item v-for="(item, index) in baseLayers" :key="item.name + index"
             class="list-group-item-accent-primary list-group-item-divider">
-            <div><strong>{{ item.name }}</strong>
-              <label class="switch switch-sm float-right switch-pill switch-success">
+            <div class="layer-name"><strong>{{ item.name }}</strong>
+              <label class="switch switch-sm float-right switch-pill switch-primary mt-3">
                 <input type="checkbox" class="switch-input" v-model="item.checked" @click="toggleLayer(item, index)">
                 <span class="switch-slider"></span>
               </label>
-            </div>
-            <div class="mt-1">
               <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
                 @drag-end="setLayerOpacity(item)">
               </app-slider>
             </div>
+            <!-- <div class="mt-1">
+
+            </div> -->
           </b-list-group-item>
         </b-collapse>
-
         <hr class="transparent mx-3 my-0">
-        <b-list-group-item class="list-group-item-accent-danger bg-light text-center font-weight-bold text-muted text-uppercase small">
+        <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-muted text-uppercase small">
           <div v-b-toggle.defaultOverlays>
-            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left"></i>
-          <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left"></i>
+            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
+            <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
           </div>
           Default Overlays
         </b-list-group-item>
         <b-collapse id="defaultOverlays" visible>
-          <b-list-group-item v-for="(item, index) in overlays" :key="item.name + index"
+          <b-list-group-item v-for="(item, index) in wmsOverlays" :key="item.name + index"
           class="list-group-item-accent-success list-group-item-divider">
-            <div><strong>{{ item.name }}</strong>
-              <label class="switch switch-sm float-right switch-pill switch-success">
+            <div class="layer-name"><strong>{{ item.name }}</strong>
+              <label class="switch switch-sm float-right switch-pill switch-success mt-3">
                 <input type="checkbox" class="switch-input" checked @click="toggleLayer(item, index)">
                 <span class="switch-slider"></span>
               </label>
-            </div>
-            <div>
-              <app-slider v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
+              <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
                 @drag-end="setLayerOpacity(item)">
               </app-slider>
             </div>
+            <!-- <div>
+
+            </div> -->
           </b-list-group-item>
         </b-collapse>
         <hr class="transparent mx-3 my-0">
-        <b-list-group-item class="list-group-item-accent-danger bg-light text-center font-weight-bold text-muted text-uppercase small">
+        <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-muted text-uppercase small">
           <div v-b-toggle.overlays>
-            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left"></i>
-            <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left"></i>
+            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
+            <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
           </div>
           Other Overlays
-          <i style="cursor: pointer;" class="fa fa-cog fa-lg float-right"></i>
+          <b-dropdown class="float-right" variant="secondar p-1" right>
+              <template slot="button-content">
+                <i class="fa fa-cog fa-lg"></i>
+              </template>
+              <b-dropdown-item v-b-modal.layerPicker >Add Overlays</b-dropdown-item>
+           </b-dropdown>
         </b-list-group-item>
         <b-collapse id="overlays" visible>
-          other overlays here..
+         <app-layer-group :wfsOverlays="wfsOverlays" :toggleLayer="toggleLayer">
+         </app-layer-group>
         </b-collapse>
       </b-list-group>
     </div>
+    <app-layer-picker @selected="loadWFSOverlays"></app-layer-picker>
   </div>
 
 </template>
 
 <script>
 import appSlider from "vue-slider-component";
+import appLayerPicker from "./LayerPicker.vue";
+import appLayerGroup from "./LayerGroup.vue";
+import { loadVectors } from "../map/wfs";
 export default {
   data() {
     return {
       show: false,
       map: null,
       baseLayers: null,
-      overlays: null,
+      wmsOverlays: null,
+      wfsOverlays: null,
       geonodeMaps: [],
       slider: {
         value: 1,
         min: 0,
         max: 1,
         interval: 0.1,
-        dotSize: 15,
+        height: 5,
+        width: 200,
+        dotSize: 13,
         clickable: false,
-        tooltip: false,
-        disabled: true
+        tooltip: false
       }
     };
   },
@@ -122,32 +135,39 @@ export default {
     setLayerOpacity(item) {
       const layer = item.layer;
       layer.setOpacity(item.opacity);
+    },
+    loadWFSOverlays(selected) {
+      loadVectors(this, selected);
     }
   },
   components: {
-    appSlider
+    appSlider,
+    appLayerPicker,
+    appLayerGroup
   },
-  created() {
+  mounted() {
     const _vm = this;
+    // triggered when WMS base layers are added to the map
     this.$map.$on("layers-added", $event => {
       _vm.baseLayers = this.$map.baseLayers;
-      _vm.overlays = this.$map.overlays;
+      _vm.wmsOverlays = this.$map.wmsOverlays;
       _vm.map = this.$map.map;
       _vm.show = true;
-      document.body.classList.add("aside-menu-show");
+    });
+    // triggered when WFS selected layers are added to the map
+    this.$map.$on("overlays-added", $event => {
+      _vm.wfsOverlays = this.$map.wfsOverlays;
     });
     this.$map.$on("map-destroy", $event => {
-      console.log("destroy map");
       _vm.map = null;
       _vm.baseLayers = null;
+      _vm.wmsOverlays = null;
       _vm.overlays = null;
       _vm.show = false;
       this.map = null;
       this.baseLayers = null;
       this.overlays = null;
-      document.body.classList.remove("aside-menu-show");
     });
-    console.log(this);
   }
 };
 </script>
@@ -155,5 +175,8 @@ export default {
 .collapsed > .open,
 :not(.collapsed) > .closed {
   display: none;
+}
+.layer-name {
+  font-size: 0.9em;
 }
 </style>

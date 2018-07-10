@@ -9,7 +9,7 @@ const yidpAxios = axios.create({
 });
 
 const geoserverAxios = axios.create({
-  baseURL: "http://yidp-geonode.geoweb.io/geoserver",
+  baseURL: "http://yidp-geonode.geoweb.io",
   auth: {
     username: "admin",
     password: "geoserver"

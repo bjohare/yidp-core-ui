@@ -9,6 +9,7 @@ import BootstrapVue from "bootstrap-vue";
 import App from "./App";
 import router from "./router";
 import VueAxios from "vue-axios";
+import VueTruncate from "vue-truncate-filter";
 import axios from "axios";
 import moment from "moment";
 
@@ -19,6 +20,7 @@ import store from "@/store/store";
 
 Vue.use(BootstrapVue);
 Vue.use(VueAxios, axios);
+Vue.use(VueTruncate);
 
 Vue.filter("format-date", function(value) {
   if (!value) return "";
@@ -42,7 +44,8 @@ Vue.filter("capitalize", function(value) {
 const EventBus = new Vue({
   map: null,
   baseLayers: [],
-  overlays: []
+  wmsOverlays: [],
+  wfsOverlays: []
 });
 
 // event bus to handle cross-component map access

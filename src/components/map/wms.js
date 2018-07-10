@@ -7,8 +7,8 @@ export const initMap = vm => {
   vm.$map.map = L.map("map").setView(vm.center, vm.zoom);
 };
 
-const fetchGeonodeLayers = async vm => {
-  return vm.$store.dispatch("map/fetchGeonodeLayers", vm);
+const fetchGeonodeWMSLayers = async vm => {
+  return vm.$store.dispatch("map/fetchGeonodeWMSLayers", vm);
 };
 
 L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
@@ -63,7 +63,7 @@ export const loadWMSLayers = async vm => {
       enabled: false
     }
   ];
-  const layers = await fetchGeonodeLayers(vm);
+  const layers = await fetchGeonodeWMSLayers(vm);
   let wmsLayers = [];
   const queryLayers = [];
   const wmsUrl = vm.wmsBaseUrl;
@@ -94,7 +94,7 @@ export const loadWMSLayers = async vm => {
         .setZIndex(zIndex)
     });
   }
-  vm.$map.overlays = wmsLayers;
+  vm.$map.wmsOverlays = wmsLayers;
   vm.$map.baseLayers = baseLayers;
   vm.triggerLayersAdded();
 
@@ -110,5 +110,5 @@ export const loadWMSLayers = async vm => {
 const resetGlobalMapBus = map => {
   map.map = null;
   map.baseLayers = null;
-  map.overlays = null;
+  map.wmsOverlays = null;
 };

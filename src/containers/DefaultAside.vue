@@ -1,13 +1,11 @@
 <template>
   <b-tabs>
-    <div v-show="showLayersTab">
-      <b-tab>
-        <template slot="title">
-          <i class='icon-layers'></i>
-        </template>
-        <app-layer-switcher></app-layer-switcher>
-      </b-tab>
-    </div>
+    <b-tab>
+      <template slot="title">
+        <i class='icon-layers'></i>
+      </template>
+      <app-layer-switcher></app-layer-switcher>
+    </b-tab>
     <b-tab>
       <template slot="title">
         <i class='fa fa-info fa-lg'></i>

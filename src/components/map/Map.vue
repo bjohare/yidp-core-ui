@@ -1,9 +1,7 @@
 <template>
   <div  class="animated fadeIn map-container">
     <app-spinner :loading="loading"></app-spinner>
-    <keep-alive>
-      <app-map></app-map>
-    </keep-alive>
+    <app-map></app-map>
   </div>
 </template>
 
@@ -39,6 +37,10 @@ export default {
   },
   created() {
     this.setGeonodeMap();
+    document.body.classList.add("aside-menu-show");
+  },
+  destroyed() {
+    document.body.classList.remove("aside-menu-show");
   },
   beforeRouteLeave(to, from, next) {
     this.$map.$emit("map-destroy");

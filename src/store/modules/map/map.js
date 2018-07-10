@@ -9,32 +9,43 @@ const state = {
   maxExtent: [41, 12, 55, 19],
   wmsBaseUrl: geoserverEndpoints.wmsBaseUrl,
   geonodeMap: null,
-  geonodeLayers: [],
+  geonodeWMSLayers: [],
+  geonodeWFSLayers: [],
+  geonodeCategories: [],
   baseLayers: [],
   overlays: []
 };
 
 const mutations = {
+  // the map title
   title(state, title) {
     state.title = title;
   },
+  // map base layers
+  baseLayers(state, layers) {
+    state.baseLayers = layers;
+  },
+  // the current geonode map
   geonodeMap(state, map) {
     state.geonodeMap = map;
   },
-  geonodeLayers(state, layers) {
-    state.geonodeLayers = layers;
+  // default geonode wms layers
+  geonodeWMSLayers(state, layers) {
+    state.geonodeWMSLayers = layers;
+  },
+  // selcted geonode wfs layers
+  geonodeWFSLayers(state, layers) {
+    state.geonodeWFSLayers = layers;
+  },
+  // the list of available geonode categories
+  geonodeCategories(state, categories) {
+    state.geonodeCategories = categories;
   },
   zoom(state, zoom) {
     state.zoom = zoom;
   },
   center(state, center) {
     state.center = center;
-  },
-  baseLayers(state, layers) {
-    state.baseLayers = layers;
-  },
-  overlays(state, layers) {
-    state.overlays = layers;
   }
 };
 
@@ -45,8 +56,14 @@ const getters = {
   getGeonodeMap(state) {
     return state.geonodeMap;
   },
-  getGeonodeLayers(state) {
-    return state.geonodeLayers;
+  getGeonodeWMSLayers(state) {
+    return state.geonodeWMSLayers;
+  },
+  getGeonodeCategories(state, dispatch) {
+    return state.geonodeCategories;
+  },
+  getGeonodeWFSLayers(state) {
+    return state.geonodeWFSLayers;
   }
 };
 

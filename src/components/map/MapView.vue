@@ -9,7 +9,7 @@ import WMSGetFeatureInfo from "ol/format/WMSGetFeatureInfo";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 // import * as methods from "./methods";
-import { initMap, loadWMSLayers } from "./wms_map_leaflet";
+import { initMap, loadWMSLayers } from "./wms";
 import appOverlay from "./Overlay.vue";
 
 import { mapState } from "vuex";
@@ -61,6 +61,9 @@ export default {
     },
     triggerLayersAdded() {
       this.$map.$emit("layers-added");
+    },
+    triggerWFSLayersAdded() {
+      this.$map.$emit("overlays-added");
     }
   },
   components: {
