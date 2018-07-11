@@ -52,7 +52,7 @@ export const loadVectors = async (vm, selected) => {
         name: layer.title,
         layer: lyr,
         enabled: true,
-        checked: "checked",
+        checked: true,
         opacity: 1
       };
       subLayers.push(subLayer);
@@ -64,7 +64,7 @@ export const loadVectors = async (vm, selected) => {
       layers: subLayers,
       enabled: true,
       opacity: 1,
-      checked: "chedked"
+      checked: true
     };
     wfsOverlays.push(layerGroup);
   }

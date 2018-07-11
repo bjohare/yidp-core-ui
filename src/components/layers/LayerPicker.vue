@@ -4,9 +4,9 @@
         Select a category below..
           <b-row v-for="(sub, index) in categoryGrid" :key="index">
               <b-col v-for="(category, idx) in sub" :key="idx" class="m-1">
-                  <b-list-group-item button @click="selectLayer(category, $event)">
+                  <b-list-group-item button @click="selectLayer(category, $event)" :disabled="category.layers_count === 0">
                     <i class="fa fa-lg" :class="category.fa_class"></i><span class="ml-3">{{ category.gn_description }}</span>
-                    <br/><h5><b-badge variant="success" pill>{{ category.layers_count}} Layers</b-badge></h5>
+                    <br/><h5><b-badge :variant="category.layers_count === 0 ? 'secondary' : 'success'" pill>{{ category.layers_count}} Layers</b-badge></h5>
                     <!-- <b-form-checkbox type="checkbox" name="layer" :value="category.id" class="mr-2 mt-10"/> -->
                   </b-list-group-item>
               </b-col>
@@ -41,7 +41,6 @@ export default {
         }
         sub.push(category);
       });
-      console.log(grid);
       return grid;
     }
   },
@@ -75,10 +74,8 @@ export default {
 };
 </script>
 
-<style>
-@media (min-width: 992px) {
-  .modal-lg {
-    max-width: 1024px !important;
-  }
+<style scoped>
+.list-group-item.disabled {
+  background-color: #f7f4f4;
 }
 </style>

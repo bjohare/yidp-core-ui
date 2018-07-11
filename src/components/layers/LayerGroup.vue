@@ -1,28 +1,30 @@
 <template>
-  <div>
+  <div v-if="show">
     <b-list-group-item v-for="(group, index) in wfsOverlays" :key="group.name + index"
         class="list-group-item-accent-success list-group-item-divider">
-      <div v-b-toggle.wmsOverlays>
+      <div v-b-toggle="'wmsOverlays-' + index">
         <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-sm float-left mr-3"></i>
         <i style="cursor: pointer;" class="open fa fa-chevron-up fa-sm float-left mr-3"></i>
       </div>
       <div class="mb-2"><strong>{{ group.name | truncate(32) }}</strong>
         <label class="switch switch-sm float-right switch-pill switch-primary">
-          <input type="checkbox" class="switch-input" checked @click="toggleLayer(group, index)">
+          <input type="checkbox" class="switch-input" v-model="group.checked" @click="toggleGroup(group)">
           <span class="switch-slider"></span>
         </label>
       </div>
-      <b-collapse id="wmsOverlays">
-        <b-list-group-item class="sub" v-for="(layer, idx) in group.layers" :key="layer.name + idx">
-          <div class="text-left small"><strong>{{ layer.name }}</strong>
-            <label class="switch switch-sm float-right switch-pill switch-success mt-3">
-              <input type="checkbox" class="switch-input" checked @click="toggleLayer(layer, idx)">
+      <b-collapse :id="'wmsOverlays-' + index" visible>
+        <b-list-group-item class="sub" v-for="(layer, idx) in group.layers" :key="layer.name + idx"
+        :disabled="!group.enabled">
+          <div class="text-left small"><strong>{{ layer.name }}</strong></div>
+            <label class="switch switch-sm switch-success ml-2">
+              <input ref="switch" type="checkbox" class="switch-input" v-model="layer.checked" @click="toggleLayer(layer)"
+              :disabled="!group.enabled">
               <span class="switch-slider"></span>
             </label>
-            <app-slider ref="opacity" v-model="layer.opacity" v-bind="slider" :disabled="!layer.enabled"
-              @drag-end="setLayerOpacity(layer)">
+            <app-slider ref="opacity" v-model="layer.opacity" v-bind="slider" :disabled="!layer.enabled || !group.enabled"
+              @drag-end="setLayerOpacity(layer)" class="float-left">
             </app-slider>
-          </div>
+            <div>Group: {{ group.enabled }}, Layer: {{ layer.enabled }}</div>
         </b-list-group-item>
       </b-collapse>
      </b-list-group-item>
@@ -32,7 +34,7 @@
 <script>
 import appSlider from "vue-slider-component";
 export default {
-  props: ["wfsOverlays", "toggleLayer"],
+  props: ["wfsOverlays", "toggleLayer", "show"],
   data() {
     return {
       slider: {
@@ -43,10 +45,19 @@ export default {
         height: 5,
         width: 150,
         dotSize: 13,
-        clickable: false,
-        tooltip: false
+        clickable: true,
+        tooltip: false,
+        debug: true,
+        bgStyle: {
+          backgroundColor: "red;"
+        }
       }
     };
+  },
+  computed: {
+    map() {
+      return this.$map.map;
+    }
   },
   components: {
     appSlider
@@ -56,6 +67,26 @@ export default {
       console.log(lyr);
       const layer = lyr.layer;
       layer.setStyle({ opacity: lyr.opacity, fillOpacity: lyr.opacity });
+    },
+    toggleGroup(item) {
+      const layer = item.layer;
+      if (!this.map.hasLayer(layer)) {
+        layer.setZIndex(layer.options.zIndex);
+        this.map.addLayer(layer);
+        item.layers.forEach(lyr => {
+          if (lyr.enabled) {
+            this.map.addLayer(lyr.layer);
+          } else {
+            this.map.removeLayer(lyr.layer);
+          }
+        });
+        item.enabled = true;
+        item.checked = true;
+      } else {
+        this.map.removeLayer(layer);
+        item.enabled = false;
+        item.checked = false;
+      }
     }
   }
 };
@@ -67,6 +98,7 @@ export default {
   display: none;
 }
 .list-group-item.sub {
-  padding: 0.5rem 0.75rem;
+  padding: 0.2rem 0.2rem 0rem 0.1rem;
+  border: none;
 }
 </style>

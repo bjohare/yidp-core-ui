@@ -26,7 +26,7 @@
             class="list-group-item-accent-primary list-group-item-divider">
             <div class="layer-name"><strong>{{ item.name }}</strong>
               <label class="switch switch-sm float-right switch-pill switch-primary mt-3">
-                <input type="checkbox" class="switch-input" v-model="item.checked" @click="toggleLayer(item, index)">
+                <input type="checkbox" class="switch-input" v-model="item.checked" @click="toggleLayer(item)">
                 <span class="switch-slider"></span>
               </label>
               <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
@@ -50,8 +50,8 @@
           <b-list-group-item v-for="(item, index) in wmsOverlays" :key="item.name + index"
           class="list-group-item-accent-success list-group-item-divider">
             <div class="layer-name"><strong>{{ item.name }}</strong>
-              <label class="switch switch-sm float-right switch-pill switch-success mt-3">
-                <input type="checkbox" class="switch-input" checked @click="toggleLayer(item, index)">
+              <label class="switch switch-sm float-right switch-pill switch-primary mt-3">
+                <input type="checkbox" class="switch-input" checked @click="toggleLayer(item)">
                 <span class="switch-slider"></span>
               </label>
               <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
@@ -78,8 +78,8 @@
            </b-dropdown>
         </b-list-group-item>
         <b-collapse id="overlays" visible>
-         <app-layer-group :wfsOverlays="wfsOverlays" :toggleLayer="toggleLayer">
-         </app-layer-group>
+          <app-spinner :loading="loading"></app-spinner>
+          <app-layer-group :wfsOverlays="wfsOverlays" :toggleLayer="toggleLayer" :show="!loading"></app-layer-group>
         </b-collapse>
       </b-list-group>
     </div>
@@ -90,12 +90,14 @@
 
 <script>
 import appSlider from "vue-slider-component";
+import appSpinner from "@/components/shared/Spinner.vue";
 import appLayerPicker from "./LayerPicker.vue";
 import appLayerGroup from "./LayerGroup.vue";
 import { loadVectors } from "../map/wfs";
 export default {
   data() {
     return {
+      loading: false,
       show: false,
       map: null,
       baseLayers: null,
@@ -121,15 +123,17 @@ export default {
     }
   },
   methods: {
-    toggleLayer(item, index) {
+    toggleLayer(item) {
       const layer = item.layer;
       if (!this.map.hasLayer(layer)) {
         layer.setZIndex(layer.options.zIndex);
         this.map.addLayer(layer);
         item.enabled = true;
+        item.checked = true;
       } else {
         this.map.removeLayer(layer);
         item.enabled = false;
+        item.checked = false;
       }
     },
     setLayerOpacity(item) {
@@ -137,15 +141,18 @@ export default {
       layer.setOpacity(item.opacity);
     },
     loadWFSOverlays(selected) {
+      this.loading = true;
       loadVectors(this, selected);
     }
   },
   components: {
     appSlider,
+    appSpinner,
     appLayerPicker,
     appLayerGroup
   },
   mounted() {
+    this.loading = false;
     const _vm = this;
     // triggered when WMS base layers are added to the map
     this.$map.$on("layers-added", $event => {
@@ -157,6 +164,7 @@ export default {
     // triggered when WFS selected layers are added to the map
     this.$map.$on("overlays-added", $event => {
       _vm.wfsOverlays = this.$map.wfsOverlays;
+      this.loading = false;
     });
     this.$map.$on("map-destroy", $event => {
       _vm.map = null;
