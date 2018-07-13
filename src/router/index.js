@@ -8,7 +8,7 @@ import DefaultContainer from "@/containers/DefaultContainer";
 // import Dashboard from '@/views/Dashboard'
 import Dashboard from "@/components/Dashboard.vue";
 import Map from "@/components/map/Map.vue";
-import Maps from "@/components/maps/Maps.vue";
+import BaseMaps from "@/components/basemaps/BaseMaps.vue";
 
 // import Colors from "@/views/theme/Colors";
 // import Typography from "@/views/theme/Typography";
@@ -83,14 +83,13 @@ export default new Router({
         {
           path: "/maps",
           name: "Maps",
-          component: Maps
+          component: BaseMaps
         },
         {
           path: "/map/:id",
           name: "map",
           component: Map,
           beforeEnter(to, from, next) {
-            console.log("Before map enter..");
             if (!store.getters["authentication/getUserProfile"]) {
               next("/account/login");
             } else {

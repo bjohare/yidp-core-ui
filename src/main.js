@@ -43,6 +43,7 @@ Vue.filter("capitalize", function(value) {
 
 const EventBus = new Vue({
   map: null,
+  userMap: null,
   baseLayers: [],
   wmsOverlays: [],
   wfsOverlays: []

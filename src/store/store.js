@@ -4,8 +4,8 @@ import createPersistedState from "vuex-persistedstate";
 
 import * as actions from "./actions";
 import authentication from "./modules/authentication/authentication";
-import map from "./modules/map/map";
-import maps from "./modules/maps/maps";
+import geonode from "./modules/geonode/geonode";
+import usermaps from "./modules/usermaps/usermaps";
 
 Vue.use(Vuex);
 
@@ -16,8 +16,8 @@ export default new Vuex.Store({
   actions, // modularized
   modules: {
     authentication,
-    map,
-    maps
+    geonode,
+    usermaps
   },
   plugins: [createPersistedState()]
 });

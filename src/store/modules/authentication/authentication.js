@@ -37,7 +37,6 @@ const actions = {
       username: payload.username,
       password: payload.password
     });
-    console.log(result);
     commit("accessToken", result.data.data.token);
     try {
       const response = await dispatch("fetchUserData");

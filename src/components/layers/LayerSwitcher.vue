@@ -74,7 +74,7 @@
               <template slot="button-content">
                 <i class="fa fa-cog fa-lg"></i>
               </template>
-              <b-dropdown-item v-b-modal.layerPicker >Add Overlays</b-dropdown-item>
+              <b-dropdown-item v-b-modal.layerPicker>Add / Remove Overlays</b-dropdown-item>
            </b-dropdown>
         </b-list-group-item>
         <b-collapse id="overlays" visible>
@@ -83,7 +83,9 @@
         </b-collapse>
       </b-list-group>
     </div>
-    <app-layer-picker @selected="loadWFSOverlays"></app-layer-picker>
+    <app-layer-picker ref="layerPicker" @selected="loadWFSOverlays"
+      v-if="userMap" :userMap="userMap" :selected="selected">
+    </app-layer-picker>
   </div>
 
 </template>
@@ -100,6 +102,7 @@ export default {
       loading: false,
       show: false,
       map: null,
+      userMap: null,
       baseLayers: null,
       wmsOverlays: null,
       wfsOverlays: null,
@@ -119,7 +122,15 @@ export default {
   },
   computed: {
     maps() {
-      return this.$store.getters["maps/getGeonodeMaps"];
+      return this.$store.getters["geonode/getGeonodeMaps"];
+    },
+    selected() {
+      const selected = [];
+      const selectedCategories = this.userMap.selectedCategories;
+      selectedCategories.forEach(category => {
+        selected.push(category.identifier);
+      });
+      return selected;
     }
   },
   methods: {
@@ -141,6 +152,11 @@ export default {
       layer.setOpacity(item.opacity);
     },
     loadWFSOverlays(selected) {
+      const payload = {
+        mapId: this.userMap.id,
+        selected
+      };
+      this.$store.dispatch("usermaps/saveSelectedCategories", payload);
       this.loading = true;
       loadVectors(this, selected);
     }
@@ -151,9 +167,13 @@ export default {
     appLayerPicker,
     appLayerGroup
   },
-  mounted() {
+  created() {
     this.loading = false;
     const _vm = this;
+    this.$map.$on("map-init", $event => {
+      _vm.userMap = this.$map.userMap;
+      loadVectors(_vm, _vm.userMap.selectedCategories);
+    });
     // triggered when WMS base layers are added to the map
     this.$map.$on("layers-added", $event => {
       _vm.baseLayers = this.$map.baseLayers;
@@ -171,6 +191,7 @@ export default {
       _vm.baseLayers = null;
       _vm.wmsOverlays = null;
       _vm.overlays = null;
+      _vm.userMap = null;
       _vm.show = false;
       this.map = null;
       this.baseLayers = null;

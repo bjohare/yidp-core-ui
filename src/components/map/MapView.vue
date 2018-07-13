@@ -12,28 +12,13 @@ import axios from "axios";
 import { initMap, loadWMSLayers } from "./wms";
 import appOverlay from "./Overlay.vue";
 
-import { mapState } from "vuex";
-
 export default {
+  props: ["userMap"],
   data() {
     return {
-      map: null,
-      layers: [],
-      maxExtent: [35, 10, 66, 28],
       info: null,
       showPopover: false
     };
-  },
-  computed: {
-    ...mapState("map", {
-      mapTitle: state => state.title,
-      wmsBaseUrl: state => state.wmsBaseUrl,
-      geonodeMap: state => state.map,
-      zoom: state => state.zoom,
-      center: state => state.center,
-      minZoom: state => state.minZoom,
-      maxZoom: state => state.maxZoom
-    })
   },
   methods: {
     async showGetFeatureInfo(url, coordinate) {
@@ -72,6 +57,12 @@ export default {
   mounted() {
     this.initializeMap();
     this.loadInitalLayers();
+  },
+  created() {
+    const _vm = this;
+    this.$map.$on("map-destroy", $event => {
+      _vm.$map.userMap = null;
+    });
   }
 };
 </script>

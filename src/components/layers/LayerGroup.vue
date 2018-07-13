@@ -16,7 +16,8 @@
         <b-list-group-item class="sub" v-for="(layer, idx) in group.layers" :key="layer.name + idx"
         :disabled="!group.enabled">
           <div class="text-left small"><strong>{{ layer.name }}</strong></div>
-            <label class="switch switch-sm switch-success ml-2">
+          <div class="flex">
+            <label class="switch switch-sm switch-success ml-3">
               <input ref="switch" type="checkbox" class="switch-input" v-model="layer.checked" @click="toggleLayer(layer)"
               :disabled="!group.enabled">
               <span class="switch-slider"></span>
@@ -24,7 +25,8 @@
             <app-slider ref="opacity" v-model="layer.opacity" v-bind="slider" :disabled="!layer.enabled || !group.enabled"
               @drag-end="setLayerOpacity(layer)" class="float-left">
             </app-slider>
-            <div>Group: {{ group.enabled }}, Layer: {{ layer.enabled }}</div>
+            <i class="fa fa-cog fa-lg"></i>
+          </div>
         </b-list-group-item>
       </b-collapse>
      </b-list-group-item>

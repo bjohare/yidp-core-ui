@@ -1,42 +1,34 @@
 <template>
   <div  class="animated fadeIn map-container">
-    <app-spinner :loading="loading"></app-spinner>
-    <app-map></app-map>
+    <app-spinner :loadin="loading"></app-spinner>
+      <app-map :userMap="userMap"></app-map>
   </div>
 </template>
 
 <script>
-import OLMap from "./MapView.vue";
+import appMap from "./MapView.vue";
 import appSpinner from "@/components/shared/Spinner.vue";
 
 export default {
   data() {
     return {
-      loading: false
+      loading: false,
+      userMap: null
     };
   },
   components: {
-    appMap: OLMap,
+    appMap,
     appSpinner
   },
   methods: {
-    async setGeonodeMap() {
+    async loadUserMap() {
       const id = this.$route.params.id;
-      let maps = this.$store.getters["maps/getGeonodeMaps"];
-      if (maps.length === 0) {
-        this.loading = true;
-        await this.$store.dispatch("maps/fetchGeonodeMaps");
-        this.loading = false;
-      }
-      maps = this.$store.getters["maps/getGeonodeMaps"];
-      const map = maps.filter(m => {
-        return m.id === Number.parseInt(id);
-      })[0];
-      this.$store.dispatch("map/setGeonodeMap", map);
+      this.userMap = this.$store.getters["usermaps/getUserMap"](id);
+      // what to do here if we don't have a map? -- 404..
     }
   },
   created() {
-    this.setGeonodeMap();
+    this.loadUserMap();
     document.body.classList.add("aside-menu-show");
   },
   destroyed() {
@@ -44,6 +36,7 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     this.$map.$emit("map-destroy");
+    // this.$store.dispatch("usermaps/saveUserMap", this.$store.state.map);
     next();
   }
 };

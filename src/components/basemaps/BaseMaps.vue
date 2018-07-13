@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import MapCard from "../maps/MapCard.vue";
+import MapCard from "./MapCard.vue";
 import appSpinner from "@/components/shared/Spinner.vue";
 
 export default {
@@ -21,7 +21,7 @@ export default {
   },
   computed: {
     maps() {
-      return this.$store.getters["maps/getGeonodeMaps"];
+      return this.$store.getters["geonode/getGeonodeMaps"];
     }
   },
   components: {
@@ -31,7 +31,10 @@ export default {
   methods: {
     async fetchGeonodeMaps() {
       this.loading = true;
-      await this.$store.dispatch("maps/fetchGeonodeMaps");
+      const geonodeMaps = await this.$store.dispatch(
+        "geonode/fetchGeonodeMaps"
+      );
+      this.$store.dispatch("usermaps/syncUserMaps", geonodeMaps);
       this.loading = false;
     }
   },

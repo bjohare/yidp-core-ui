@@ -1,22 +1,23 @@
 <template>
   <b-container>
-      <b-modal id="layerPicker" v-bind="modal" @ok="addLayers">
-        Select a category below..
-          <b-row v-for="(sub, index) in categoryGrid" :key="index">
-              <b-col v-for="(category, idx) in sub" :key="idx" class="m-1">
-                  <b-list-group-item button @click="selectLayer(category, $event)" :disabled="category.layers_count === 0">
-                    <i class="fa fa-lg" :class="category.fa_class"></i><span class="ml-3">{{ category.gn_description }}</span>
-                    <br/><h5><b-badge :variant="category.layers_count === 0 ? 'secondary' : 'success'" pill>{{ category.layers_count}} Layers</b-badge></h5>
-                    <!-- <b-form-checkbox type="checkbox" name="layer" :value="category.id" class="mr-2 mt-10"/> -->
-                  </b-list-group-item>
-              </b-col>
-          </b-row>
-      </b-modal>
+    <b-modal id="layerPicker" v-bind="modal" @ok="addLayers">
+      Select a category below..
+        <b-row v-for="(sub, index) in categoryGrid" :key="index">
+            <b-col v-for="(category, idx) in sub" :key="idx" class="m-1">
+                <b-list-group-item button @click="selectLayer(category, $event)" :disabled="category.layers_count === 0"
+                :active="isSelected(category.identifier)">
+                  <i class="fa fa-lg" :class="category.fa_class"></i><span class="ml-3">{{ category.gn_description }}</span>
+                  <br/><h5><b-badge :variant="variant(category.layers_count)" pill>{{ category.layers_count}} Layers</b-badge></h5>
+                </b-list-group-item>
+            </b-col>
+        </b-row>
+    </b-modal>
   </b-container>
 </template>
 
 <script>
 export default {
+  props: ["userMap", "selected"],
   data() {
     return {
       modal: {
@@ -47,12 +48,15 @@ export default {
   methods: {
     async fetchGeonodeCategories() {
       const categories = await this.$store.dispatch(
-        "map/fetchGeonodeCategories",
+        "geonode/fetchGeonodeCategories",
         this
       );
       this.categories = categories;
     },
-    selectLayer(category, event) {
+    variant(count) {
+      return count === 0 ? "secondary" : "success";
+    },
+    selectLayer(category) {
       if (!this.selectedLayers.has(category)) {
         this.selectedLayers.add(category);
       } else {
@@ -61,11 +65,10 @@ export default {
       event.currentTarget.classList.toggle("active");
     },
     async addLayers() {
-      let selected = [];
-      this.selectedLayers.forEach(value => {
-        selected.push(value);
-      });
-      this.$emit("selected", selected);
+      this.$emit("selected", Array.from(this.selectedLayers));
+    },
+    isSelected(category) {
+      return this.selected.indexOf(category) !== -1;
     }
   },
   created() {

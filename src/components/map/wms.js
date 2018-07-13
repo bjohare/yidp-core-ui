@@ -4,11 +4,13 @@ import { geoserverAxios } from "../../store/axios";
 
 export const initMap = vm => {
   resetGlobalMapBus(vm.$map);
-  vm.$map.map = L.map("map").setView(vm.center, vm.zoom);
+  vm.$map.userMap = vm.userMap;
+  vm.$map.map = L.map("map").setView(vm.userMap.center, vm.userMap.zoom);
+  vm.$map.$emit("map-init");
 };
 
 const fetchGeonodeWMSLayers = async vm => {
-  return vm.$store.dispatch("map/fetchGeonodeWMSLayers", vm);
+  return vm.$store.dispatch("geonode/fetchGeonodeWMSLayers", vm);
 };
 
 L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
@@ -66,8 +68,7 @@ export const loadWMSLayers = async vm => {
   const layers = await fetchGeonodeWMSLayers(vm);
   let wmsLayers = [];
   const queryLayers = [];
-  const wmsUrl = vm.wmsBaseUrl;
-  console.log(wmsUrl);
+  const wmsUrl = vm.userMap.wmsBaseUrl;
   let zIndex = 400;
   for (let idx in layers) {
     zIndex++;
@@ -80,8 +81,8 @@ export const loadWMSLayers = async vm => {
       FORMAT: "image/png",
       TRANSPARENT: "true",
       TILED: true,
-      minZoom: vm.minZoom,
-      maxZoom: vm.maxZoom
+      minZoom: vm.userMap.minZoom,
+      maxZoom: vm.userMap.maxZoom
     };
     wmsLayers.push({
       name: layer.title,
@@ -100,15 +101,17 @@ export const loadWMSLayers = async vm => {
 
   vm.$map.map.on("moveend", event => {
     const position = {
+      mapId: vm.userMap.id,
       zoom: event.target.getZoom(),
       center: event.target.getCenter()
     };
-    console.log(position);
+    vm.$store.dispatch("usermaps/saveMapPosition", position);
   });
 };
 
 const resetGlobalMapBus = map => {
   map.map = null;
+  map.userMap = null;
   map.baseLayers = null;
   map.wmsOverlays = null;
 };

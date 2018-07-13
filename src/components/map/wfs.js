@@ -1,16 +1,17 @@
 import * as L from "leaflet";
 
-import { geonodeAxios } from "../../store/axios";
+import { geoserverAxios } from "../../store/axios";
 
 export const fetchGeonodeWFSLayers = async (vm, selected) => {
   const payload = {
     vm,
     selected
   };
-  return vm.$store.dispatch("map/fetchGeonodeWFSLayers", payload);
+  return vm.$store.dispatch("geonode/fetchGeonodeWFSLayers", payload);
 };
 
 export const loadVectors = async (vm, selected) => {
+  // turn off previously selected layers..
   const layerGroups = await fetchGeonodeWFSLayers(vm, selected);
   const map = vm.$map.map;
   const rootUrl = "/geoserver/geonode/ows";
@@ -28,13 +29,12 @@ export const loadVectors = async (vm, selected) => {
     featureGroup.setZIndex(600);
     let subLayers = [];
     await layers.reduce(async (promise, layer) => {
+      await promise;
       var parameters = L.Util.extend(defaultParameters, {
         typeName: layer.typename
       });
-      console.log(parameters);
       const url = rootUrl + L.Util.getParamString(parameters);
-      console.log(url);
-      let result = await geonodeAxios.get(url);
+      let result = await geoserverAxios.get(url);
       var lyr = L.geoJson(result.data, {
         onEachFeature: function(feature, layer) {
           layer.bindPopup(
@@ -57,7 +57,6 @@ export const loadVectors = async (vm, selected) => {
       };
       subLayers.push(subLayer);
     }, Promise.resolve());
-    console.log(subLayers);
     let layerGroup = {
       name: group,
       layer: featureGroup,
