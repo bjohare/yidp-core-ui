@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-show="!show">
+    <div v-if="!show">
        <b-list-group class="list-group-accent">
         <b-list-group-item class="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
           Select a Map
@@ -12,7 +12,7 @@
         </b-list-group-item>
       </b-list-group>
     </div>
-    <div v-show="show">
+    <div v-if="show">
       <b-list-group  class="list-group-accent">
         <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-muted text-uppercase small">
           <div v-b-toggle.baseLayers>
@@ -21,7 +21,7 @@
           </div>
           Base Layers
         </b-list-group-item>
-        <b-collapse id="baseLayers" visible>
+        <b-collapse id="baseLayers" @shown="updateSliders">
           <b-list-group-item v-for="(item, index) in baseLayers" :key="item.name + index"
             class="list-group-item-accent-primary list-group-item-divider">
             <div class="layer-name"><strong>{{ item.name }}</strong>
@@ -46,7 +46,7 @@
           </div>
           Default Overlays
         </b-list-group-item>
-        <b-collapse id="defaultOverlays" visible>
+        <b-collapse id="defaultOverlays" visible @shown="updateSliders">
           <b-list-group-item v-for="(item, index) in wmsOverlays" :key="item.name + index"
           class="list-group-item-accent-success list-group-item-divider">
             <div class="layer-name"><strong>{{ item.name }}</strong>
@@ -77,18 +77,18 @@
               <b-dropdown-item v-b-modal.layerPicker>Add / Remove Overlays</b-dropdown-item>
            </b-dropdown>
         </b-list-group-item>
-        <b-collapse id="overlays" visible>
+        <b-collapse id="overlays" visible @shown="updateSliders">
           <div v-for="(group, index) in wfsOverlays" :key="group.name + index">
             <app-layer-group :group="group" :index="index" :toggleLayer="toggleLayer"></app-layer-group>
           </div>
         </b-collapse>
         <div class="loading" v-if="!overlaysLoaded">
-            <stretch :background="'#4DBD74'"></stretch>
+            <appSpinner :background="'#4DBD74'"></appSpinner>
         </div>
       </b-list-group>
     </div>
     <app-layer-picker ref="layerPicker" @selected="loadSelectedOverlays"
-      v-if="userMap" :userMap="userMap" :selected="selected">
+        v-if="userMap" :userMap="userMap" :selected="selected">
     </app-layer-picker>
   </div>
 
@@ -192,14 +192,18 @@ export default {
         this.overlaysLoaded = false;
         loadVectors(this, layersToLoad);
       }
+    },
+    updateSliders() {
+      this.$refs.opacity.forEach(slider => {
+        slider.refresh();
+      });
     }
   },
   components: {
     appSlider,
-    // appSpinner,
     appLayerPicker,
     appLayerGroup,
-    Stretch
+    appSpinner: Stretch
   },
   created() {
     const _vm = this;

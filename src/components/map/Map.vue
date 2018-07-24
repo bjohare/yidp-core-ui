@@ -1,6 +1,6 @@
 <template>
   <div  class="animated fadeIn map-container">
-    <app-spinner :loadin="loading"></app-spinner>
+    <app-spinner :loading="loading"></app-spinner>
     <app-map :userMap="userMap"></app-map>
   </div>
 </template>

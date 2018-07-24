@@ -11,7 +11,7 @@
         <span class="switch-slider"></span>
       </label>
     </div>
-    <b-collapse :id="'group-' + index" visible>
+    <b-collapse :id="'group-' + index" @shown="updateSliders">
       <b-list-group-item class="sub" v-for="(layer, idx) in group.layers" :key="layer.name + idx"
       :disabled="!group.enabled">
         <div class="text-left small"><strong>{{ layer.name }}</strong></div>
@@ -49,10 +49,10 @@ export default {
         dotSize: 13,
         clickable: true,
         tooltip: false,
-        debug: true,
-        bgStyle: {
-          backgroundColor: "red;"
-        }
+        debug: true
+        // bgStyle: {
+        //   backgroundColor: "red;"
+        // }
       }
     };
   },
@@ -88,6 +88,11 @@ export default {
         item.enabled = false;
         item.checked = false;
       }
+    },
+    updateSliders() {
+      this.$refs.opacity.forEach(slider => {
+        slider.refresh();
+      });
     }
   }
 };

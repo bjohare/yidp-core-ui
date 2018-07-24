@@ -18,7 +18,7 @@ export default {
 .loading {
   width: 100px;
   height: 100px;
-  position: relative;
+  position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
