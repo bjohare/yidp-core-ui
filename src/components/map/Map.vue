@@ -1,7 +1,7 @@
 <template>
   <div  class="animated fadeIn map-container">
     <app-spinner :loadin="loading"></app-spinner>
-      <app-map :userMap="userMap"></app-map>
+    <app-map :userMap="userMap"></app-map>
   </div>
 </template>
 
@@ -36,7 +36,6 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     this.$map.$emit("map-destroy");
-    // this.$store.dispatch("usermaps/saveUserMap", this.$store.state.map);
     next();
   }
 };

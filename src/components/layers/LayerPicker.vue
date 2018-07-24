@@ -4,7 +4,7 @@
       Select a category below..
         <b-row v-for="(sub, index) in categoryGrid" :key="index">
             <b-col v-for="(category, idx) in sub" :key="idx" class="m-1">
-                <b-list-group-item button @click="selectLayer(category, $event)" :disabled="category.layers_count === 0"
+                <b-list-group-item button @click="selectLayer(category)" :disabled="category.layers_count === 0"
                 :active="isSelected(category.identifier)">
                   <i class="fa fa-lg" :class="category.fa_class"></i><span class="ml-3">{{ category.gn_description }}</span>
                   <br/><h5><b-badge :variant="variant(category.layers_count)" pill>{{ category.layers_count}} Layers</b-badge></h5>
@@ -52,6 +52,12 @@ export default {
         this
       );
       this.categories = categories;
+      // set the pre-selected layers if any
+      this.categories.forEach(category => {
+        if (this.selected.indexOf(category.identifier) !== -1) {
+          this.selectedLayers.add(category);
+        }
+      });
     },
     variant(count) {
       return count === 0 ? "secondary" : "success";

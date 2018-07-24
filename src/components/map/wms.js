@@ -95,8 +95,8 @@ export const loadWMSLayers = async vm => {
         .setZIndex(zIndex)
     });
   }
-  vm.$map.wmsOverlays = wmsLayers;
-  vm.$map.baseLayers = baseLayers;
+  vm.$map.wmsOverlays.push(...wmsLayers);
+  vm.$map.baseLayers.push(...baseLayers);
   vm.triggerLayersAdded();
 
   vm.$map.map.on("moveend", event => {
@@ -112,6 +112,6 @@ export const loadWMSLayers = async vm => {
 const resetGlobalMapBus = map => {
   map.map = null;
   map.userMap = null;
-  map.baseLayers = null;
-  map.wmsOverlays = null;
+  map.baseLayers = [];
+  map.wmsOverlays = [];
 };

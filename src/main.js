@@ -14,6 +14,7 @@ import axios from "axios";
 import moment from "moment";
 
 import store from "@/store/store";
+import map from "@/components/map";
 
 // todo
 // cssVars()
@@ -41,19 +42,11 @@ Vue.filter("capitalize", function(value) {
 //   }
 // });
 
-const EventBus = new Vue({
-  map: null,
-  userMap: null,
-  baseLayers: [],
-  wmsOverlays: [],
-  wfsOverlays: []
-});
-
-// event bus to handle cross-component map access
+// initialize map event bus to handle cross-component map access
 Object.defineProperties(Vue.prototype, {
   $map: {
     get: function() {
-      return EventBus;
+      return map;
     }
   }
 });

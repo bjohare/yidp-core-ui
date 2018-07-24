@@ -78,12 +78,16 @@
            </b-dropdown>
         </b-list-group-item>
         <b-collapse id="overlays" visible>
-          <app-spinner :loading="!overlaysLoaded"></app-spinner>
-          <app-layer-group v-if="overlaysLoaded" :wfsOverlays="wfsOverlays" :toggleLayer="toggleLayer"></app-layer-group>
+          <div v-for="(group, index) in wfsOverlays" :key="group.name + index">
+            <app-layer-group :group="group" :index="index" :toggleLayer="toggleLayer"></app-layer-group>
+          </div>
         </b-collapse>
+        <div class="loading" v-if="!overlaysLoaded">
+            <stretch :background="'#4DBD74'"></stretch>
+        </div>
       </b-list-group>
     </div>
-    <app-layer-picker ref="layerPicker" @selected="loadWFSOverlays"
+    <app-layer-picker ref="layerPicker" @selected="loadSelectedOverlays"
       v-if="userMap" :userMap="userMap" :selected="selected">
     </app-layer-picker>
   </div>
@@ -92,20 +96,15 @@
 
 <script>
 import appSlider from "vue-slider-component";
-import appSpinner from "@/components/shared/Spinner.vue";
 import appLayerPicker from "./LayerPicker.vue";
 import appLayerGroup from "./LayerGroup.vue";
 import { loadVectors } from "../map/wfs";
+import { Stretch } from "vue-loading-spinner";
 export default {
   data() {
     return {
       overlaysLoaded: false,
       show: false,
-      map: null,
-      userMap: null,
-      baseLayers: null,
-      wmsOverlays: null,
-      wfsOverlays: null,
       geonodeMaps: [],
       slider: {
         value: 1,
@@ -131,6 +130,21 @@ export default {
         selected.push(category.identifier);
       });
       return selected;
+    },
+    map() {
+      return this.$map.map;
+    },
+    userMap() {
+      return this.$map.userMap;
+    },
+    baseLayers() {
+      return this.$map.baseLayers;
+    },
+    wmsOverlays() {
+      return this.$map.wmsOverlays;
+    },
+    wfsOverlays() {
+      return this.$map.wfsOverlays;
     }
   },
   methods: {
@@ -151,53 +165,58 @@ export default {
       const layer = item.layer;
       layer.setOpacity(item.opacity);
     },
-    loadWFSOverlays(selected) {
+    loadSelectedOverlays(selected) {
+      let layersToLoad = selected.slice(0);
+      this.$map.wfsOverlays.forEach(layer => {
+        let selection = selected.find(category => {
+          if (category.gn_description_en === layer.name) {
+            return category;
+          }
+        });
+        if (selection === undefined) {
+          // remove unselected layer
+          this.$map.removeWFSOverlay(layer);
+        } else {
+          // load any layers not already loaded
+          layersToLoad = layersToLoad.filter(lyr => {
+            return lyr.gn_description_en !== layer.name;
+          });
+        }
+      });
       const payload = {
         mapId: this.userMap.id,
         selected
       };
       this.$store.dispatch("usermaps/saveSelectedCategories", payload);
-      // this.overlaysLoaded = false;
-      loadVectors(this, selected);
+      if (layersToLoad) {
+        this.overlaysLoaded = false;
+        loadVectors(this, layersToLoad);
+      }
     }
   },
   components: {
     appSlider,
-    appSpinner,
+    // appSpinner,
     appLayerPicker,
-    appLayerGroup
+    appLayerGroup,
+    Stretch
   },
   created() {
-    this.overlaysLoaded = false;
     const _vm = this;
     this.$map.$on("map-init", $event => {
-      _vm.userMap = this.$map.userMap;
       loadVectors(_vm, _vm.userMap.selectedCategories);
     });
     // triggered when WMS base layers are added to the map
     this.$map.$on("layers-added", $event => {
-      _vm.baseLayers = this.$map.baseLayers;
-      _vm.wmsOverlays = this.$map.wmsOverlays;
-      _vm.map = this.$map.map;
       _vm.show = true;
     });
     // triggered when WFS selected layers are added to the map
     this.$map.$on("overlays-loaded", $event => {
-      _vm.wfsOverlays = this.$map.wfsOverlays;
       _vm.overlaysLoaded = true;
-      alert('overlays loaded');
     });
     this.$map.$on("map-destroy", $event => {
-      _vm.map = null;
-      _vm.baseLayers = null;
-      _vm.wmsOverlays = null;
-      _vm.overlays = null;
-      _vm.userMap = null;
       _vm.show = false;
       _vm.overlaysLoaded = false;
-      this.map = null;
-      this.baseLayers = null;
-      this.overlays = null;
     });
   }
 };
@@ -209,5 +228,20 @@ export default {
 }
 .layer-name {
   font-size: 0.9em;
+}
+.loading {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 1rem;
+}
+svg.spinner {
+  width: 60px !important;
+  height: 60px !important;
+  color: blue;
 }
 </style>

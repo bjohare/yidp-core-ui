@@ -47,9 +47,6 @@ export default {
     triggerLayersAdded() {
       this.$map.$emit("layers-added");
     }
-    // triggerWFSLayersAdded() {
-    //   this.$map.$emit("overlays-added");
-    // }
   },
   components: {
     appOverlay
@@ -59,9 +56,8 @@ export default {
     this.loadInitalLayers();
   },
   created() {
-    const _vm = this;
     this.$map.$on("map-destroy", $event => {
-      _vm.$map.userMap = null;
+      this.$map.resetMap();
     });
   }
 };

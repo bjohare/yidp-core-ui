@@ -11,11 +11,9 @@ export const fetchGeonodeWFSLayers = async (vm, selected) => {
 };
 
 export const loadVectors = async (vm, selected) => {
-  // TODO: turn off previously selected layers..
   const layerGroups = await fetchGeonodeWFSLayers(vm, selected);
-  const map = vm.$map.map;
+  // const map = vm.$map.map;
   const rootUrl = "/geoserver/geonode/ows";
-  const wfsOverlays = [];
   let defaultParameters = {
     service: "WFS",
     version: "1.0.0",
@@ -25,7 +23,7 @@ export const loadVectors = async (vm, selected) => {
   };
   for (let group in layerGroups) {
     const layers = layerGroups[group];
-    var featureGroup = L.featureGroup().addTo(map);
+    var featureGroup = L.featureGroup();
     featureGroup.setZIndex(600);
     let subLayers = [];
     await layers.reduce(async (promise, layer) => {
@@ -65,8 +63,7 @@ export const loadVectors = async (vm, selected) => {
       opacity: 1,
       checked: true
     };
-    wfsOverlays.push(layerGroup);
+    vm.$map.addWFSOverlay(layerGroup);
   }
-  vm.$map.wfsOverlays = wfsOverlays;
   vm.$map.$emit("overlays-loaded");
 };
