@@ -46,10 +46,10 @@ export default {
     },
     triggerLayersAdded() {
       this.$map.$emit("layers-added");
-    },
-    triggerWFSLayersAdded() {
-      this.$map.$emit("overlays-added");
     }
+    // triggerWFSLayersAdded() {
+    //   this.$map.$emit("overlays-added");
+    // }
   },
   components: {
     appOverlay

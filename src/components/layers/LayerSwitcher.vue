@@ -78,8 +78,8 @@
            </b-dropdown>
         </b-list-group-item>
         <b-collapse id="overlays" visible>
-          <app-spinner :loading="loading"></app-spinner>
-          <app-layer-group :wfsOverlays="wfsOverlays" :toggleLayer="toggleLayer" :show="!loading"></app-layer-group>
+          <app-spinner :loading="!overlaysLoaded"></app-spinner>
+          <app-layer-group v-if="overlaysLoaded" :wfsOverlays="wfsOverlays" :toggleLayer="toggleLayer"></app-layer-group>
         </b-collapse>
       </b-list-group>
     </div>
@@ -99,7 +99,7 @@ import { loadVectors } from "../map/wfs";
 export default {
   data() {
     return {
-      loading: false,
+      overlaysLoaded: false,
       show: false,
       map: null,
       userMap: null,
@@ -157,7 +157,7 @@ export default {
         selected
       };
       this.$store.dispatch("usermaps/saveSelectedCategories", payload);
-      this.loading = true;
+      // this.overlaysLoaded = false;
       loadVectors(this, selected);
     }
   },
@@ -168,7 +168,7 @@ export default {
     appLayerGroup
   },
   created() {
-    this.loading = false;
+    this.overlaysLoaded = false;
     const _vm = this;
     this.$map.$on("map-init", $event => {
       _vm.userMap = this.$map.userMap;
@@ -182,9 +182,10 @@ export default {
       _vm.show = true;
     });
     // triggered when WFS selected layers are added to the map
-    this.$map.$on("overlays-added", $event => {
+    this.$map.$on("overlays-loaded", $event => {
       _vm.wfsOverlays = this.$map.wfsOverlays;
-      this.loading = false;
+      _vm.overlaysLoaded = true;
+      alert('overlays loaded');
     });
     this.$map.$on("map-destroy", $event => {
       _vm.map = null;
@@ -193,6 +194,7 @@ export default {
       _vm.overlays = null;
       _vm.userMap = null;
       _vm.show = false;
+      _vm.overlaysLoaded = false;
       this.map = null;
       this.baseLayers = null;
       this.overlays = null;

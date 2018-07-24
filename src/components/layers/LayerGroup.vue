@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show">
+  <div>
     <b-list-group-item v-for="(group, index) in wfsOverlays" :key="group.name + index"
         class="list-group-item-accent-success list-group-item-divider">
       <div v-b-toggle="'wmsOverlays-' + index">
@@ -15,6 +15,7 @@
       <b-collapse :id="'wmsOverlays-' + index" visible>
         <b-list-group-item class="sub" v-for="(layer, idx) in group.layers" :key="layer.name + idx"
         :disabled="!group.enabled">
+        {{ 'Enabled:' + group.enabled }}
           <div class="text-left small"><strong>{{ layer.name }}</strong></div>
           <div class="flex">
             <label class="switch switch-sm switch-success ml-3">
@@ -36,7 +37,7 @@
 <script>
 import appSlider from "vue-slider-component";
 export default {
-  props: ["wfsOverlays", "toggleLayer", "show"],
+  props: ["wfsOverlays", "toggleLayer"],
   data() {
     return {
       slider: {

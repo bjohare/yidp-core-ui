@@ -11,7 +11,7 @@ export const fetchGeonodeWFSLayers = async (vm, selected) => {
 };
 
 export const loadVectors = async (vm, selected) => {
-  // turn off previously selected layers..
+  // TODO: turn off previously selected layers..
   const layerGroups = await fetchGeonodeWFSLayers(vm, selected);
   const map = vm.$map.map;
   const rootUrl = "/geoserver/geonode/ows";
@@ -68,5 +68,5 @@ export const loadVectors = async (vm, selected) => {
     wfsOverlays.push(layerGroup);
   }
   vm.$map.wfsOverlays = wfsOverlays;
-  vm.$map.$emit("overlays-added");
+  vm.$map.$emit("overlays-loaded");
 };
