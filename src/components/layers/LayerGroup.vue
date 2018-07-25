@@ -1,4 +1,5 @@
 <template>
+<transition name="fade" mode="out-in">
   <div>
     <b-list-group-item class="list-group-item-accent-success list-group-item-divider">
     <div v-b-toggle="'group-' + index">
@@ -12,47 +13,52 @@
       </label>
     </div>
     <b-collapse :id="'group-' + index" @shown="updateSliders">
-      <b-list-group-item class="sub" v-for="(layer, idx) in group.layers" :key="layer.name + idx"
+      <b-list-group-item :id="'group-' + index + '-layer-' + idx" class="sub" v-for="(layer, idx) in group.layers" :key="layer.name + idx"
       :disabled="!group.enabled">
         <div class="text-left small"><strong>{{ layer.name }}</strong></div>
-        <div class="flex">
-          <label class="switch switch-sm switch-success ml-3">
+        <div class="d-flex">
+          <app-slider ref="opacity" v-model="layer.opacity" v-bind="slider" :disabled="!layer.enabled || !group.enabled"
+            @drag-end="setLayerOpacity(layer)">
+          </app-slider>
+          <label class="switch switch-sm switch-success ml-2">
             <input ref="switch" type="checkbox" class="switch-input" v-model="layer.checked" @click="toggleLayer(layer)"
             :disabled="!group.enabled">
             <span class="switch-slider"></span>
           </label>
-          <app-slider ref="opacity" v-model="layer.opacity" v-bind="slider" :disabled="!layer.enabled || !group.enabled"
-            @drag-end="setLayerOpacity(layer)" class="float-left">
-          </app-slider>
-          <i class="fa fa-cog fa-lg"></i>
+          <span :id="'group-' + index + '-layer-style-' + idx"
+            class="fa fa-cog fa-lg ml-2 mt-1"
+            :disabled="popoverShow"
+            v-b-tooltip.hover title="Edit Layer Style">
+          </span>
         </div>
+        <app-editor :featureGroup="group" :layer="layer" :element="'group-' + index + '-layer-style-' + idx"></app-editor>
       </b-list-group-item>
     </b-collapse>
     </b-list-group-item>
   </div>
+</transition>
+
 </template>
 
 <script>
 import appSlider from "vue-slider-component";
+import appEditor from "@/components/layers/LayerEditor.vue";
 export default {
   props: ["group", "index", "toggleLayer"],
   data() {
     return {
       loaded: false,
+      popoverShow: false,
       slider: {
-        value: 1,
+        value: 0.65,
         min: 0,
         max: 1,
         interval: 0.1,
         height: 5,
         width: 150,
         dotSize: 13,
-        clickable: true,
-        tooltip: false,
-        debug: true
-        // bgStyle: {
-        //   backgroundColor: "red;"
-        // }
+        clickable: false,
+        tooltip: false
       }
     };
   },
@@ -62,7 +68,8 @@ export default {
     }
   },
   components: {
-    appSlider
+    appSlider,
+    appEditor
   },
   methods: {
     setLayerOpacity(lyr) {
@@ -93,6 +100,9 @@ export default {
       this.$refs.opacity.forEach(slider => {
         slider.refresh();
       });
+    },
+    editStyle() {
+      console.log("edit style..");
     }
   }
 };
@@ -106,5 +116,12 @@ export default {
 .list-group-item.sub {
   padding: 0.2rem 0.2rem 0rem 0.1rem;
   border: none;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.75s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>

@@ -1,7 +1,7 @@
 import * as L from "leaflet";
 
 import { geoserverAxios } from "../../store/axios";
-
+import { defaultStyle } from "./styles";
 export const fetchGeonodeWFSLayers = async (vm, selected) => {
   const payload = {
     vm,
@@ -34,6 +34,7 @@ export const loadVectors = async (vm, selected) => {
       const url = rootUrl + L.Util.getParamString(parameters);
       let result = await geoserverAxios.get(url);
       var lyr = L.geoJson(result.data, {
+        style: defaultStyle,
         onEachFeature: function(feature, layer) {
           layer.bindPopup(
             "str.1: " +

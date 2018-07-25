@@ -1,92 +1,100 @@
 <template>
-  <div>
-    <div v-if="!show">
-       <b-list-group class="list-group-accent">
-        <b-list-group-item class="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
-          Select a Map
-        </b-list-group-item>
-        <b-list-group-item v-for="(map, index) in maps" :key="map.title + index"
-          class="list-group-item-accent-primary list-group-item-divider">
-          <div><strong><router-link :to="{ name: 'map', params: {id: map.id}}">{{ map.title }}</router-link></strong>
-          </div>
-        </b-list-group-item>
-      </b-list-group>
-    </div>
-    <div v-if="show">
-      <b-list-group  class="list-group-accent">
-        <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-muted text-uppercase small">
-          <div v-b-toggle.baseLayers>
-            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
-            <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
-          </div>
-          Base Layers
-        </b-list-group-item>
-        <b-collapse id="baseLayers" @shown="updateSliders">
-          <b-list-group-item v-for="(item, index) in baseLayers" :key="item.name + index"
+  <div id="layer-switcher">
+    <!-- <transition name="fade" mode="out-in">
+      <div v-if="!show">
+        <b-list-group class="list-group-accent">
+          <b-list-group-item class="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
+            Select a Map
+          </b-list-group-item>
+          <b-list-group-item v-for="(map, index) in maps" :key="map.title + index"
             class="list-group-item-accent-primary list-group-item-divider">
-            <div class="layer-name"><strong>{{ item.name }}</strong>
-              <label class="switch switch-sm float-right switch-pill switch-primary mt-3">
-                <input type="checkbox" class="switch-input" v-model="item.checked" @click="toggleLayer(item)">
-                <span class="switch-slider"></span>
-              </label>
-              <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
-                @drag-end="setLayerOpacity(item)">
-              </app-slider>
+            <div><strong><router-link :to="{ name: 'map', params: {id: map.id}}">{{ map.title }}</router-link></strong>
             </div>
-            <!-- <div class="mt-1">
-
-            </div> -->
           </b-list-group-item>
-        </b-collapse>
-        <hr class="transparent mx-3 my-0">
-        <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-muted text-uppercase small">
-          <div v-b-toggle.defaultOverlays>
-            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
-            <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
-          </div>
-          Default Overlays
-        </b-list-group-item>
-        <b-collapse id="defaultOverlays" visible @shown="updateSliders">
-          <b-list-group-item v-for="(item, index) in wmsOverlays" :key="item.name + index"
-          class="list-group-item-accent-success list-group-item-divider">
-            <div class="layer-name"><strong>{{ item.name }}</strong>
-              <label class="switch switch-sm float-right switch-pill switch-primary mt-3">
-                <input type="checkbox" class="switch-input" checked @click="toggleLayer(item)">
-                <span class="switch-slider"></span>
-              </label>
-              <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
-                @drag-end="setLayerOpacity(item)">
-              </app-slider>
+        </b-list-group>
+      </div>
+    </transition> -->
+    <transition name="fade" mode="out-in">
+      <div v-if="show">
+        <b-list-group  class="list-group-accent">
+          <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-muted text-uppercase small">
+            <div v-b-toggle.baseLayers>
+              <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
+              <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
             </div>
-            <!-- <div>
-
-            </div> -->
+            Base Layers
           </b-list-group-item>
-        </b-collapse>
-        <hr class="transparent mx-3 my-0">
-        <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-muted text-uppercase small">
-          <div v-b-toggle.overlays>
-            <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
-            <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
+          <b-collapse id="baseLayers" @shown="updateSliders">
+            <b-list-group-item v-for="(item, index) in baseLayers" :key="item.name + index"
+              class="list-group-item-accent-primary list-group-item-divider">
+              <div class="layer-name"><strong>{{ item.name }}</strong>
+                <div class="d-flex">
+                  <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
+                    @drag-end="setLayerOpacity(item)">
+                  </app-slider>
+                  <label class="switch switch-sm switch-pill switch-primary ml-4">
+                    <input type="checkbox" class="switch-input" v-model="item.checked" @click="toggleLayer(item)">
+                    <span class="switch-slider"></span>
+                  </label>
+                </div>
+              </div>
+              <!-- <div class="mt-1">
+
+              </div> -->
+            </b-list-group-item>
+          </b-collapse>
+          <hr class="transparent mx-3 my-0">
+          <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-muted text-uppercase small">
+            <div v-b-toggle.defaultOverlays>
+              <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
+              <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
+            </div>
+            Default Overlays
+          </b-list-group-item>
+          <b-collapse id="defaultOverlays" @shown="updateSliders">
+            <b-list-group-item v-for="(item, index) in wmsOverlays" :key="item.name + index"
+            class="list-group-item-accent-success list-group-item-divider">
+              <div class="layer-name"><strong>{{ item.name }}</strong>
+                <div class="d-flex">
+                  <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
+                  @drag-end="setLayerOpacity(item)">
+                  </app-slider>
+                  <label class="switch switch-sm switch-pill switch-primary ml-4">
+                    <input type="checkbox" class="switch-input" checked @click="toggleLayer(item)">
+                    <span class="switch-slider"></span>
+                  </label>
+                </div>
+              </div>
+              <!-- <div>
+
+              </div> -->
+            </b-list-group-item>
+          </b-collapse>
+          <hr class="transparent mx-3 my-0">
+          <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-muted text-uppercase small">
+            <div v-b-toggle.overlays>
+              <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
+              <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
+            </div>
+            Other Overlays
+            <b-dropdown class="float-right" variant="secondar p-1" right>
+                <template slot="button-content">
+                  <i class="fa fa-cog fa-lg"></i>
+                </template>
+                <b-dropdown-item v-b-modal.layerPicker>Add / Remove Overlays</b-dropdown-item>
+            </b-dropdown>
+          </b-list-group-item>
+          <b-collapse id="overlays" visible @shown="updateSliders">
+            <div v-for="(group, index) in wfsOverlays" :key="group.name + index">
+              <app-layer-group :group="group" :index="index" :toggleLayer="toggleLayer"></app-layer-group>
+            </div>
+          </b-collapse>
+          <div class="loading" v-if="!overlaysLoaded">
+              <appSpinner :background="'#4DBD74'"></appSpinner>
           </div>
-          Other Overlays
-          <b-dropdown class="float-right" variant="secondar p-1" right>
-              <template slot="button-content">
-                <i class="fa fa-cog fa-lg"></i>
-              </template>
-              <b-dropdown-item v-b-modal.layerPicker>Add / Remove Overlays</b-dropdown-item>
-           </b-dropdown>
-        </b-list-group-item>
-        <b-collapse id="overlays" visible @shown="updateSliders">
-          <div v-for="(group, index) in wfsOverlays" :key="group.name + index">
-            <app-layer-group :group="group" :index="index" :toggleLayer="toggleLayer"></app-layer-group>
-          </div>
-        </b-collapse>
-        <div class="loading" v-if="!overlaysLoaded">
-            <appSpinner :background="'#4DBD74'"></appSpinner>
-        </div>
-      </b-list-group>
-    </div>
+        </b-list-group>
+      </div>
+    </transition>
     <app-layer-picker ref="layerPicker" @selected="loadSelectedOverlays"
         v-if="userMap" :userMap="userMap" :selected="selected">
     </app-layer-picker>
@@ -246,6 +254,12 @@ export default {
 svg.spinner {
   width: 60px !important;
   height: 60px !important;
-  color: blue;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
