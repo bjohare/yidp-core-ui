@@ -1,5 +1,7 @@
 import * as actions from "./actions";
 import { geoserverEndpoints } from "../../endpoints";
+// import * as _ from "lodash";
+// import Vue from "vue";
 
 const defaultConfig = {
   zoom: 7,
@@ -12,7 +14,7 @@ const defaultConfig = {
   wmsLayers: [],
   wfsLayers: [],
   selectedCategories: [],
-  styles: []
+  layerStates: []
 };
 
 const state = {
@@ -41,6 +43,67 @@ const mutations = {
   saveSelectedCategories(state, payload) {
     const { mapId, selected } = payload;
     state.userMaps[mapId].selectedCategories = selected;
+  },
+  saveLayerState(state, layer) {
+    let layerStates = state.userMaps[layer.mapId].layerStates;
+    if (layer.hasOwnProperty("layers")) {
+      // update the feature group..
+      let { name, mapId, checked, enabled, opacity, layer } = layer;
+      let featureGroup = layerStates.find(s => {
+        return s.name === layer.name;
+      });
+      if (featureGroup) {
+        // featureGroup = { ...}
+        Object.assign(featureGroup, {
+          name,
+          mapId,
+          checked,
+          enabled,
+          opacity
+        });
+      } else {
+        let featureGroup = {};
+        Object.assign(featureGroup, {
+          name,
+          mapId,
+          checked,
+          enabled,
+          opacity
+        });
+        layerStates.push(featureGroup);
+      }
+    } else {
+      // update the layer
+      let featureGroup = layerStates.find(s => {
+        return s.name === layer.groupName;
+      });
+      let layers = featureGroup.layers;
+      let { name, mapId, checked, enabled, opacity, style } = layer;
+      let layerState = layers.find(l => {
+        return l.name === layer.name;
+      });
+      if (layerState) {
+        Object.assign(layerState, {
+          name,
+          mapId,
+          checked,
+          enabled,
+          opacity,
+          style
+        });
+      } else {
+        let layerState = {};
+        Object.assign(layerState, {
+          name,
+          mapId,
+          checked,
+          enabled,
+          opacity,
+          style
+        });
+        layerStates.push(layerState);
+      }
+    }
   }
 };
 
@@ -53,6 +116,12 @@ const getters = {
   },
   getSelectedCategories: state => id => {
     return state.userMaps[id].selectedCategories;
+  },
+  getLayerState: state => (id, layerName) => {
+    let layerStates = state.userMaps[id].layerStates;
+    return layerStates.find(s => {
+      return s.name === layerName;
+    });
   }
 };
 

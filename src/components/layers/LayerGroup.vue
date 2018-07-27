@@ -27,7 +27,6 @@
           </label>
           <span :id="'group-' + index + '-layer-style-' + idx"
             class="fa fa-cog fa-lg ml-2 mt-1"
-            :disabled="popoverShow"
             v-b-tooltip.hover title="Edit Layer Style">
           </span>
         </div>
@@ -44,7 +43,7 @@
 import appSlider from "vue-slider-component";
 import appEditor from "@/components/layers/LayerEditor.vue";
 export default {
-  props: ["group", "index", "toggleLayer"],
+  props: ["map", "group", "index", "toggleLayer"],
   data() {
     return {
       loaded: false,
@@ -62,38 +61,35 @@ export default {
       }
     };
   },
-  computed: {
-    map() {
-      return this.$map.map;
-    }
-  },
   components: {
     appSlider,
     appEditor
   },
   methods: {
-    setLayerOpacity(lyr) {
-      const layer = lyr.layer;
-      layer.setStyle({ opacity: lyr.opacity, fillOpacity: lyr.opacity });
+    setLayerOpacity(layer) {
+      layer.style.opacity = layer.opacity;
+      layer.style.fillOpacity = layer.opacity;
+      layer.layer.setStyle(layer.style);
+      this.$store.dispatch("usermaps/saveLayerState", layer);
     },
-    toggleGroup(item) {
-      const layer = item.layer;
+    toggleGroup(group) {
+      const layer = group.layer;
       if (!this.map.hasLayer(layer)) {
         layer.setZIndex(layer.options.zIndex);
         this.map.addLayer(layer);
-        item.layers.forEach(lyr => {
+        group.layers.forEach(lyr => {
           if (lyr.enabled) {
             this.map.addLayer(lyr.layer);
           } else {
             this.map.removeLayer(lyr.layer);
           }
         });
-        item.enabled = true;
-        item.checked = true;
+        group.enabled = true;
+        group.checked = true;
       } else {
         this.map.removeLayer(layer);
-        item.enabled = false;
-        item.checked = false;
+        group.enabled = false;
+        group.checked = false;
       }
     },
     updateSliders() {

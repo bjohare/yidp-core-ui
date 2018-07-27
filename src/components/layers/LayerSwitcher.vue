@@ -52,7 +52,7 @@
             Default Overlays
           </b-list-group-item>
           <b-collapse id="defaultOverlays" @shown="updateSliders">
-            <b-list-group-item v-for="(item, index) in wmsOverlays" :key="item.name + index"
+            <b-list-group-item v-for="(item, index) in wmsLayers" :key="item.name + index"
             class="list-group-item-accent-success list-group-item-divider">
               <div class="layer-name"><strong>{{ item.name }}</strong>
                 <div class="d-flex">
@@ -86,7 +86,7 @@
           </b-list-group-item>
           <b-collapse id="overlays" visible @shown="updateSliders">
             <div v-for="(group, index) in wfsOverlays" :key="group.name + index">
-              <app-layer-group :group="group" :index="index" :toggleLayer="toggleLayer"></app-layer-group>
+              <app-layer-group :map="map" :group="group" :index="index" :toggleLayer="toggleLayer"></app-layer-group>
             </div>
           </b-collapse>
           <div class="loading" v-if="!overlaysLoaded">
@@ -99,7 +99,6 @@
         v-if="userMap" :userMap="userMap" :selected="selected">
     </app-layer-picker>
   </div>
-
 </template>
 
 <script>
@@ -108,12 +107,17 @@ import appLayerPicker from "./LayerPicker.vue";
 import appLayerGroup from "./LayerGroup.vue";
 import { loadVectors } from "../map/wfs";
 import { Stretch } from "vue-loading-spinner";
+
 export default {
   data() {
     return {
-      overlaysLoaded: false,
+      map: null,
+      userMap: null,
+      baseLayers: [],
+      wmsLayers: [],
+      wfsOverlays: [],
+      overlaysLoaded: true,
       show: false,
-      geonodeMaps: [],
       slider: {
         value: 1,
         min: 0,
@@ -128,9 +132,6 @@ export default {
     };
   },
   computed: {
-    maps() {
-      return this.$store.getters["geonode/getGeonodeMaps"];
-    },
     selected() {
       const selected = [];
       const selectedCategories = this.userMap.selectedCategories;
@@ -138,36 +139,21 @@ export default {
         selected.push(category.identifier);
       });
       return selected;
-    },
-    map() {
-      return this.$map.map;
-    },
-    userMap() {
-      return this.$map.userMap;
-    },
-    baseLayers() {
-      return this.$map.baseLayers;
-    },
-    wmsOverlays() {
-      return this.$map.wmsOverlays;
-    },
-    wfsOverlays() {
-      return this.$map.wfsOverlays;
     }
   },
   methods: {
-    toggleLayer(item) {
-      const layer = item.layer;
-      if (!this.map.hasLayer(layer)) {
-        layer.setZIndex(layer.options.zIndex);
-        this.map.addLayer(layer);
-        item.enabled = true;
-        item.checked = true;
+    toggleLayer(layer) {
+      if (!this.map.hasLayer(layer.layer)) {
+        layer.layer.setZIndex(layer.layer.options.zIndex);
+        this.map.addLayer(layer.layer);
+        layer.enabled = true;
+        layer.checked = true;
       } else {
-        this.map.removeLayer(layer);
-        item.enabled = false;
-        item.checked = false;
+        this.map.removeLayer(layer.layer);
+        layer.enabled = false;
+        layer.checked = false;
       }
+      this.$store.dispatch("usermaps/saveLayerState", layer);
     },
     setLayerOpacity(item) {
       const layer = item.layer;
@@ -175,7 +161,7 @@ export default {
     },
     loadSelectedOverlays(selected) {
       let layersToLoad = selected.slice(0);
-      this.$map.wfsOverlays.forEach(layer => {
+      this.wfsOverlays.forEach(layer => {
         let selection = selected.find(category => {
           if (category.gn_description_en === layer.name) {
             return category;
@@ -183,7 +169,7 @@ export default {
         });
         if (selection === undefined) {
           // remove unselected layer
-          this.$map.removeWFSOverlay(layer);
+          this.removeWFSOverlay(layer);
         } else {
           // load any layers not already loaded
           layersToLoad = layersToLoad.filter(lyr => {
@@ -205,6 +191,29 @@ export default {
       this.$refs.opacity.forEach(slider => {
         slider.refresh();
       });
+    },
+    addWFSOverlay(overlay, featureGroup) {
+      this.wfsOverlays.push(overlay); // non-leaflet
+      overlay.layer.addTo(this.map);
+      this.$emit("overlay-added", overlay);
+    },
+    removeWFSOverlay(overlay) {
+      this.map.removeLayer(overlay.layer);
+      this.wfsOverlays = this.wfsOverlays.filter(
+        item => item.name !== overlay.name
+      );
+    },
+    resetMap() {
+      this.map = null;
+      this.userMap = null;
+      this.baseLayers = [];
+      this.wmsLayers = [];
+      this.wfsOverlays = [];
+    },
+    loadUserMap() {
+      const id = this.$route.params.id;
+      this.userMap = this.$store.getters["usermaps/getUserMap"](id);
+      loadVectors(this, this.userMap.selectedCategories);
     }
   },
   components: {
@@ -215,20 +224,26 @@ export default {
   },
   created() {
     const _vm = this;
-    this.$map.$on("map-init", $event => {
-      loadVectors(_vm, _vm.userMap.selectedCategories);
+    this.$root.$on("map-init", map => {
+      _vm.map = map;
+      _vm.loadUserMap();
     });
-    // triggered when WMS base layers are added to the map
-    this.$map.$on("layers-added", $event => {
-      _vm.show = true;
-    });
-    // triggered when WFS selected layers are added to the map
-    this.$map.$on("overlays-loaded", $event => {
+    this.$on("overlays-loaded", () => {
       _vm.overlaysLoaded = true;
     });
-    this.$map.$on("map-destroy", $event => {
+    // triggered when WMS base layers are added to the map
+    this.$root.$on("base-layers-added", (baseLayers, wmsLayers) => {
+      _vm.baseLayers = baseLayers;
+      _vm.wmsLayers = wmsLayers;
+      _vm.show = true;
+    });
+    this.$root.$on("map-destroy", $event => {
       _vm.show = false;
       _vm.overlaysLoaded = false;
+      _vm.resetMap();
+    });
+    this.$on("overlay-added", overlay => {
+      // this.$store.dispatch("usermaps/saveLayerState", overlay);
     });
   }
 };

@@ -12,7 +12,7 @@ export const fetchGeonodeWFSLayers = async (vm, selected) => {
 
 export const loadVectors = async (vm, selected) => {
   const layerGroups = await fetchGeonodeWFSLayers(vm, selected);
-  // const map = vm.$map.map;
+  const userMap = vm.userMap;
   const rootUrl = "/geoserver/geonode/ows";
   let defaultParameters = {
     service: "WFS",
@@ -20,6 +20,12 @@ export const loadVectors = async (vm, selected) => {
     request: "GetFeature",
     outputFormat: "application/json",
     srsName: "EPSG:4326"
+  };
+  let defaultState = {
+    enabled: true,
+    checked: true,
+    opacity: 1,
+    style: defaultStyle
   };
   for (let group in layerGroups) {
     const layers = layerGroups[group];
@@ -31,17 +37,18 @@ export const loadVectors = async (vm, selected) => {
       var parameters = L.Util.extend(defaultParameters, {
         typeName: layer.typename
       });
+      let state = vm.$store.getters["usermaps/getLayerState"](
+        userMap.id,
+        layer.title
+      );
+      let layerState = state === undefined ? defaultState : state;
       const url = rootUrl + L.Util.getParamString(parameters);
       let result = await geoserverAxios.get(url);
       var lyr = L.geoJson(result.data, {
-        style: defaultStyle,
+        style: layerState.style,
         onEachFeature: function(feature, layer) {
-          layer.bindPopup(
-            "str.1: " +
-              feature.properties.str1 +
-              "<br />cat: " +
-              feature.properties.cat
-          );
+          // popup config here..
+          layer.bindPopup();
         },
         pointToLayer: function(feature, latlng) {
           return L.circleMarker(latlng); // cluster here..
@@ -49,10 +56,13 @@ export const loadVectors = async (vm, selected) => {
       }).addTo(featureGroup);
       var subLayer = {
         name: layer.title,
+        groupName: group,
+        mapId: userMap.id,
         layer: lyr,
-        enabled: true,
-        checked: true,
-        opacity: 1
+        enabled: layerState.enabled,
+        checked: layerState.checked,
+        opacity: layerState.opacity,
+        style: layerState.style
       };
       subLayers.push(subLayer);
     }, Promise.resolve());
@@ -60,11 +70,11 @@ export const loadVectors = async (vm, selected) => {
       name: group,
       layer: featureGroup,
       layers: subLayers,
+      mapId: userMap.id,
       enabled: true,
-      opacity: 1,
       checked: true
     };
-    vm.$map.addWFSOverlay(layerGroup);
+    vm.addWFSOverlay(layerGroup, featureGroup);
   }
-  vm.$map.$emit("overlays-loaded");
+  vm.$emit("overlays-loaded");
 };

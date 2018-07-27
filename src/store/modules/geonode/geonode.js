@@ -18,8 +18,18 @@ const getters = {
   getGeonodeMaps(state) {
     return state.geonodeMaps;
   },
-  getGeonodeCategories(state, dispatch) {
+  getGeonodeCategories(state) {
     return state.geonodeCategories;
+  },
+  getGeonodeMapLayers: state => mapId => {
+    const map = state.geonodeMaps.find(m => {
+      return m.id === mapId;
+    });
+    if (map) {
+      return map.layers;
+    } else {
+      return [];
+    }
   }
 };
 

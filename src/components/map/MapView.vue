@@ -8,14 +8,14 @@
 import WMSGetFeatureInfo from "ol/format/WMSGetFeatureInfo";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
-// import * as methods from "./methods";
 import { initMap, loadWMSLayers } from "./wms";
 import appOverlay from "./Overlay.vue";
 
 export default {
-  props: ["userMap"],
   data() {
     return {
+      map: null,
+      userMap: null,
       info: null,
       showPopover: false
     };
@@ -44,8 +44,12 @@ export default {
     async loadInitalLayers() {
       await loadWMSLayers(this);
     },
-    triggerLayersAdded() {
-      this.$map.$emit("layers-added");
+    triggerLayersAdded(baseLayers, wmsLayers) {
+      this.$root.$emit("base-layers-added", baseLayers, wmsLayers);
+    },
+    loadUserMap() {
+      const id = this.$route.params.id;
+      this.userMap = this.$store.getters["usermaps/getUserMap"](id);
     }
   },
   components: {
@@ -56,8 +60,11 @@ export default {
     this.loadInitalLayers();
   },
   created() {
-    this.$map.$on("map-destroy", $event => {
-      this.$map.resetMap();
+    const _vm = this;
+    this.loadUserMap();
+    this.$root.$on("map-destroy", () => {
+      _vm.map = null;
+      _vm.userMap = null;
     });
   }
 };

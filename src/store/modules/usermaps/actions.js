@@ -18,6 +18,10 @@ export const saveSelectedCategories = ({ commit }, payload) => {
   commit("saveSelectedCategories", payload);
 };
 
+export const saveLayerState = ({ commit }, layer) => {
+  commit("saveLayerState", layer);
+};
+
 export const syncUserMaps = ({ commit, state }, geonodeMaps) => {
   const mapIds = [];
   geonodeMaps.forEach(geonodeMap => {
@@ -28,12 +32,13 @@ export const syncUserMaps = ({ commit, state }, geonodeMaps) => {
       const defaults = state.defaults;
       const map = {
         id: mapId,
-        ...defaults,
-        ...geonodeMap
+        ...defaults
+        // ...geonodeMap
       };
       commit("saveUserMap", map);
     } else {
-      const updatedUserMap = { ...userMap, ...geonodeMap };
+      // const updatedUserMap = { ...userMap, ...geonodeMap };
+      const updatedUserMap = { ...userMap };
       commit("saveUserMap", updatedUserMap);
     }
   });

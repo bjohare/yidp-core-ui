@@ -3,10 +3,8 @@ import * as L from "leaflet";
 import { geoserverAxios } from "../../store/axios";
 
 export const initMap = vm => {
-  resetGlobalMapBus(vm.$map);
-  vm.$map.userMap = vm.userMap;
-  vm.$map.map = L.map("map").setView(vm.userMap.center, vm.userMap.zoom);
-  vm.$map.$emit("map-init");
+  vm.map = L.map("map").setView(vm.userMap.center, vm.userMap.zoom);
+  vm.$root.$emit("map-init", vm.map);
 };
 
 const fetchGeonodeWMSLayers = async vm => {
@@ -38,7 +36,7 @@ export const loadWMSLayers = async vm => {
     attribution: osmAttrib,
     zIndex: 200
   });
-  osm.addTo(vm.$map.map);
+  osm.addTo(vm.map);
   const mapLink = '<a href="http://www.esri.com/">Esri</a>';
   const wholink =
     "i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community";
@@ -91,15 +89,13 @@ export const loadWMSLayers = async vm => {
       opacity: 1,
       layer: L.tileLayer
         .wms_auth(wmsUrl, params)
-        .addTo(vm.$map.map)
+        .addTo(vm.map)
         .setZIndex(zIndex)
     });
   }
-  vm.$map.wmsOverlays.push(...wmsLayers);
-  vm.$map.baseLayers.push(...baseLayers);
-  vm.triggerLayersAdded();
+  vm.triggerLayersAdded(baseLayers, wmsLayers);
 
-  vm.$map.map.on("moveend", event => {
+  vm.map.on("moveend", event => {
     const position = {
       mapId: vm.userMap.id,
       zoom: event.target.getZoom(),
@@ -107,11 +103,4 @@ export const loadWMSLayers = async vm => {
     };
     vm.$store.dispatch("usermaps/saveMapPosition", position);
   });
-};
-
-const resetGlobalMapBus = map => {
-  map.map = null;
-  map.userMap = null;
-  map.baseLayers = [];
-  map.wmsOverlays = [];
 };

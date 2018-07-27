@@ -9,24 +9,23 @@
                @shown="onShown"
                @hidden="onHidden">
       <template slot="title">
-        <b-btn @click="onClose" class="close" aria-label="Close">
-          <span class="d-inline-block" aria-hidden="true">&times;</span>
-        </b-btn>
         <strong>{{ layer.name }}</strong>
       </template>
       <div>
         <b-form-group label="Outline Color" label-for="stroke"
                       horizontal class="mb-1"
                       description="Pick outline colour">
-          <color-picker ref="stroke" id="outline-color-picker" v-model="strokeColors" class="w-100" @input="updateStroke"></color-picker>
+          <color-picker ref="stroke" id="outline-color-picker" v-model="colors.strokeColors" class="w-100" @input="updateStroke"></color-picker>
         </b-form-group>
         <b-form-group label="Fill Color" label-for="fill"
                       horizontal class="mb-1"
                       description="Pick fill color">
-          <color-picker ref="fill" id="fill-color-picker" v-model="fillColors" class="w-100" @input="updateFill"></color-picker>
+          <color-picker ref="fill" id="fill-color-picker" v-model="colors.fillColors" class="w-100" @input="updateFill"></color-picker>
         </b-form-group>
-        <b-btn @click="onClose" size="sm" variant="danger">Reset</b-btn>
-        <b-btn @click="onOk" size="sm" variant="primary">Ok</b-btn>
+        <div class="d-inline-block float-right mb-3 mr-2">
+          <b-btn @click="reset" size="sm" variant="danger" class="">Reset</b-btn>
+          <b-btn @click="onOk" size="sm" variant="primary" class="">Ok</b-btn>
+        </div>
       </div>
     </b-popover>
   </div>
@@ -34,40 +33,42 @@
 <script>
 import { Compact as colorPicker } from "vue-color";
 
+let styleDefaults = function() {
+  return {
+    strokeColors: { hex: "#009CE0" },
+    fillColors: { hex: "#009CE0" }
+  };
+};
+
 export default {
   props: ["element", "layer", "featureGroup"],
   data() {
     return {
-      defaultColors: { stroke: "#3388FF", fill: "#A2C8C7" },
-      strokeColors: { hex: "#009CE0" },
-      fillColors: { hex: "#009CE0" },
-      stroke: "#3388FF",
-      fill: "#A2C8C7",
+      colors: styleDefaults(),
       popoverShow: false
     };
   },
   methods: {
     updateStroke($event) {
-      const lyr = this.layer.layer;
-      lyr.setStyle({
-        stroke: true,
-        color: $event.hex,
-        fill: true,
-        fillColor: this.fillColors.hex
-      });
+      this.layer.style.color = $event.hex;
+      this.layer.style.fillColor = this.colors.fillColors.hex;
+      this.layer.layer.setStyle(this.layer.style);
+      this.$store.dispatch("usermaps/saveLayerState", this.layer);
     },
     updateFill($event) {
-      const lyr = this.layer.layer;
-      lyr.setStyle({ fill: true, fillColor: $event.hex });
+      this.layer.style.color = this.colors.strokeColors.hex;
+      this.layer.style.fillColor = $event.hex;
+      this.layer.layer.setStyle(this.layer.style);
+      this.$store.dispatch("usermaps/saveLayerState", this.layer);
     },
     resetStyle() {
-      const lyr = this.layer.layer;
-      lyr.eachLayer(l => {
-        lyr.resetStyle(l);
-      });
+      Object.assign(this.$data.colors, styleDefaults());
+      this.layer.style.color = this.colors.strokeColors.hex;
+      this.layer.style.fillColor = this.colors.fillColors.hex;
+      this.layer.layer.setStyle(this.layer.style);
+      this.$store.dispatch("usermaps/saveLayerState", this.layer);
     },
-    onClose() {
-      this.popoverShow = false;
+    reset() {
       this.resetStyle();
     },
     onOk() {

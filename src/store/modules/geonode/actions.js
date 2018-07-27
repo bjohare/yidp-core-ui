@@ -10,8 +10,8 @@ export const fetchGeonodeMaps = async ({ commit }) => {
 };
 
 export const fetchGeonodeWMSLayers = async ({ commit, dispatch }, vm) => {
-  const lyrs = vm.userMap.layers;
-  const overlays = lyrs.filter(lyr => {
+  const lyrs = vm.$store.getters["geonode/getGeonodeMapLayers"](vm.userMap.id);
+  const defaultOverlays = lyrs.filter(lyr => {
     if (lyr.group === null) {
       return true;
     } else {
@@ -19,7 +19,7 @@ export const fetchGeonodeWMSLayers = async ({ commit, dispatch }, vm) => {
     }
   });
   const layers = [];
-  await overlays.reduce(async (promise, overlay) => {
+  await defaultOverlays.reduce(async (promise, overlay) => {
     await promise;
     const response = await geonodeAxios.get(
       geonodeEndpoints.layersUrl + "?name=" + overlay.name.split(":")[1],
