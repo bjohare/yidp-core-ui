@@ -14,15 +14,17 @@
     </div>
     <b-collapse :id="'group-' + index" @shown="updateSliders">
       <b-list-group-item :id="'group-' + index + '-layer-' + idx" class="sub" v-for="(layer, idx) in group.layers" :key="layer.name + idx"
-      :disabled="!group.enabled">
+      :disabled="!group.checked">
+      {{ layer }}
         <div class="text-left small"><strong>{{ layer.name }}</strong></div>
         <div class="d-flex">
-          <app-slider ref="opacity" v-model="layer.opacity" v-bind="slider" :disabled="!layer.enabled || !group.enabled"
+          <app-slider ref="opacity" v-model="layer.opacity" v-bind="slider" :disabled="!layer.checked || !group.checked"
             @drag-end="setLayerOpacity(layer)">
           </app-slider>
           <label class="switch switch-sm switch-success ml-2">
-            <input ref="switch" type="checkbox" class="switch-input" v-model="layer.checked" @click="toggleLayer(layer)"
-            :disabled="!group.enabled">
+            {{layer.checked}}
+            <input ref="switch" type="checkbox" class="switch-input" v-model="layer.checked" @click="toggleLayer(layer, group)"
+            :disabled="!group.checked">
             <span class="switch-slider"></span>
           </label>
           <span :id="'group-' + index + '-layer-style-' + idx"
@@ -43,7 +45,7 @@
 import appSlider from "vue-slider-component";
 import appEditor from "@/components/layers/LayerEditor.vue";
 export default {
-  props: ["map", "group", "index", "toggleLayer"],
+  props: ["map", "group", "index", "toggleLayer", "toggleGroup"],
   data() {
     return {
       loaded: false,
@@ -71,26 +73,6 @@ export default {
       layer.style.fillOpacity = layer.opacity;
       layer.layer.setStyle(layer.style);
       this.$store.dispatch("usermaps/saveLayerState", layer);
-    },
-    toggleGroup(group) {
-      const layer = group.layer;
-      if (!this.map.hasLayer(layer)) {
-        layer.setZIndex(layer.options.zIndex);
-        this.map.addLayer(layer);
-        group.layers.forEach(lyr => {
-          if (lyr.enabled) {
-            this.map.addLayer(lyr.layer);
-          } else {
-            this.map.removeLayer(lyr.layer);
-          }
-        });
-        group.enabled = true;
-        group.checked = true;
-      } else {
-        this.map.removeLayer(layer);
-        group.enabled = false;
-        group.checked = false;
-      }
     },
     updateSliders() {
       this.$refs.opacity.forEach(slider => {

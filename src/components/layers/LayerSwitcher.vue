@@ -86,7 +86,9 @@
           </b-list-group-item>
           <b-collapse id="overlays" visible @shown="updateSliders">
             <div v-for="(group, index) in wfsOverlays" :key="group.name + index">
-              <app-layer-group :map="map" :group="group" :index="index" :toggleLayer="toggleLayer"></app-layer-group>
+              {{ group }}
+              <app-layer-group :map="map" :group="group"
+                :index="index" :toggleLayer="toggleLayer" :toggleGroup="toggleGroup"></app-layer-group>
             </div>
           </b-collapse>
           <div class="loading" v-if="!overlaysLoaded">
@@ -115,7 +117,8 @@ export default {
       userMap: null,
       baseLayers: [],
       wmsLayers: [],
-      wfsOverlays: [],
+      featureGroups: [],
+      // wfsOverlays: [],
       overlaysLoaded: true,
       show: false,
       slider: {
@@ -139,21 +142,55 @@ export default {
         selected.push(category.identifier);
       });
       return selected;
+    },
+    wfsOverlays() {
+      return this.userMap.layers;
     }
   },
   methods: {
-    toggleLayer(layer) {
-      if (!this.map.hasLayer(layer.layer)) {
-        layer.layer.setZIndex(layer.layer.options.zIndex);
-        this.map.addLayer(layer.layer);
-        layer.enabled = true;
+    toggleLayer(layer, group) {
+      const featureGroup = this.featureGroups.find(f => {
+        return f.name === layer.groupName;
+      });
+      let featureLayer = null;
+      featureGroup.eachLayer(lyr => {
+        if (lyr.name === layer.name) {
+          featureLayer = lyr;
+        }
+      });
+      if (featureLayer && !this.map.hasLayer(featureLayer)) {
+        featureLayer.setZIndex(featureLayer.options.zIndex);
+        this.map.addLayer(featureLayer);
         layer.checked = true;
       } else {
-        this.map.removeLayer(layer.layer);
-        layer.enabled = false;
+        this.map.removeLayer(featureLayer);
         layer.checked = false;
       }
-      this.$store.dispatch("usermaps/saveLayerState", layer);
+      this.$store.dispatch("usermaps/saveFeatureGroup", group);
+    },
+    toggleGroup(group) {
+      const layer = this.featureGroups.find(lyr => {
+        return (lyr.name = group.name);
+      });
+      if (!this.map.hasLayer(layer)) {
+        layer.setZIndex(layer.options.zIndex);
+        this.map.addLayer(layer);
+        group.layers.forEach(lyr => {
+          let l = layer.eachLayer(ly => {
+            ly.name = lyr.name;
+          });
+          if (lyr.checked) {
+            this.map.addLayer(l);
+          } else {
+            this.map.removeLayer(l);
+          }
+        });
+        group.checked = true;
+      } else {
+        this.map.removeLayer(layer);
+        group.checked = false;
+      }
+      this.$store.dispatch("usermaps/saveFeatureGroup", group);
     },
     setLayerOpacity(item) {
       const layer = item.layer;
@@ -192,23 +229,36 @@ export default {
         slider.refresh();
       });
     },
-    addWFSOverlay(overlay, featureGroup) {
-      this.wfsOverlays.push(overlay); // non-leaflet
-      overlay.layer.addTo(this.map);
-      this.$emit("overlay-added", overlay);
+    addWFSOverlay(group, featureGroup) {
+      this.featureGroups.push(featureGroup);
+      if (group.checked && !this.map.hasLayer(featureGroup)) {
+        this.map.addLayer(featureGroup);
+      }
+      group.layers.forEach(layer => {
+        let l = featureGroup.eachLayer(ly => {
+          ly.name = layer.name;
+        });
+        if (layer.checked && group.checked) {
+          this.map.addLayer(l);
+        } else {
+          this.map.removeLayer(l);
+        }
+      });
+      this.$store.dispatch("usermaps/saveFeatureGroup", group);
     },
     removeWFSOverlay(overlay) {
-      this.map.removeLayer(overlay.layer);
-      this.wfsOverlays = this.wfsOverlays.filter(
-        item => item.name !== overlay.name
-      );
+      // this.map.removeLayer(overlay.layer);
+      // this.wfsOverlays = this.wfsOverlays.filter(
+      //   item => item.name !== overlay.name
+      // );
+      console.log("remove overlay", overlay);
     },
     resetMap() {
       this.map = null;
       this.userMap = null;
       this.baseLayers = [];
       this.wmsLayers = [];
-      this.wfsOverlays = [];
+      this.featureGroups = [];
     },
     loadUserMap() {
       const id = this.$route.params.id;
@@ -242,8 +292,8 @@ export default {
       _vm.overlaysLoaded = false;
       _vm.resetMap();
     });
-    this.$on("overlay-added", overlay => {
-      // this.$store.dispatch("usermaps/saveLayerState", overlay);
+    this.$on("overlays-added", () => {
+      _vm.overlaysLoaded = true;
     });
   }
 };

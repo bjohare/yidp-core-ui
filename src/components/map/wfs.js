@@ -10,6 +10,16 @@ export const fetchGeonodeWFSLayers = async (vm, selected) => {
   return vm.$store.dispatch("geonode/fetchGeonodeWFSLayers", payload);
 };
 
+L.FeatureGroup.YIDP = L.FeatureGroup.extend({
+  name: ""
+});
+L.featureGroup.yidp = options => new L.FeatureGroup.YIDP(options);
+
+L.GeoJSON.YIDP = L.GeoJSON.extend({
+  name: ""
+});
+L.geoJson.yidp = options => new L.GeoJSON.YIDP(options);
+
 export const loadVectors = async (vm, selected) => {
   const layerGroups = await fetchGeonodeWFSLayers(vm, selected);
   const userMap = vm.userMap;
@@ -22,14 +32,22 @@ export const loadVectors = async (vm, selected) => {
     srsName: "EPSG:4326"
   };
   let defaultState = {
-    enabled: true,
     checked: true,
-    opacity: 1,
+    opacity: 0.65,
     style: defaultStyle
   };
   for (let group in layerGroups) {
     const layers = layerGroups[group];
-    var featureGroup = L.featureGroup();
+    let state = vm.$store.getters["usermaps/getFeatureGroup"](
+      userMap.id,
+      group
+    );
+    const groupState =
+      state === undefined
+        ? { checked: true, enabled: true, layers: [] }
+        : state;
+    var featureGroup = L.featureGroup.yidp();
+    featureGroup.name = group;
     featureGroup.setZIndex(600);
     let subLayers = [];
     await layers.reduce(async (promise, layer) => {
@@ -37,15 +55,15 @@ export const loadVectors = async (vm, selected) => {
       var parameters = L.Util.extend(defaultParameters, {
         typeName: layer.typename
       });
-      let state = vm.$store.getters["usermaps/getLayerState"](
-        userMap.id,
-        layer.title
-      );
+      let state = groupState.layers.find(l => {
+        return (l.name = layer.title);
+      });
       let layerState = state === undefined ? defaultState : state;
       const url = rootUrl + L.Util.getParamString(parameters);
       let result = await geoserverAxios.get(url);
-      var lyr = L.geoJson(result.data, {
+      let lyr = L.geoJson.yidp(result.data, {
         style: layerState.style,
+        name: layer.title,
         onEachFeature: function(feature, layer) {
           // popup config here..
           layer.bindPopup();
@@ -53,13 +71,13 @@ export const loadVectors = async (vm, selected) => {
         pointToLayer: function(feature, latlng) {
           return L.circleMarker(latlng); // cluster here..
         }
-      }).addTo(featureGroup);
+      });
+      lyr.name = layer.title;
+      lyr.addTo(featureGroup);
       var subLayer = {
         name: layer.title,
         groupName: group,
         mapId: userMap.id,
-        layer: lyr,
-        enabled: layerState.enabled,
         checked: layerState.checked,
         opacity: layerState.opacity,
         style: layerState.style
@@ -68,13 +86,11 @@ export const loadVectors = async (vm, selected) => {
     }, Promise.resolve());
     let layerGroup = {
       name: group,
-      layer: featureGroup,
       layers: subLayers,
       mapId: userMap.id,
-      enabled: true,
-      checked: true
+      checked: groupState.checked
     };
     vm.addWFSOverlay(layerGroup, featureGroup);
   }
-  vm.$emit("overlays-loaded");
+  vm.$emit("overlays-added");
 };

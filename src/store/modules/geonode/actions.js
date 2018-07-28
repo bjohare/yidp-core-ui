@@ -33,10 +33,6 @@ export const fetchGeonodeWMSLayers = async ({ commit, dispatch }, vm) => {
     );
     layers.push(response.data.objects[0]);
   }, Promise.resolve());
-  vm.$store.dispatch("usermaps/saveWMSLayers", {
-    mapId: vm.userMap.id,
-    layers
-  });
   return layers;
 };
 
@@ -59,10 +55,6 @@ export const fetchGeonodeWFSLayers = async ({ commit }, payload) => {
     );
     layerGroups[category] = response.data.objects;
   }
-  vm.$store.dispatch("usermaps/saveWFSLayers", {
-    mapId: vm.userMap.id,
-    layerGroups: layerGroups
-  });
   return layerGroups;
 };
 

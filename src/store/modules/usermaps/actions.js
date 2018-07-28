@@ -6,20 +6,12 @@ export const saveUserMap = ({ commit }, map) => {
   commit("saveUserMap", map);
 };
 
-export const saveWMSLayers = ({ commit }, payload) => {
-  commit("setWMSLayers", payload);
-};
-
-export const saveWFSLayers = ({ commit }, payload) => {
-  commit("setWFSLayers", payload);
-};
-
 export const saveSelectedCategories = ({ commit }, payload) => {
   commit("saveSelectedCategories", payload);
 };
 
-export const saveLayerState = ({ commit }, layer) => {
-  commit("saveLayerState", layer);
+export const saveFeatureGroup = ({ commit }, group) => {
+  commit("saveFeatureGroup", group);
 };
 
 export const syncUserMaps = ({ commit, state }, geonodeMaps) => {
