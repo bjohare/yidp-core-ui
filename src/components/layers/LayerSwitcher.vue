@@ -29,11 +29,11 @@
               class="list-group-item-accent-primary list-group-item-divider">
               <div class="layer-name"><strong>{{ item.name }}</strong>
                 <div class="d-flex">
-                  <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
+                  <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.checked"
                     @drag-end="setLayerOpacity(item)">
                   </app-slider>
                   <label class="switch switch-sm switch-pill switch-primary ml-4">
-                    <input type="checkbox" class="switch-input" v-model="item.checked" @click="toggleLayer(item)">
+                    <input type="checkbox" class="switch-input" v-model="item.checked" @click="toggleBaseLayer(item)">
                     <span class="switch-slider"></span>
                   </label>
                 </div>
@@ -56,11 +56,11 @@
             class="list-group-item-accent-success list-group-item-divider">
               <div class="layer-name"><strong>{{ item.name }}</strong>
                 <div class="d-flex">
-                  <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.enabled"
+                  <app-slider ref="opacity" v-model="item.opacity" v-bind="slider" :disabled="!item.checked"
                   @drag-end="setLayerOpacity(item)">
                   </app-slider>
                   <label class="switch switch-sm switch-pill switch-primary ml-4">
-                    <input type="checkbox" class="switch-input" checked @click="toggleLayer(item)">
+                    <input type="checkbox" class="switch-input" v-model="item.checked" @click="toggleBaseLayer(item)">
                     <span class="switch-slider"></span>
                   </label>
                 </div>
@@ -148,6 +148,15 @@ export default {
     }
   },
   methods: {
+    toggleBaseLayer(layer) {
+      if (!layer.checked && !this.map.hasLayer(layer.layer)) {
+        this.map.addLayer(layer.layer);
+        layer.checked = true;
+      } else {
+        this.map.removeLayer(layer.layer);
+        layer.checked = false;
+      }
+    },
     toggleLayer(layer, group) {
       const featureGroup = this.featureGroups.find(f => {
         return f.name === layer.groupName;

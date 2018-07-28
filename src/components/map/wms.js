@@ -52,15 +52,13 @@ export const loadWMSLayers = async vm => {
       name: "OpenStreetMap",
       layer: osm,
       opacity: 1,
-      checked: "checked",
-      enabled: true
+      checked: true
     },
     {
       name: "Esri World Imagery",
       layer: esri,
       opacity: 1,
-      checked: "",
-      enabled: false
+      checked: ""
     }
   ];
   const layers = await fetchGeonodeWMSLayers(vm);
