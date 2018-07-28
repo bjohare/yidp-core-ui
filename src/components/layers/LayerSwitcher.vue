@@ -86,7 +86,6 @@
           </b-list-group-item>
           <b-collapse id="overlays" visible @shown="updateSliders">
             <div v-for="(group, index) in wfsOverlays" :key="group.name + index">
-              {{ group }}
               <app-layer-group :map="map" :group="group"
                 :index="index" :toggleLayer="toggleLayer" :toggleGroup="toggleGroup"></app-layer-group>
             </div>
@@ -169,25 +168,28 @@ export default {
       this.$store.dispatch("usermaps/saveFeatureGroup", group);
     },
     toggleGroup(group) {
-      const layer = this.featureGroups.find(lyr => {
-        return (lyr.name = group.name);
+      const featureGroup = this.featureGroups.find(lyr => {
+        return lyr.name === group.name;
       });
-      if (!this.map.hasLayer(layer)) {
-        layer.setZIndex(layer.options.zIndex);
-        this.map.addLayer(layer);
+      if (!this.map.hasLayer(featureGroup)) {
+        featureGroup.setZIndex(featureGroup.options.zIndex);
+        this.map.addLayer(featureGroup);
         group.layers.forEach(lyr => {
-          let l = layer.eachLayer(ly => {
-            ly.name = lyr.name;
+          let layer = null;
+          featureGroup.eachLayer(l => {
+            if (l.name === lyr.name) {
+              layer = l;
+            }
           });
           if (lyr.checked) {
-            this.map.addLayer(l);
+            this.map.addLayer(layer);
           } else {
-            this.map.removeLayer(l);
+            this.map.removeLayer(layer);
           }
         });
         group.checked = true;
       } else {
-        this.map.removeLayer(layer);
+        this.map.removeLayer(featureGroup);
         group.checked = false;
       }
       this.$store.dispatch("usermaps/saveFeatureGroup", group);
@@ -235,8 +237,8 @@ export default {
         this.map.addLayer(featureGroup);
       }
       group.layers.forEach(layer => {
-        let l = featureGroup.eachLayer(ly => {
-          ly.name = layer.name;
+        let l = featureGroup.getLayers().find(ly => {
+          return ly.name === layer.name;
         });
         if (layer.checked && group.checked) {
           this.map.addLayer(l);
@@ -244,7 +246,7 @@ export default {
           this.map.removeLayer(l);
         }
       });
-      this.$store.dispatch("usermaps/saveFeatureGroup", group);
+      this.$store.dispatch("usermaps/addFeatureGroup", group);
     },
     removeWFSOverlay(overlay) {
       // this.map.removeLayer(overlay.layer);

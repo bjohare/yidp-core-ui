@@ -1,3 +1,5 @@
+import { geoserverEndpoints } from "../../endpoints";
+
 export const saveMapPosition = ({ commit }, payload) => {
   commit("saveMapPosition", payload);
 };
@@ -14,6 +16,10 @@ export const saveFeatureGroup = ({ commit }, group) => {
   commit("saveFeatureGroup", group);
 };
 
+export const addFeatureGroup = ({ commit }, group) => {
+  commit("addFeatureGroup", group);
+};
+
 export const syncUserMaps = ({ commit, state }, geonodeMaps) => {
   const mapIds = [];
   geonodeMaps.forEach(geonodeMap => {
@@ -21,15 +27,22 @@ export const syncUserMaps = ({ commit, state }, geonodeMaps) => {
     mapIds.push(mapId);
     const userMap = state.userMaps[mapId];
     if (!userMap) {
-      const defaults = state.defaults;
+      const defaults = {
+        zoom: 7,
+        minZoom: 5,
+        center: [15.51, 48.47],
+        maxExtent: [41, 12, 55, 19],
+        extent: null,
+        wmsBaseUrl: geoserverEndpoints.wmsBaseUrl,
+        selectedCategories: [],
+        layers: []
+      };
       const map = {
         id: mapId,
         ...defaults
-        // ...geonodeMap
       };
       commit("saveUserMap", map);
     } else {
-      // const updatedUserMap = { ...userMap, ...geonodeMap };
       const updatedUserMap = { ...userMap };
       commit("saveUserMap", updatedUserMap);
     }

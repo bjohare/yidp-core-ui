@@ -1,7 +1,7 @@
 import * as L from "leaflet";
 
 import { geoserverAxios } from "../../store/axios";
-import { defaultStyle } from "./styles";
+import { defaultStyle, defaultMarkerStyle } from "./styles";
 export const fetchGeonodeWFSLayers = async (vm, selected) => {
   const payload = {
     vm,
@@ -18,7 +18,7 @@ L.featureGroup.yidp = options => new L.FeatureGroup.YIDP(options);
 L.GeoJSON.YIDP = L.GeoJSON.extend({
   name: ""
 });
-L.geoJson.yidp = options => new L.GeoJSON.YIDP(options);
+L.geoJson.yidp = (data, options) => new L.GeoJSON.YIDP(data, options);
 
 export const loadVectors = async (vm, selected) => {
   const layerGroups = await fetchGeonodeWFSLayers(vm, selected);
@@ -56,24 +56,23 @@ export const loadVectors = async (vm, selected) => {
         typeName: layer.typename
       });
       let state = groupState.layers.find(l => {
-        return (l.name = layer.title);
+        return l.name === layer.title;
       });
       let layerState = state === undefined ? defaultState : state;
       const url = rootUrl + L.Util.getParamString(parameters);
       let result = await geoserverAxios.get(url);
-      let lyr = L.geoJson.yidp(result.data, {
+      let options = {
         style: layerState.style,
-        name: layer.title,
         onEachFeature: function(feature, layer) {
           // popup config here..
           layer.bindPopup();
         },
         pointToLayer: function(feature, latlng) {
-          return L.circleMarker(latlng); // cluster here..
+          return L.circleMarker(latlng, defaultMarkerStyle); // cluster here..
         }
-      });
+      };
+      let lyr = L.geoJson.yidp(result.data, options).addTo(featureGroup);
       lyr.name = layer.title;
-      lyr.addTo(featureGroup);
       var subLayer = {
         name: layer.title,
         groupName: group,

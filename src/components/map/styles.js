@@ -7,3 +7,12 @@ export const defaultStyle = {
   stroke: true,
   fill: true
 };
+
+export const defaultMarkerStyle = {
+  radius: 8,
+  fillColor: "#ff7800",
+  color: "#000",
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.8
+};

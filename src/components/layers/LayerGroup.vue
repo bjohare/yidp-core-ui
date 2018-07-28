@@ -15,14 +15,12 @@
     <b-collapse :id="'group-' + index" @shown="updateSliders">
       <b-list-group-item :id="'group-' + index + '-layer-' + idx" class="sub" v-for="(layer, idx) in group.layers" :key="layer.name + idx"
       :disabled="!group.checked">
-      {{ layer }}
         <div class="text-left small"><strong>{{ layer.name }}</strong></div>
         <div class="d-flex">
           <app-slider ref="opacity" v-model="layer.opacity" v-bind="slider" :disabled="!layer.checked || !group.checked"
             @drag-end="setLayerOpacity(layer)">
           </app-slider>
           <label class="switch switch-sm switch-success ml-2">
-            {{layer.checked}}
             <input ref="switch" type="checkbox" class="switch-input" v-model="layer.checked" @click="toggleLayer(layer, group)"
             :disabled="!group.checked">
             <span class="switch-slider"></span>
@@ -72,7 +70,7 @@ export default {
       layer.style.opacity = layer.opacity;
       layer.style.fillOpacity = layer.opacity;
       layer.layer.setStyle(layer.style);
-      this.$store.dispatch("usermaps/saveLayerState", layer);
+      // this.$store.dispatch("usermaps/saveLayerState", layer);
     },
     updateSliders() {
       this.$refs.opacity.forEach(slider => {

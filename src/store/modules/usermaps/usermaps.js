@@ -1,21 +1,8 @@
 import * as actions from "./actions";
-import { geoserverEndpoints } from "../../endpoints";
-import * as _ from "lodash";
-// import Vue from "vue";
-
-const defaultConfig = {
-  zoom: 7,
-  minZoom: 5,
-  center: [15.51, 48.47],
-  maxExtent: [41, 12, 55, 19],
-  extent: null,
-  wmsBaseUrl: geoserverEndpoints.wmsBaseUrl,
-  selectedCategories: [],
-  layers: []
-};
+// import * as _ from "lodash";
+import Vue from "vue";
 
 const state = {
-  defaults: defaultConfig,
   userMaps: {}
 };
 
@@ -33,19 +20,24 @@ const mutations = {
     const { mapId, selected } = payload;
     state.userMaps[mapId].selectedCategories = selected;
   },
-  saveFeatureGroup(state, layer) {
-    let { mapId, name } = layer;
+  addFeatureGroup(state, group) {
+    let { mapId, name } = group;
+    let l = state.userMaps[mapId].layers.find(lyr => {
+      return lyr.name === name;
+    });
+    if (l === undefined) {
+      state.userMaps[mapId].layers.push(group);
+    }
+  },
+  saveFeatureGroup(state, group) {
+    let { mapId, name } = group;
     let layers = state.userMaps[mapId].layers;
     let l = layers.find(lyr => {
-      return (lyr.name = name);
+      return lyr.name === name;
     });
     if (l) {
-      _.remove(layers, lyr => {
-        return (lyr.name = l.name);
-      });
-      layers.push(layer);
-    } else {
-      layers.push(layer);
+      const index = layers.indexOf(l);
+      Vue.set(this.userMaps[mapId].layers, index, group);
     }
   }
 };
@@ -64,7 +56,7 @@ const getters = {
     });
   },
   getLayers: state => id => {
-    return state.userMaps[id].layers;
+    return state.userMap[id].layers;
   }
 };
 
