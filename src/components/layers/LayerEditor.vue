@@ -41,32 +41,45 @@ let styleDefaults = function() {
 };
 
 export default {
-  props: ["element", "layer", "featureGroup"],
+  props: ["element", "layer", "group", "featureGroup", "getFeature"],
   data() {
     return {
-      colors: styleDefaults(),
+      // colors: styleDefaults(),
       popoverShow: false
     };
+  },
+  computed: {
+    colors() {
+      const style = this.layer.style;
+      if (style.fillColor && style.color) {
+        return {
+          strokeColors: { hex: style.color },
+          fillColors: { hex: style.fillColor }
+        };
+      } else {
+        return styleDefaults();
+      }
+    }
   },
   methods: {
     updateStroke($event) {
       this.layer.style.color = $event.hex;
       this.layer.style.fillColor = this.colors.fillColors.hex;
-      this.layer.layer.setStyle(this.layer.style);
-      this.$store.dispatch("usermaps/saveFeatureGroup", featureGroup);
+      this.getFeature(this.layer.name).setStyle(this.layer.style);
+      this.$store.dispatch("usermaps/saveFeatureGroup", this.group);
     },
     updateFill($event) {
       this.layer.style.color = this.colors.strokeColors.hex;
       this.layer.style.fillColor = $event.hex;
-      this.layer.layer.setStyle(this.layer.style);
-      this.$store.dispatch("usermaps/saveFeatureGroup", featureGroup);
+      this.getFeature(this.layer.name).setStyle(this.layer.style);
+      this.$store.dispatch("usermaps/saveFeatureGroup", this.group);
     },
     resetStyle() {
       Object.assign(this.$data.colors, styleDefaults());
       this.layer.style.color = this.colors.strokeColors.hex;
       this.layer.style.fillColor = this.colors.fillColors.hex;
-      this.layer.layer.setStyle(this.layer.style);
-      this.$store.dispatch("usermaps/saveFeatureGroup", featureGroup);
+      this.getFeature(this.layer.name).setStyle(this.layer.style);
+      this.$store.dispatch("usermaps/saveFeatureGroup", this.group);
     },
     reset() {
       this.resetStyle();
@@ -103,12 +116,12 @@ export default {
   },
   components: {
     colorPicker
-  },
-  computed: {
-    bgc() {
-      return this.colors.hex;
-    }
   }
+  // computed: {
+  //   bgc() {
+  //     return this.colors.hex;
+  //   }
+  // }
 };
 </script>
 <style>

@@ -30,7 +30,8 @@
             v-b-tooltip.hover title="Edit Layer Style">
           </span>
         </div>
-        <app-editor :featureGroup="group" :layer="layer" :element="'group-' + index + '-layer-style-' + idx"></app-editor>
+        <app-editor :group="group" :featureGroup="featureGroup" :getFeature="getFeature"
+          :layer="layer" :element="'group-' + index + '-layer-style-' + idx"></app-editor>
       </b-list-group-item>
     </b-collapse>
     </b-list-group-item>
@@ -43,7 +44,14 @@
 import appSlider from "vue-slider-component";
 import appEditor from "@/components/layers/LayerEditor.vue";
 export default {
-  props: ["map", "group", "index", "toggleLayer", "toggleGroup"],
+  props: [
+    "map",
+    "group",
+    "index",
+    "toggleLayer",
+    "toggleGroup",
+    "featureGroup"
+  ],
   data() {
     return {
       loaded: false,
@@ -69,16 +77,18 @@ export default {
     setLayerOpacity(layer) {
       layer.style.opacity = layer.opacity;
       layer.style.fillOpacity = layer.opacity;
-      layer.layer.setStyle(layer.style);
-      // this.$store.dispatch("usermaps/saveLayerState", layer);
+      this.getFeature(layer.name).setStyle(layer.style);
+      this.$store.dispatch("usermaps/saveFeatureGroup", this.group);
     },
     updateSliders() {
       this.$refs.opacity.forEach(slider => {
         slider.refresh();
       });
     },
-    editStyle() {
-      console.log("edit style..");
+    getFeature(name) {
+      return this.featureGroup.getLayers().find(lyr => {
+        return lyr.name === name;
+      });
     }
   }
 };

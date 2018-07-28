@@ -86,7 +86,7 @@
           </b-list-group-item>
           <b-collapse id="overlays" visible @shown="updateSliders">
             <div v-for="(group, index) in wfsOverlays" :key="group.name + index">
-              <app-layer-group :map="map" :group="group"
+              <app-layer-group :map="map" :group="group" :featureGroup="getFeatureGroup(group.name)"
                 :index="index" :toggleLayer="toggleLayer" :toggleGroup="toggleGroup"></app-layer-group>
             </div>
           </b-collapse>
@@ -269,6 +269,11 @@ export default {
       const id = this.$route.params.id;
       this.userMap = this.$store.getters["usermaps/getUserMap"](id);
       loadVectors(this, this.userMap.selectedCategories);
+    },
+    getFeatureGroup(group) {
+      return this.featureGroups.find(g => {
+        return g.name === group;
+      });
     }
   },
   components: {
