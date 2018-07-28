@@ -53,20 +53,20 @@ export default {
       this.layer.style.color = $event.hex;
       this.layer.style.fillColor = this.colors.fillColors.hex;
       this.layer.layer.setStyle(this.layer.style);
-      this.$store.dispatch("usermaps/saveLayerState", this.layer);
+      this.$store.dispatch("usermaps/saveFeatureGroup", featureGroup);
     },
     updateFill($event) {
       this.layer.style.color = this.colors.strokeColors.hex;
       this.layer.style.fillColor = $event.hex;
       this.layer.layer.setStyle(this.layer.style);
-      this.$store.dispatch("usermaps/saveLayerState", this.layer);
+      this.$store.dispatch("usermaps/saveFeatureGroup", featureGroup);
     },
     resetStyle() {
       Object.assign(this.$data.colors, styleDefaults());
       this.layer.style.color = this.colors.strokeColors.hex;
       this.layer.style.fillColor = this.colors.fillColors.hex;
       this.layer.layer.setStyle(this.layer.style);
-      this.$store.dispatch("usermaps/saveLayerState", this.layer);
+      this.$store.dispatch("usermaps/saveFeatureGroup", featureGroup);
     },
     reset() {
       this.resetStyle();

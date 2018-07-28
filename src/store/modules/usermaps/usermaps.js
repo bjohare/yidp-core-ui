@@ -1,5 +1,5 @@
 import * as actions from "./actions";
-// import * as _ from "lodash";
+import * as _ from "lodash";
 import Vue from "vue";
 
 const state = {
@@ -29,6 +29,12 @@ const mutations = {
       state.userMaps[mapId].layers.push(group);
     }
   },
+  removeFeatureGroup(state, group) {
+    const { mapId, name } = group;
+    _.remove(state.userMaps[mapId].layers, layer => {
+      return layer.name === name;
+    });
+  },
   saveFeatureGroup(state, group) {
     let { mapId, name } = group;
     let layers = state.userMaps[mapId].layers;
@@ -37,7 +43,7 @@ const mutations = {
     });
     if (l) {
       const index = layers.indexOf(l);
-      Vue.set(this.userMaps[mapId].layers, index, group);
+      Vue.set(state.userMaps[mapId].layers, index, group);
     }
   }
 };

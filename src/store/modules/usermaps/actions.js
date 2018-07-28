@@ -20,6 +20,10 @@ export const addFeatureGroup = ({ commit }, group) => {
   commit("addFeatureGroup", group);
 };
 
+export const removeFeatureGroup = ({ commit }, group) => {
+  commit("removeFeatureGroup", group);
+};
+
 export const syncUserMaps = ({ commit, state }, geonodeMaps) => {
   const mapIds = [];
   geonodeMaps.forEach(geonodeMap => {

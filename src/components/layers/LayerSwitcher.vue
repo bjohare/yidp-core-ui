@@ -108,6 +108,7 @@ import appLayerPicker from "./LayerPicker.vue";
 import appLayerGroup from "./LayerGroup.vue";
 import { loadVectors } from "../map/wfs";
 import { Stretch } from "vue-loading-spinner";
+import * as _ from "lodash";
 
 export default {
   data() {
@@ -248,12 +249,14 @@ export default {
       });
       this.$store.dispatch("usermaps/addFeatureGroup", group);
     },
-    removeWFSOverlay(overlay) {
-      // this.map.removeLayer(overlay.layer);
-      // this.wfsOverlays = this.wfsOverlays.filter(
-      //   item => item.name !== overlay.name
-      // );
-      console.log("remove overlay", overlay);
+    removeWFSOverlay(group) {
+      const featureGroups = _.remove(this.featureGroups, fg => {
+        return fg.name === group.name;
+      });
+      if (featureGroups) {
+        this.map.removeLayer(featureGroups[0]);
+        this.$store.dispatch("usermaps/removeFeatureGroup", group);
+      }
     },
     resetMap() {
       this.map = null;
