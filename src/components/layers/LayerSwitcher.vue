@@ -318,11 +318,6 @@ export default {
     });
     this.$on("overlays-added", () => {
       _vm.overlaysLoaded = true;
-      _vm.map.on("click", () => {
-        if (_vm.selectedFeature) {
-          // _vm.selectedFeature = null;
-        }
-      });
     });
   }
 };

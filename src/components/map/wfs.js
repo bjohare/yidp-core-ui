@@ -66,6 +66,9 @@ export const loadVectors = async (vm, selected) => {
         onEachFeature: function(feature, layer) {
           vm.showOverlay(vm, feature, layer);
         },
+        onAdd: function(m) {
+          console.log(m);
+        },
         pointToLayer: function(feature, latlng) {
           return L.circleMarker(latlng, defaultMarkerStyle); // cluster here..
         }

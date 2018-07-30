@@ -1,7 +1,9 @@
 <template>
   <div style="height: inherit;">
       <div id="map" class="d-flex">
-        <app-overlay :info="selectedFeature" :showPopover="showPopover"></app-overlay>
+        <div ref="overlay">
+          <app-overlay :info="selectedFeature" :showPopover="showPopover"></app-overlay>
+        </div>
       </div>
   </div>
 </template>
@@ -55,6 +57,14 @@ export default {
   mounted() {
     this.initializeMap();
     this.loadInitalLayers();
+    this.$nextTick(() => {
+      this.$refs.overlay.onclick = e => {
+        e.stopPropagation();
+      };
+      this.$refs.overlay.mousewheel = e => {
+        e.stopPropagation();
+      };
+    });
   },
   created() {
     const _vm = this;
