@@ -50,8 +50,26 @@ main {
   width: 300px;
 }
 
+html:not([dir="rtl"]) .aside-menu {
+  margin-right: -300px;
+}
+
 @media (min-width: 992px) {
   .modal-lg {
     max-width: 1024px !important;
   }
+}
+
+.leaflet-control-resetmap {
+  padding-top: 1px;
+  background: #fff;
+  color: black;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  cursor: pointer;
+  border-radius: 2px;
+  font-size: 19px;
+  display: block;
+  text-align: center;
 }

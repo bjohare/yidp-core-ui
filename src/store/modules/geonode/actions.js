@@ -69,3 +69,18 @@ export const fetchGeonodeCategories = async ({ commit, state }, vm) => {
   commit("geonodeCategories", response.data.objects);
   return state.geonodeCategories;
 };
+
+export const fetchGeonodeMapDescription = async ({ commit }, payload) => {
+  const { vm, mapId } = payload;
+  const response = await geonodeAxios.get(
+    geonodeEndpoints.mapsUrl + "/" + mapId,
+    {
+      headers: {
+        Authorization:
+          "Bearer" +
+          vm.$store.getters["authentication/getAccessToken"].access_token
+      }
+    }
+  );
+  return response.data;
+};

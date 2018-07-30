@@ -18,6 +18,11 @@ const getters = {
   getGeonodeMaps(state) {
     return state.geonodeMaps;
   },
+  getGeonodeMap: state => mapId => {
+    return state.geonodeMaps.find(map => {
+      return map.id === mapId;
+    });
+  },
   getGeonodeCategories(state) {
     return state.geonodeCategories;
   },

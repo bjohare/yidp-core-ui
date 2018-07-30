@@ -27,7 +27,7 @@
           </label>
           <span :id="'group-' + index + '-layer-style-' + idx"
             class="fa fa-cog fa-lg ml-2 mt-1"
-            v-b-tooltip.hover title="Edit Layer Style">
+            v-b-tooltip.hover title="Edit Layer Style" :disabled="!group.checked || !layer.checked">
           </span>
         </div>
         <app-editor :group="group" :featureGroup="featureGroup" :getFeature="getFeature"

@@ -2,8 +2,33 @@ import * as L from "leaflet";
 
 import { geoserverAxios } from "../../store/axios";
 
+const mapDefaults = {
+  zoom: 7,
+  center: [15.51, 48.47]
+};
+
+const resetMapViewControl = (vm, map) => {
+  let control = new L.Control({ position: "topleft" });
+  control.onAdd = function(map) {
+    var azoom = L.DomUtil.create("div", "leaflet-bar");
+    azoom.innerHTML =
+      '<a title="Reset Map" class="leaflet-control-resetmap"><span class="fa fa-refresh"></span></a>';
+    L.DomEvent.disableClickPropagation(azoom).addListener(
+      azoom,
+      "click",
+      function() {
+        map.setView(mapDefaults.center, mapDefaults.zoom);
+      },
+      azoom
+    );
+    return azoom;
+  };
+  return control;
+};
+
 export const initMap = vm => {
   vm.map = L.map("map").setView(vm.userMap.center, vm.userMap.zoom);
+  resetMapViewControl(vm, vm.map).addTo(vm.map);
   vm.$root.$emit("map-init", vm.map);
 };
 

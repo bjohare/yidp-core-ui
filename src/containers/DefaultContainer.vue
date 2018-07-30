@@ -50,7 +50,7 @@
       </AppAside>
     </div>
     <TheFooter>
-      Some footer content
+      &copy;&nbsp; 2018 &nbsp; <a href="https://www.yemenpeaceproject.org/" target="blank"> Yemen Peace Project</a>
     </TheFooter>
   </div>
 </template>
