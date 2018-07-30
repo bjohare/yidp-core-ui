@@ -1,15 +1,14 @@
 <template>
   <div style="height: inherit;">
-      <div id="map" class="d-flex"></div>
-      <!-- <app-overlay :info="info" :showPopover="showPopover"></app-overlay> -->
+      <div id="map" class="d-flex">
+        <app-overlay :info="selectedFeature" :showPopover="showPopover"></app-overlay>
+      </div>
   </div>
 </template>
 <script>
-import WMSGetFeatureInfo from "ol/format/WMSGetFeatureInfo";
 import "leaflet/dist/leaflet.css";
-import axios from "axios";
 import { initMap, loadWMSLayers } from "./wms";
-import appOverlay from "./Overlay.vue";
+import appOverlay from "../layers/LayerOverlay.vue";
 
 export default {
   data() {
@@ -17,26 +16,24 @@ export default {
       map: null,
       userMap: null,
       info: null,
-      showPopover: false
+      selectedFeature: null
     };
+  },
+  computed: {
+    showPopover() {
+      return this.selectedFeature !== null;
+    }
+  },
+  components: {
+    appOverlay
   },
   methods: {
     async showGetFeatureInfo(url, coordinate) {
       this.showPopover = false;
       const featureInfo = this.map.getOverlayById("featureInfoOverlay");
       featureInfo.setPosition(coordinate);
-      this.info = null;
-      console.log(url);
-      const response = await axios.get(url);
-      const data = response.data;
-      const features = new WMSGetFeatureInfo().readFeatures(data);
-      if (features.length) {
-        const props = features[0].getProperties();
-        const geomName = features[0].getGeometryName();
-        delete props[geomName];
-        this.info = props;
-        this.showPopover = true;
-      }
+      // const response = await axios.get(url);
+      // const data = response.data;
     },
     initializeMap() {
       initMap(this);
@@ -50,10 +47,10 @@ export default {
     loadUserMap() {
       const id = this.$route.params.id;
       this.userMap = this.$store.getters["usermaps/getUserMap"](id);
+    },
+    resetSelectedFeature() {
+      this.selectedFeature.layer.setStyle(this.selectedFeature.style);
     }
-  },
-  components: {
-    appOverlay
   },
   mounted() {
     this.initializeMap();
@@ -62,9 +59,23 @@ export default {
   created() {
     const _vm = this;
     this.loadUserMap();
+    this.$root.$on("map-init", map => {
+      map.on("click", e => {
+        if (_vm.selectedFeature !== null) {
+          this.resetSelectedFeature();
+          _vm.selectedFeature = null;
+        }
+      });
+    });
     this.$root.$on("map-destroy", () => {
       _vm.map = null;
       _vm.userMap = null;
+    });
+    this.$root.$on("feature-selected", info => {
+      if (_vm.selectedFeature) {
+        _vm.resetSelectedFeature();
+      }
+      this.selectedFeature = info;
     });
   }
 };

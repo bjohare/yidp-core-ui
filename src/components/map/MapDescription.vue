@@ -1,7 +1,7 @@
 <template>
   <div class="p-3">
-    <span class="h3">Map Details</span>
     <div class="message" v-if="show">
+      <span class="h3">Map Details</span>
       <div class="py-3 pb-5 mr-3 float-left">
         <h4>{{ map.title }}</h4>
         <img style="border: 1px solid grey" class="mb-2" :src="map.thumbnail_url"/>

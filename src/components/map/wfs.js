@@ -64,8 +64,7 @@ export const loadVectors = async (vm, selected) => {
       let options = {
         style: layerState.style,
         onEachFeature: function(feature, layer) {
-          // popup config here..
-          layer.bindPopup();
+          vm.showOverlay(vm, feature, layer);
         },
         pointToLayer: function(feature, latlng) {
           return L.circleMarker(latlng, defaultMarkerStyle); // cluster here..

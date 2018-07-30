@@ -87,7 +87,7 @@ export default new Router({
         },
         {
           path: "/map/:id",
-          name: "map",
+          name: "Map",
           component: Map,
           beforeEnter(to, from, next) {
             if (!store.getters["authentication/getUserProfile"]) {

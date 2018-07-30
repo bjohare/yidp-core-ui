@@ -16,3 +16,13 @@ export const defaultMarkerStyle = {
   opacity: 1,
   fillOpacity: 0.8
 };
+
+export const highlightStyle = {
+  color: "#FF5733",
+  fillColor: "#FF5733",
+  weight: 5,
+  opacity: 1,
+  fillOpacity: 0.8,
+  stroke: true,
+  fill: true
+};

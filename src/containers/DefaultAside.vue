@@ -2,14 +2,16 @@
   <b-tabs>
     <b-tab>
       <template slot="title">
-        <i class='icon-layers'></i>
+        <i class='icon-layers' v-b-tooltip.hover.left title="Map Layers"></i>
       </template>
+      <div v-if="!show">No map selected.</div>
       <app-layer-switcher></app-layer-switcher>
     </b-tab>
     <b-tab>
       <template slot="title">
-        <i class='fa fa-bar-chart fa-lg'></i>
+        <i class='fa fa-bar-chart fa-lg' v-b-tooltip.hover.left title="Map Analysis"></i>
       </template>
+      <div class="message" v-if="!show">No map selected.</div>
       <div class="p-3">
         <div class="message" v-if="show">
           <div class="py-3 pb-5 mr-3 float-left">
@@ -20,8 +22,9 @@
     </b-tab>
     <b-tab>
       <template slot="title">
-        <i class='fa fa-info fa-lg'></i>
+        <i class='fa fa-info fa-lg' v-b-tooltip.hover.left title="Map Information"></i>
       </template>
+      <div class="message" v-if="!show">No map selected.</div>
       <app-map-description :map="mapDescription" :show="show"></app-map-description>
     </b-tab>
   </b-tabs>

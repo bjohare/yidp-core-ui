@@ -108,6 +108,7 @@ import appLayerPicker from "./LayerPicker.vue";
 import appLayerGroup from "./LayerGroup.vue";
 import { loadVectors } from "../map/wfs";
 import { Stretch } from "vue-loading-spinner";
+import * as mapInteractions from "@/components/map/interactions";
 import * as _ from "lodash";
 
 export default {
@@ -145,9 +146,13 @@ export default {
     },
     wfsOverlays() {
       return this.userMap.layers;
+    },
+    showPopover() {
+      return this.selectedFeature !== null;
     }
   },
   methods: {
+    ...mapInteractions,
     toggleBaseLayer(layer) {
       if (!layer.checked && !this.map.hasLayer(layer.layer)) {
         this.map.addLayer(layer.layer);
@@ -313,6 +318,11 @@ export default {
     });
     this.$on("overlays-added", () => {
       _vm.overlaysLoaded = true;
+      _vm.map.on("click", () => {
+        if (_vm.selectedFeature) {
+          // _vm.selectedFeature = null;
+        }
+      });
     });
   }
 };

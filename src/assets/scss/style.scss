@@ -46,14 +46,6 @@ main {
   }
 }
 
-.aside-menu {
-  width: 300px;
-}
-
-html:not([dir="rtl"]) .aside-menu {
-  margin-right: -300px;
-}
-
 @media (min-width: 992px) {
   .modal-lg {
     max-width: 1024px !important;

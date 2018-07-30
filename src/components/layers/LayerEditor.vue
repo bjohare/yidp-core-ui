@@ -75,9 +75,9 @@ export default {
       this.$store.dispatch("usermaps/saveFeatureGroup", this.group);
     },
     resetStyle() {
-      Object.assign(this.$data.colors, styleDefaults());
-      this.layer.style.color = this.colors.strokeColors.hex;
-      this.layer.style.fillColor = this.colors.fillColors.hex;
+      const defaults = styleDefaults();
+      this.layer.style.color = defaults.strokeColors.hex;
+      this.layer.style.fillColor = defaults.fillColors.hex;
       this.getFeature(this.layer.name).setStyle(this.layer.style);
       this.$store.dispatch("usermaps/saveFeatureGroup", this.group);
     },
