@@ -1,26 +1,19 @@
 <template>
   <b-tabs>
-    <b-tab>
+    <b-tab id="layers">
       <template slot="title">
         <i class='icon-layers' v-b-tooltip.hover.left title="Map Layers"></i>
       </template>
       <div v-if="!show">No map selected.</div>
       <app-layer-switcher></app-layer-switcher>
     </b-tab>
-    <b-tab>
+    <b-tab id="analysis">
       <template slot="title">
         <i class='fa fa-bar-chart fa-lg' v-b-tooltip.hover.left title="Map Analysis"></i>
       </template>
-      <div class="message" v-if="!show">No map selected.</div>
-      <div class="p-3">
-        <div class="message" v-if="show">
-          <div class="py-3 pb-5 mr-3 float-left">
-            Analysis tools here..
-          </div>
-        </div>
-      </div>
+      <app-analysis-panel :show="show"></app-analysis-panel>
     </b-tab>
-    <b-tab>
+    <b-tab id="details">
       <template slot="title">
         <i class='fa fa-info fa-lg' v-b-tooltip.hover.left title="Map Information"></i>
       </template>
@@ -34,6 +27,7 @@
 import { Switch as cSwitch } from "@coreui/vue";
 import appLayerSwitcher from "@/components/layers/LayerSwitcher.vue";
 import appMapDescription from "@/components/map/MapDescription.vue";
+import appAnalysisPanel from "@/components/analysis/AnalysisPanel.vue";
 export default {
   name: "DefaultAside",
   data() {
@@ -60,7 +54,8 @@ export default {
   components: {
     cSwitch,
     appLayerSwitcher,
-    appMapDescription
+    appMapDescription,
+    appAnalysisPanel
   },
   created() {
     const _vm = this;

@@ -93,5 +93,5 @@ export const loadVectors = async (vm, selected) => {
     };
     vm.addWFSOverlay(layerGroup, featureGroup);
   }
-  vm.$emit("overlays-added");
+  vm.$root.$emit("overlays-added");
 };

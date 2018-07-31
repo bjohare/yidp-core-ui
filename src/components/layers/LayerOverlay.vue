@@ -1,7 +1,7 @@
 <template>
   <div id="featureInfo" v-if="showPopover">
     <div class="h4"><strong>Selected Feature</strong></div>
-    <ul class="list">
+    <ul class="list-group">
       <li class="list-item" v-for="(item, key) in info.feature.properties" :key="key">
         <span><strong>{{ key }}: </strong></span><span>{{ item }}</span>
       </li>
@@ -21,15 +21,14 @@ export default {
   top: 0;
   right: 0;
   z-index: 900;
-  /* background-color: #2f353a !important; */
   background-color: white;
   color: #2f353a;
-  /* color: white !important; */
   opacity: 0.8;
-  /* border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px; */
   padding: 1rem;
-  font-size: small;
+  font-size: 11pt;
   height: 100%;
+}
+#featureInfo > ul {
+  list-style-type: none;
 }
 </style>

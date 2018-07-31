@@ -316,7 +316,7 @@ export default {
       _vm.overlaysLoaded = false;
       _vm.resetMap();
     });
-    this.$on("overlays-added", () => {
+    this.$root.$on("overlays-added", () => {
       _vm.overlaysLoaded = true;
     });
   }

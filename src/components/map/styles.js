@@ -12,7 +12,7 @@ export const defaultMarkerStyle = {
   radius: 8,
   fillColor: "#ff7800",
   color: "#000",
-  weight: 1,
+  weight: 5,
   opacity: 1,
   fillOpacity: 0.8
 };
@@ -20,9 +20,19 @@ export const defaultMarkerStyle = {
 export const highlightStyle = {
   color: "#FF5733",
   fillColor: "#FF5733",
-  weight: 5,
+  weight: 2,
   opacity: 1,
   fillOpacity: 0.8,
+  stroke: true,
+  fill: true
+};
+
+export const filterStyle = {
+  color: "blue",
+  fillColor: "blue",
+  weight: 2,
+  opacity: 0.65,
+  fillOpacity: 0.01,
   stroke: true,
   fill: true
 };
