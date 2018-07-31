@@ -5,7 +5,7 @@ const geonodeAxios = axios.create({
 });
 
 const yidpAxios = axios.create({
-  baseURL: "http://localhost:8000"
+  baseURL: "http://localhost:8001"
 });
 
 const geoserverAxios = axios.create({
