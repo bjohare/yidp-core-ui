@@ -1,0 +1,42 @@
+<template>
+  <div  class="animated fadeIn m-4">
+    <app-spinner :loading="loading"></app-spinner>
+    <b-card-group deck class="mb-3" v-show="!loading">
+    <div v-for="(doc, index) in documents" :key="index">
+      <app-document-card :document="doc"></app-document-card>
+    </div>
+  </b-card-group>
+  </div>
+</template>
+<script>
+import appSpinner from "@/components/shared/Spinner.vue";
+import appDocumentCard from "./DocumentCard.vue";
+export default {
+  data() {
+    return {
+      loading: false
+    };
+  },
+  computed: {
+    documents() {
+      return this.$store.getters["geonode/getGeonodeDocuments"];
+    }
+  },
+  components: {
+    appDocumentCard,
+    appSpinner
+  },
+  methods: {
+    async fetchGeonodeDocuments() {
+      this.loading = true;
+      await this.$store.dispatch("geonode/fetchGeonodeDocuments");
+      this.loading = false;
+    }
+  },
+  created() {
+    this.fetchGeonodeDocuments();
+  }
+};
+</script>
+<style>
+</style>
