@@ -36,3 +36,12 @@ export const filterStyle = {
   stroke: true,
   fill: true
 };
+
+export const selectedFilterStyle = {
+  color: "#FF5733",
+  weight: 5,
+  opacity: 1,
+  fillOpacity: 0.1,
+  stroke: true,
+  fill: true
+};

@@ -8,6 +8,7 @@ import DefaultContainer from "@/containers/DefaultContainer";
 // import Dashboard from '@/views/Dashboard'
 import Dashboard from "@/components/Dashboard.vue";
 import Map from "@/components/map/Map.vue";
+import Documents from "@/components/documents/Documents.vue";
 import BaseMaps from "@/components/basemaps/BaseMaps.vue";
 
 // import Colors from "@/views/theme/Colors";
@@ -84,6 +85,11 @@ export default new Router({
           path: "/maps",
           name: "Maps",
           component: BaseMaps
+        },
+        {
+          path: "/documents",
+          name: "Documents",
+          component: Documents
         },
         {
           path: "/map/:id",

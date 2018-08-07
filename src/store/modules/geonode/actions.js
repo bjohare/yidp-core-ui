@@ -36,7 +36,7 @@ export const fetchGeonodeWMSLayers = async ({ commit, dispatch }, vm) => {
   return layers;
 };
 
-export const fetchGeonodeWFSLayers = async ({ commit }, payload) => {
+export const fetchGeonodeSelectedLayers = async ({ commit }, payload) => {
   const { vm, selected } = payload;
   let layerGroups = {};
   for (let idx in selected) {
@@ -83,4 +83,10 @@ export const fetchGeonodeMapDescription = async ({ commit }, payload) => {
     }
   );
   return response.data;
+};
+
+export const fetchGeonodeDocuments = async ({ commit }) => {
+  const response = await geonodeAxios.get(geonodeEndpoints.documentsUrl);
+  commit("geonodeDocuments", response.data.objects);
+  return response.data.objects;
 };

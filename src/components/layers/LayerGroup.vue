@@ -25,13 +25,13 @@
             :disabled="!group.checked">
             <span class="switch-slider"></span>
           </label>
-          <span :id="'group-' + index + '-layer-style-' + idx"
+          <!-- <span :id="'group-' + index + '-layer-style-' + idx"
             class="fa fa-cog fa-lg ml-2 mt-1"
             v-b-tooltip.hover title="Edit Layer Style" :disabled="!group.checked || !layer.checked">
-          </span>
+          </span> -->
         </div>
-        <app-editor :group="group" :featureGroup="featureGroup" :getFeature="getFeature"
-          :layer="layer" :element="'group-' + index + '-layer-style-' + idx"></app-editor>
+        <!-- <app-editor :group="group" :featureGroup="featureGroup" :getFeature="getFeature"
+          :layer="layer" :element="'group-' + index + '-layer-style-' + idx"></app-editor> -->
       </b-list-group-item>
     </b-collapse>
     </b-list-group-item>

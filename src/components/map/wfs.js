@@ -2,12 +2,12 @@ import * as L from "leaflet";
 
 import { geoserverAxios } from "../../store/axios";
 import { defaultStyle, defaultMarkerStyle } from "./styles";
-export const fetchGeonodeWFSLayers = async (vm, selected) => {
+export const fetchGeonodeSelectedLayers = async (vm, selected) => {
   const payload = {
     vm,
     selected
   };
-  return vm.$store.dispatch("geonode/fetchGeonodeWFSLayers", payload);
+  return vm.$store.dispatch("geonode/fetchGeonodeSelectedLayers", payload);
 };
 
 L.FeatureGroup.YIDP = L.FeatureGroup.extend({
@@ -21,7 +21,7 @@ L.GeoJSON.YIDP = L.GeoJSON.extend({
 L.geoJson.yidp = (data, options) => new L.GeoJSON.YIDP(data, options);
 
 export const loadVectors = async (vm, selected) => {
-  const layerGroups = await fetchGeonodeWFSLayers(vm, selected);
+  const layerGroups = await fetchGeonodeSelectedLayers(vm, selected);
   const userMap = vm.userMap;
   const rootUrl = "/geoserver/geonode/ows";
   let defaultParameters = {

@@ -2,6 +2,7 @@
 const GEONODE_MAPS_API_URL = "/api/maps/";
 const GEONODE_LAYERS_API_URL = "/api/layers/";
 const GEONODE_CATEGORIES_URL = "/api/categories/";
+const GEONODE_DOCUMENTS_URL = "/api/documents/";
 
 // geoserver endpoints
 const GEOSERVER_LAYERS_API_URL = "/rest/layers.json";
@@ -13,7 +14,8 @@ const GEOSERVER_WMS_CAPABILITIES_URL =
 export const geonodeEndpoints = {
   mapsUrl: GEONODE_MAPS_API_URL,
   layersUrl: GEONODE_LAYERS_API_URL,
-  categoriesUrl: GEONODE_CATEGORIES_URL
+  categoriesUrl: GEONODE_CATEGORIES_URL,
+  documentsUrl: GEONODE_DOCUMENTS_URL
 };
 
 export const geoserverEndpoints = {

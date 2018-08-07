@@ -106,7 +106,8 @@
 import appSlider from "vue-slider-component";
 import appLayerPicker from "./LayerPicker.vue";
 import appLayerGroup from "./LayerGroup.vue";
-import { loadVectors } from "../map/wfs";
+// import { loadVectors } from "../map/wfs";
+import { loadOverlays } from "../map/wms";
 import { Stretch } from "vue-loading-spinner";
 import * as mapInteractions from "@/components/map/interactions";
 import * as _ from "lodash";
@@ -186,9 +187,7 @@ export default {
       const featureGroup = this.featureGroups.find(lyr => {
         return lyr.name === group.name;
       });
-      if (!this.map.hasLayer(featureGroup)) {
-        featureGroup.setZIndex(featureGroup.options.zIndex);
-        this.map.addLayer(featureGroup);
+      if (group.checked) {
         group.layers.forEach(lyr => {
           let layer = null;
           featureGroup.eachLayer(l => {
@@ -196,16 +195,24 @@ export default {
               layer = l;
             }
           });
-          if (lyr.checked) {
-            this.map.addLayer(layer);
-          } else {
+          if (lyr.checked && this.map.hasLayer(layer)) {
             this.map.removeLayer(layer);
           }
         });
-        group.checked = true;
-      } else {
-        this.map.removeLayer(featureGroup);
         group.checked = false;
+      } else {
+        group.layers.forEach(lyr => {
+          let layer = null;
+          featureGroup.eachLayer(l => {
+            if (l.name === lyr.name) {
+              layer = l;
+            }
+          });
+          if (lyr.checked && !this.map.hasLayer(layer)) {
+            this.map.addLayer(layer);
+          }
+        });
+        group.checked = true;
       }
       this.$store.dispatch("usermaps/saveFeatureGroup", group);
     },
@@ -223,7 +230,7 @@ export default {
         });
         if (selection === undefined) {
           // remove unselected layer
-          this.removeWFSOverlay(layer);
+          this.removeOverlay(layer);
         } else {
           // load any layers not already loaded
           layersToLoad = layersToLoad.filter(lyr => {
@@ -238,7 +245,7 @@ export default {
       this.$store.dispatch("usermaps/saveSelectedCategories", payload);
       if (layersToLoad) {
         this.overlaysLoaded = false;
-        loadVectors(this, layersToLoad);
+        loadOverlays(this, layersToLoad);
       }
     },
     updateSliders() {
@@ -246,7 +253,7 @@ export default {
         slider.refresh();
       });
     },
-    addWFSOverlay(group, featureGroup) {
+    addOverlay(group, featureGroup) {
       this.featureGroups.push(featureGroup);
       if (group.checked && !this.map.hasLayer(featureGroup)) {
         this.map.addLayer(featureGroup);
@@ -263,7 +270,7 @@ export default {
       });
       this.$store.dispatch("usermaps/addFeatureGroup", group);
     },
-    removeWFSOverlay(group) {
+    removeOverlay(group) {
       const featureGroups = _.remove(this.featureGroups, fg => {
         return fg.name === group.name;
       });
@@ -282,7 +289,7 @@ export default {
     loadUserMap() {
       const id = this.$route.params.id;
       this.userMap = this.$store.getters["usermaps/getUserMap"](id);
-      loadVectors(this, this.userMap.selectedCategories);
+      loadOverlays(this, this.userMap.selectedCategories);
     },
     getFeatureGroup(group) {
       return this.featureGroups.find(g => {

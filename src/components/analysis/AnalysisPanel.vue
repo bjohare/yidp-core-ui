@@ -12,15 +12,16 @@
 <script>
 import axios from "axios";
 import * as L from "leaflet";
-import { filterStyle } from "@/components/map/styles";
+import { filterStyle, selectedFilterStyle } from "@/components/map/styles";
 export default {
-  props: ["show"],
+  props: ["show", "tabs"],
   data() {
     return {
       map: null,
       featureGroup: L.featureGroup(),
       layers: [],
-      selected: "admin1"
+      selected: "admin1",
+      selectedLayer: null
     };
   },
   methods: {
@@ -31,10 +32,13 @@ export default {
       this.featureGroup.setZIndex(2000);
       let options = {
         style: filterStyle,
-        onEachFeature: function(feature, layer) {
+        onEachFeature: (feature, layer) => {
           layer.bindTooltip(feature.properties.name_en, {
             sticky: true,
             className: "analysis-tooltip"
+          });
+          layer.on("click", e => {
+            this.selectFilter(e.target);
           });
         }
       };
@@ -57,6 +61,13 @@ export default {
     selectLayer(layer) {
       this.featureGroup.clearLayers();
       this.featureGroup.addLayer(layer.layer);
+    },
+    selectFilter(layer) {
+      if (this.selectedLayer) {
+        this.selectedLayer.setStyle(filterStyle);
+      }
+      this.selectedLayer = layer;
+      layer.setStyle(selectedFilterStyle);
     }
   },
   created() {
@@ -69,8 +80,12 @@ export default {
     });
     this.$root.$on("changed::tab", $event => {
       if ($event.tabs[$event.currentTab].id === "analysis") {
-        this.featureGroup.addTo(this.map);
-      } else this.featureGroup.removeFrom(this.map);
+        this.featureGroup.addTo(_vm.map);
+      } else this.featureGroup.removeFrom(_vm.map);
+      _vm.selectedLayer = null;
+    });
+    this.$root.$on("map-destroy", () => {
+      _vm.selectedLayer = null;
     });
   }
 };

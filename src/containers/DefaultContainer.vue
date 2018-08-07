@@ -45,7 +45,6 @@
         </div>
       </main>
       <AppAside fixed>
-        <!--aside-->
         <DefaultAside/>
       </AppAside>
     </div>

@@ -1,5 +1,5 @@
 <template>
-  <div id="featureInfo" v-if="showPopover">
+  <div ref="info" id="featureInfo" v-if="showPopover">
     <div class="h4"><strong>Selected Feature</strong></div>
     <ul class="list-group">
       <li class="list-item" v-for="(item, key) in info.feature.properties" :key="key">

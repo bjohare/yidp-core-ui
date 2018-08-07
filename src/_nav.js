@@ -14,6 +14,12 @@ export default {
       name: "Maps",
       url: "/maps",
       icon: "icon-globe"
+    },
+    {
+      title: false,
+      name: "Documents",
+      url: "/documents",
+      icon: "icon-folder"
     }
     // {
     //   title: true,

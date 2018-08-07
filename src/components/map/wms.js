@@ -36,6 +36,14 @@ const fetchGeonodeWMSLayers = async vm => {
   return vm.$store.dispatch("geonode/fetchGeonodeWMSLayers", vm);
 };
 
+export const fetchGeonodeSelectedLayers = async (vm, selected) => {
+  const payload = {
+    vm,
+    selected
+  };
+  return vm.$store.dispatch("geonode/fetchGeonodeSelectedLayers", payload);
+};
+
 L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
   createTile(coords, done) {
     const url = this.getTileUrl(coords);
@@ -53,15 +61,17 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
 });
 L.tileLayer.wms_auth = (url, options) => new L.TileLayer.WMS_AUTH(url, options);
 
-export const loadWMSLayers = async vm => {
+L.LayerGroup.YIDP = L.LayerGroup.extend({
+  name: ""
+});
+L.layerGroup.yidp = options => new L.LayerGroup.YIDP(options);
+
+export const loadBaseLayers = async map => {
   var osmUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   var osmAttrib =
     'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
-  var osm = new L.TileLayer(osmUrl, {
-    attribution: osmAttrib,
-    zIndex: 200
-  });
-  osm.addTo(vm.map);
+  var osm = new L.TileLayer(osmUrl, { attribution: osmAttrib, zIndex: 200 });
+  osm.addTo(map);
   const mapLink = '<a href="http://www.esri.com/">Esri</a>';
   const wholink =
     "i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community";
@@ -73,35 +83,28 @@ export const loadWMSLayers = async vm => {
     zIndex: 200
   });
   const baseLayers = [
-    {
-      name: "OpenStreetMap",
-      layer: osm,
-      opacity: 1,
-      checked: true
-    },
-    {
-      name: "Esri World Imagery",
-      layer: esri,
-      opacity: 1,
-      checked: ""
-    }
+    { name: "OpenStreetMap", layer: osm, opacity: 1, checked: true },
+    { name: "Esri World Imagery", layer: esri, opacity: 1, checked: "" }
   ];
+  return baseLayers;
+};
+
+export const loadWMSLayers = async vm => {
+  let baseLayers = await loadBaseLayers(vm.map);
   const layers = await fetchGeonodeWMSLayers(vm);
   let wmsLayers = [];
-  const queryLayers = [];
   const wmsUrl = vm.userMap.wmsBaseUrl;
   let zIndex = 400;
   for (let idx in layers) {
     zIndex++;
     let layer = layers[idx];
     let typename = layer.typename;
-    queryLayers.push(layer.typename);
     let params = {
-      LAYERS: typename,
-      VERISON: "1.3.0",
-      FORMAT: "image/png",
-      TRANSPARENT: "true",
-      TILED: true,
+      layers: typename,
+      version: "1.3.0",
+      format: "image/png",
+      transparent: "true",
+      tiled: true,
       minZoom: vm.userMap.minZoom,
       maxZoom: vm.userMap.maxZoom
     };
@@ -126,4 +129,68 @@ export const loadWMSLayers = async vm => {
     };
     vm.$store.dispatch("usermaps/saveMapPosition", position);
   });
+};
+
+export const loadOverlays = async (vm, selected) => {
+  const layerGroups = await fetchGeonodeSelectedLayers(vm, selected);
+  const userMap = vm.userMap;
+  const wmsUrl = vm.userMap.wmsBaseUrl;
+  let zIndex = 600;
+  let params = {
+    service: "WMS",
+    version: "1.3.0",
+    format: "image/png",
+    transparent: "true",
+    tiled: true,
+    minZoom: vm.userMap.minZoom,
+    maxZoom: vm.userMap.maxZoom
+  };
+  let defaultState = { checked: true, opacity: 0.65 };
+  for (let group in layerGroups) {
+    const layers = layerGroups[group];
+    let state = vm.$store.getters["usermaps/getFeatureGroup"](
+      userMap.id,
+      group
+    );
+    const groupState =
+      state === undefined
+        ? { checked: true, enabled: true, layers: [] }
+        : state;
+    let lyrGroup = L.layerGroup.yidp();
+    lyrGroup.name = group;
+    lyrGroup.setZIndex(600);
+    let subLayers = [];
+    await layers.reduce(async (promise, layer) => {
+      await promise;
+      var parameters = L.Util.extend(params, {
+        layers: layer.typename
+      });
+      let state = groupState.layers.find(l => {
+        return l.name === layer.title;
+      });
+      let layerState = state === undefined ? defaultState : state;
+      let lyr = L.tileLayer
+        .wms_auth(wmsUrl, parameters)
+        .addTo(vm.map)
+        .setZIndex(zIndex)
+        .addTo(lyrGroup);
+      lyr.name = layer.title;
+      var subLayer = {
+        name: layer.title,
+        groupName: group,
+        mapId: userMap.id,
+        checked: layerState.checked,
+        opacity: layerState.opacity
+      };
+      subLayers.push(subLayer);
+    }, Promise.resolve());
+    let layerGroup = {
+      name: group,
+      layers: subLayers,
+      mapId: userMap.id,
+      checked: groupState.checked
+    };
+    vm.addOverlay(layerGroup, lyrGroup);
+  }
+  vm.$root.$emit("overlays-added");
 };
