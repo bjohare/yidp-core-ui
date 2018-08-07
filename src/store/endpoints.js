@@ -7,7 +7,7 @@ const GEONODE_DOCUMENTS_URL = "/api/documents/";
 // geoserver endpoints
 const GEOSERVER_LAYERS_API_URL = "/rest/layers.json";
 const GEOSERVER_WMS_BASE_URL =
-  "http://yidp-geonode.geoweb.io/geoserver/geonode/wms?";
+  "http://yidp-geonode.geoweb.io/geoserver/geonode/wms";
 const GEOSERVER_WMS_CAPABILITIES_URL =
   "/geonode/wms?version=1.0.0&request=GetCapabilities";
 

@@ -1,7 +1,7 @@
 <template>
 <transition name="fade" mode="out-in">
   <div>
-    <b-list-group-item class="list-group-item-accent-success list-group-item-divider">
+    <b-list-group-item class="list-group-item-accent-success list-group-item-divider" @click="selectLayerGroup">
     <div v-b-toggle="'group-' + index">
       <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-sm float-left mr-3"></i>
       <i style="cursor: pointer;" class="open fa fa-chevron-up fa-sm float-left mr-3"></i>
@@ -17,14 +17,16 @@
       :disabled="!group.checked">
         <div class="text-left small"><strong>{{ layer.name }}</strong></div>
         <div class="d-flex">
+          <img :src="layer.legendUrl" class="mb-1"/>
           <app-slider ref="opacity" v-model="layer.opacity" v-bind="slider" :disabled="!layer.checked || !group.checked"
             @drag-end="setLayerOpacity(layer)">
           </app-slider>
-          <label class="switch switch-sm switch-success ml-2">
+          <label class="switch switch-sm switch-success">
             <input ref="switch" type="checkbox" class="switch-input" v-model="layer.checked" @click="toggleLayer(layer, group)"
             :disabled="!group.checked">
             <span class="switch-slider"></span>
           </label>
+          <span class="icon-question font-lg m-1" v-b-popover.click="layer.abstract"></span>
           <!-- <span :id="'group-' + index + '-layer-style-' + idx"
             class="fa fa-cog fa-lg ml-2 mt-1"
             v-b-tooltip.hover title="Edit Layer Style" :disabled="!group.checked || !layer.checked">
@@ -75,9 +77,7 @@ export default {
   },
   methods: {
     setLayerOpacity(layer) {
-      layer.style.opacity = layer.opacity;
-      layer.style.fillOpacity = layer.opacity;
-      this.getFeature(layer.name).setStyle(layer.style);
+      this.getFeature(layer.name).setOpacity(layer.opacity);
       this.$store.dispatch("usermaps/saveFeatureGroup", this.group);
     },
     updateSliders() {
@@ -89,6 +89,9 @@ export default {
       return this.featureGroup.getLayers().find(lyr => {
         return lyr.name === name;
       });
+    },
+    selectLayerGroup($event) {
+      // $event.target.classList.toggle("active");
     }
   }
 };

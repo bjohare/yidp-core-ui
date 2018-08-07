@@ -10,18 +10,18 @@ const mapDefaults = {
 const resetMapViewControl = (vm, map) => {
   let control = new L.Control({ position: "topleft" });
   control.onAdd = function(map) {
-    var azoom = L.DomUtil.create("div", "leaflet-bar");
-    azoom.innerHTML =
+    var reset = L.DomUtil.create("div", "leaflet-bar");
+    reset.innerHTML =
       '<a title="Reset Map" class="leaflet-control-resetmap"><span class="fa fa-refresh"></span></a>';
-    L.DomEvent.disableClickPropagation(azoom).addListener(
-      azoom,
+    L.DomEvent.disableClickPropagation(reset).addListener(
+      reset,
       "click",
       function() {
         map.setView(mapDefaults.center, mapDefaults.zoom);
       },
-      azoom
+      reset
     );
-    return azoom;
+    return reset;
   };
   return control;
 };
@@ -45,6 +45,13 @@ export const fetchGeonodeSelectedLayers = async (vm, selected) => {
 };
 
 L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
+  isOverlay: false,
+  initialize: function(url, vm, wmsParams, options) {
+    L.TileLayer.WMS.prototype.initialize.call(this, url, wmsParams);
+    this.name = options.name;
+    this.vm = vm;
+    this.isOverlay = options.isOverlay;
+  },
   createTile(coords, done) {
     const url = this.getTileUrl(coords);
     const img = document.createElement("img");
@@ -57,11 +64,70 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
         done(null, img);
       });
     return img;
+  },
+
+  onAdd: function(map) {
+    // Triggered when the layer is added to a map.
+    //   Register a click listener, then do all the upstream WMS things
+    L.TileLayer.WMS.prototype.onAdd.call(this, map);
+    if (this.isOverlay) {
+      map.on("click", this.getFeatureInfo, this);
+    }
+  },
+  onRemove: function(map) {
+    // Triggered when the layer is removed from a map.
+    //   Unregister a click listener, then do all the upstream WMS things
+    L.TileLayer.WMS.prototype.onRemove.call(this, map);
+    if (this.isOverlay) {
+      map.off("click", this.getFeatureInfo, this);
+    }
+  },
+  getFeatureInfo: function(evt) {
+    let layer = this;
+    // Make an AJAX request to the server and hope for the best
+    let url = this.getFeatureInfoUrl(evt.latlng);
+    geoserverAxios.get(url).then(response => {
+      if (response.data && response.data.features.length > 0) {
+        let feature = {
+          name: layer.name,
+          properties: response.data.features[0].properties
+        };
+        this.vm.$root.$emit("feature-selected", feature);
+      }
+    });
+  },
+  getFeatureInfoUrl: function(latlng) {
+    // Construct a GetFeatureInfo request URL given a point
+    let point = this._map.latLngToContainerPoint(latlng, this._map.getZoom());
+    let size = this._map.getSize();
+    let params = {
+      request: "GetFeatureInfo",
+      service: "WMS",
+      srs: "EPSG:4326",
+      styles: this.wmsParams.styles,
+      transparent: this.wmsParams.transparent,
+      version: "1.1.1",
+      format: this.wmsParams.format,
+      bbox: this._map.getBounds().toBBoxString(),
+      height: size.y,
+      width: size.x,
+      layers: this.wmsParams.layers,
+      query_layers: this.wmsParams.layers,
+      feature_count: 1,
+      info_format: "application/json"
+    };
+
+    params[params.version === "1.3.0" ? "i" : "x"] = point.x;
+    params[params.version === "1.3.0" ? "j" : "y"] = point.y;
+
+    return this._url + L.Util.getParamString(params, this._url, true);
   }
 });
-L.tileLayer.wms_auth = (url, options) => new L.TileLayer.WMS_AUTH(url, options);
 
-L.LayerGroup.YIDP = L.LayerGroup.extend({
+L.tileLayer.wms_auth = (url, vm, wmsParams, options) =>
+  new L.TileLayer.WMS_AUTH(url, vm, wmsParams, options);
+
+L.LayerGroup.YIDP = L.FeatureGroup.extend({
   name: ""
 });
 L.layerGroup.yidp = options => new L.LayerGroup.YIDP(options);
@@ -99,9 +165,9 @@ export const loadWMSLayers = async vm => {
     zIndex++;
     let layer = layers[idx];
     let typename = layer.typename;
-    let params = {
+    let wmsParams = {
       layers: typename,
-      version: "1.3.0",
+      version: "1.1.1",
       format: "image/png",
       transparent: "true",
       tiled: true,
@@ -114,7 +180,7 @@ export const loadWMSLayers = async vm => {
       enabled: true,
       opacity: 1,
       layer: L.tileLayer
-        .wms_auth(wmsUrl, params)
+        .wms_auth(wmsUrl, vm, wmsParams, { name: layer.title })
         .addTo(vm.map)
         .setZIndex(zIndex)
     });
@@ -135,18 +201,26 @@ export const loadOverlays = async (vm, selected) => {
   const layerGroups = await fetchGeonodeSelectedLayers(vm, selected);
   const userMap = vm.userMap;
   const wmsUrl = vm.userMap.wmsBaseUrl;
-  let zIndex = 600;
+  let zIndex = 700;
   let params = {
     service: "WMS",
-    version: "1.3.0",
+    version: "1.1.1",
     format: "image/png",
     transparent: "true",
     tiled: true,
     minZoom: vm.userMap.minZoom,
     maxZoom: vm.userMap.maxZoom
   };
+  let legendParams = {
+    request: "GetLegendGraphic",
+    version: "1.1.1",
+    format: "image/png",
+    width: 20,
+    height: 20
+  };
   let defaultState = { checked: true, opacity: 0.65 };
   for (let group in layerGroups) {
+    zIndex++;
     const layers = layerGroups[group];
     let state = vm.$store.getters["usermaps/getFeatureGroup"](
       userMap.id,
@@ -162,25 +236,30 @@ export const loadOverlays = async (vm, selected) => {
     let subLayers = [];
     await layers.reduce(async (promise, layer) => {
       await promise;
-      var parameters = L.Util.extend(params, {
+      let wmsParams = L.Util.extend(params, {
         layers: layer.typename
       });
+      let legendParam = L.Util.extend(legendParams, { layer: layer.typename });
+      let legendUrl = wmsUrl + L.Util.getParamString(legendParam);
       let state = groupState.layers.find(l => {
         return l.name === layer.title;
       });
       let layerState = state === undefined ? defaultState : state;
-      let lyr = L.tileLayer
-        .wms_auth(wmsUrl, parameters)
+      let options = { name: layer.title, isOverlay: true };
+      L.tileLayer
+        .wms_auth(wmsUrl, vm, wmsParams, options)
         .addTo(vm.map)
         .setZIndex(zIndex)
+        .setOpacity(layerState.opacity)
         .addTo(lyrGroup);
-      lyr.name = layer.title;
       var subLayer = {
         name: layer.title,
         groupName: group,
         mapId: userMap.id,
         checked: layerState.checked,
-        opacity: layerState.opacity
+        opacity: layerState.opacity,
+        legendUrl: legendUrl,
+        abstract: layer.abstract
       };
       subLayers.push(subLayer);
     }, Promise.resolve());

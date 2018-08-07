@@ -2,7 +2,7 @@
   <div style="height: inherit;">
       <div id="map" class="d-flex">
         <div ref="overlay">
-          <app-overlay :info="selectedFeature" :showPopover="showPopover"></app-overlay>
+          <app-overlay :features="selectedFeatures" :showPopover="showPopover"></app-overlay>
         </div>
       </div>
   </div>
@@ -18,12 +18,12 @@ export default {
       map: null,
       userMap: null,
       info: null,
-      selectedFeature: null
+      selectedFeatures: []
     };
   },
   computed: {
     showPopover() {
-      return this.selectedFeature !== null;
+      return this.selectedFeatures.length > 0;
     }
   },
   components: {
@@ -51,7 +51,7 @@ export default {
       this.userMap = this.$store.getters["usermaps/getUserMap"](id);
     },
     resetSelectedFeature() {
-      this.selectedFeature.layer.setStyle(this.selectedFeature.style);
+      // this.selectedFeature.layer.setStyle(this.selectedFeature.style);
     }
   },
   mounted() {
@@ -71,9 +71,8 @@ export default {
     this.loadUserMap();
     this.$root.$on("map-init", map => {
       map.on("click", e => {
-        if (_vm.selectedFeature !== null) {
-          this.resetSelectedFeature();
-          _vm.selectedFeature = null;
+        if (_vm.selectedFeatures.length === 2) {
+          _vm.selectedFeatures = [];
         }
       });
     });
@@ -81,11 +80,11 @@ export default {
       _vm.map = null;
       _vm.userMap = null;
     });
-    this.$root.$on("feature-selected", info => {
-      if (_vm.selectedFeature) {
-        _vm.resetSelectedFeature();
+    this.$root.$on("feature-selected", feature => {
+      if (this.selectedFeatures.length === 2) {
+        this.selectedFeatures = [];
       }
-      this.selectedFeature = info;
+      this.selectedFeatures.push(feature);
     });
   }
 };
