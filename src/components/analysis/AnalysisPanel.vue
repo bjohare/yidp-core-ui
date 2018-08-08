@@ -1,11 +1,23 @@
 <template>
   <div class="message p-3" v-if="show">
     <div class="pb-5 mr-3 float-left">
-      <b-form-group label="Select filter layer..." class="h4">
-      <b-form-radio-group stacked name="layers" v-for="(layer, index) in layers" :key="index" v-model="selected">
-        <b-form-radio class="layer" :value="layer.value" @change="selectLayer(layer)">{{layer.name}}</b-form-radio>
-      </b-form-radio-group>
-    </b-form-group>
+      <b-form-group label="Filter by.." class="h5">
+        <b-form-radio-group stacked name="layers" v-for="(layer, index) in layers" :key="index" v-model="filterLayer">
+          <b-form-radio class="layer" :value="layer.value" @change="selectLayer(layer)">{{layer.name}}</b-form-radio>
+        </b-form-radio-group>
+      </b-form-group>
+      <b-form-group label="Select data layer.." class="h5">
+        <b-form-select class="mb-3" v-model="dataLayer">
+          <template slot="first">
+            <option :value="null" disabled>-- Please select the input layer --</option>
+          </template>
+          <optgroup v-for="(group, name) in datalayers" :key="name" :label="name">
+            <option v-for="(option, index) in group" :key="index" :value="option.value">
+              {{ option.text }}
+            </option>
+          </optgroup>
+        </b-form-select>
+      </b-form-group>
     </div>
   </div>
 </template>
@@ -18,11 +30,27 @@ export default {
   data() {
     return {
       map: null,
+      userMap: null,
       featureGroup: L.featureGroup(),
       layers: [],
-      selected: "admin1",
+      filterLayer: 'admin1',
+      dataLayer: null,
       selectedLayer: null
     };
+  },
+  computed: {
+    datalayers(){
+      let layers = this.userMap.layers;
+      let options = {};
+      layers.forEach(layer => {
+        options[layer.name] = [];
+        layer.layers.forEach(subLayer => {
+          let opt = {value: subLayer.name, text: subLayer.name}
+          options[layer.name].push(opt)
+        })
+      })
+      return options;
+    }
   },
   methods: {
     async loadAnalysisLayers() {
@@ -68,12 +96,17 @@ export default {
       }
       this.selectedLayer = layer;
       layer.setStyle(selectedFilterStyle);
+    },
+    loadUserMap() {
+      const id = this.$route.params.id;
+      this.userMap = this.$store.getters["usermaps/getUserMap"](id)
     }
   },
   created() {
     const _vm = this;
     this.$root.$on("map-init", map => {
       _vm.map = map;
+      _vm.loadUserMap();
       if (_vm.layers.length === 0) {
         _vm.loadAnalysisLayers();
       }

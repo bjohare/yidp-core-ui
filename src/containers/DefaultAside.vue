@@ -23,6 +23,12 @@
       <div class="message" v-if="!show">No map selected.</div>
       <app-map-description :map="mapDescription" :show="show"></app-map-description>
     </b-tab>
+    <b-tab id="settings" ref="settings">
+      <template slot="title">
+        <i class='fa fa-cog fa-lg' v-b-tooltip.hover.left title="Settings"></i>
+      </template>
+      <div class="message"><button class="btn btn-primary m-5">Reset Application.</button></div>
+    </b-tab>
   </b-tabs>
 </template>
 
