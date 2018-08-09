@@ -29,7 +29,6 @@ const resetMapViewControl = (vm, map) => {
 export const initMap = vm => {
   vm.map = L.map("map").setView(vm.userMap.center, vm.userMap.zoom);
   resetMapViewControl(vm, vm.map).addTo(vm.map);
-  vm.$root.$emit("map-init", vm.map);
 };
 
 const fetchGeonodeWMSLayers = async vm => {

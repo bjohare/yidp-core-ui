@@ -111,6 +111,7 @@ import { loadOverlays } from "../map/wms";
 import { Stretch } from "vue-loading-spinner";
 import * as mapInteractions from "@/components/map/interactions";
 import * as _ from "lodash";
+import * as moment from "moment";
 
 export default {
   data() {
@@ -120,7 +121,6 @@ export default {
       baseLayers: [],
       wmsLayers: [],
       featureGroups: [],
-      // wfsOverlays: [],
       overlaysLoaded: true,
       show: false,
       slider: {
@@ -133,7 +133,8 @@ export default {
         dotSize: 13,
         clickable: false,
         tooltip: false
-      }
+      },
+      counter: 0
     };
   },
   computed: {
@@ -285,6 +286,8 @@ export default {
       this.baseLayers = [];
       this.wmsLayers = [];
       this.featureGroups = [];
+      this.show = false;
+      this.overlaysLoaded = false;
     },
     loadUserMap() {
       const id = this.$route.params.id;
@@ -319,8 +322,7 @@ export default {
       _vm.show = true;
     });
     this.$root.$on("map-destroy", $event => {
-      _vm.show = false;
-      _vm.overlaysLoaded = false;
+      _vm.$root.$off("map-init");
       _vm.resetMap();
     });
     this.$root.$on("overlays-added", () => {

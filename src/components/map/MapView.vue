@@ -39,6 +39,8 @@ export default {
     },
     initializeMap() {
       initMap(this);
+      console.log("initializing map.. ");
+      this.$root.$emit("map-init", this.map);
     },
     async loadInitalLayers() {
       await loadWMSLayers(this);
@@ -59,10 +61,10 @@ export default {
     this.loadInitalLayers();
     this.$nextTick(() => {
       this.$refs.overlay.onclick = e => {
-        e.stopPropagation();
+        e.preventDefault();
       };
-      this.$refs.overlay.mousewheel = e => {
-        e.stopPropagation();
+      this.$refs.overlay.onwheel = e => {
+        e.preventDefault();
       };
     });
   },
