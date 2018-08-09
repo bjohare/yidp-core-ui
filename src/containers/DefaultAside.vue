@@ -8,7 +8,7 @@
         <i class='icon-layers' v-b-tooltip.hover.left title="Map Layers"></i>
       </template>
       <div v-if="!show">No map selected.</div>
-      <app-layer-switcher></app-layer-switcher>
+      <app-layer-switcher :userMap="userMap" :map="map"></app-layer-switcher>
     </b-tab>
     <b-tab id="analysis" ref="analysis">
       <template slot="title">
@@ -42,6 +42,7 @@ export default {
   data() {
     return {
       show: false,
+      map: null,
       mapDescription: null,
       userMap: null,
       showLayersTab: true
@@ -68,6 +69,7 @@ export default {
   created() {
     const _vm = this;
     this.$root.$on("map-init", map => {
+      _vm.map = map;
       _vm.loadUserMap();
     });
     this.$root.$on("map-destroy", () => {

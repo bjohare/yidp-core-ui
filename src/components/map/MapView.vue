@@ -39,7 +39,6 @@ export default {
     },
     initializeMap() {
       initMap(this);
-      console.log("initializing map.. ");
       this.$root.$emit("map-init", this.map);
     },
     async loadInitalLayers() {

@@ -84,7 +84,7 @@
                 <b-dropdown-item v-b-modal.layerPicker>Add / Remove Overlays</b-dropdown-item>
             </b-dropdown>
           </b-list-group-item>
-          <b-collapse id="overlays" visible @shown="updateSliders">
+          <b-collapse id="overlays" visible @shown="updateSliders" v-if="overlaysLoaded">
             <div v-for="(group, index) in wfsOverlays" :key="group.name + index">
               <app-layer-group :map="map" :group="group" :featureGroup="getFeatureGroup(group.name)"
                 :index="index" :toggleLayer="toggleLayer" :toggleGroup="toggleGroup"></app-layer-group>
@@ -111,13 +111,11 @@ import { loadOverlays } from "../map/wms";
 import { Stretch } from "vue-loading-spinner";
 import * as mapInteractions from "@/components/map/interactions";
 import * as _ from "lodash";
-import * as moment from "moment";
 
 export default {
+  props: ["userMap", "map"],
   data() {
     return {
-      map: null,
-      userMap: null,
       baseLayers: [],
       wmsLayers: [],
       featureGroups: [],
@@ -133,8 +131,7 @@ export default {
         dotSize: 13,
         clickable: false,
         tooltip: false
-      },
-      counter: 0
+      }
     };
   },
   computed: {
@@ -151,6 +148,11 @@ export default {
     },
     showPopover() {
       return this.selectedFeature !== null;
+    }
+  },
+  watch: {
+    userMap: function(userMap) {
+      loadOverlays(this, userMap.selectedCategories);
     }
   },
   methods: {
@@ -281,18 +283,18 @@ export default {
       }
     },
     resetMap() {
-      this.map = null;
-      this.userMap = null;
+      // this.map = null;
+      // this.userMap = null;
       this.baseLayers = [];
       this.wmsLayers = [];
       this.featureGroups = [];
       this.show = false;
       this.overlaysLoaded = false;
     },
-    loadUserMap() {
+    async loadUserMap() {
       const id = this.$route.params.id;
       this.userMap = this.$store.getters["usermaps/getUserMap"](id);
-      loadOverlays(this, this.userMap.selectedCategories);
+      await loadOverlays(this, this.userMap.selectedCategories);
     },
     getFeatureGroup(group) {
       return this.featureGroups.find(g => {
@@ -308,13 +310,10 @@ export default {
   },
   created() {
     const _vm = this;
-    this.$root.$on("map-init", map => {
-      _vm.map = map;
-      _vm.loadUserMap();
-    });
-    this.$on("overlays-loaded", () => {
-      _vm.overlaysLoaded = true;
-    });
+    // this.$root.$on("map-init", map => {
+    //   _vm.map = map;
+    //   _vm.loadUserMap();
+    // });
     // triggered when WMS base layers are added to the map
     this.$root.$on("base-layers-added", (baseLayers, wmsLayers) => {
       _vm.baseLayers = baseLayers;
@@ -322,7 +321,7 @@ export default {
       _vm.show = true;
     });
     this.$root.$on("map-destroy", $event => {
-      _vm.$root.$off("map-init");
+      // _vm.$root.$off("map-init");
       _vm.resetMap();
     });
     this.$root.$on("overlays-added", () => {
