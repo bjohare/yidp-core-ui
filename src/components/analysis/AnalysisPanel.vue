@@ -33,22 +33,22 @@ export default {
       userMap: null,
       featureGroup: L.featureGroup(),
       layers: [],
-      filterLayer: 'admin1',
+      filterLayer: "admin1",
       dataLayer: null,
       selectedLayer: null
     };
   },
   computed: {
-    datalayers(){
+    datalayers() {
       let layers = this.userMap.layers;
       let options = {};
       layers.forEach(layer => {
         options[layer.name] = [];
         layer.layers.forEach(subLayer => {
-          let opt = {value: subLayer.name, text: subLayer.name}
-          options[layer.name].push(opt)
-        })
-      })
+          let opt = { value: subLayer.name, text: subLayer.name };
+          options[layer.name].push(opt);
+        });
+      });
       return options;
     }
   },
@@ -99,7 +99,7 @@ export default {
     },
     loadUserMap() {
       const id = this.$route.params.id;
-      this.userMap = this.$store.getters["usermaps/getUserMap"](id)
+      this.userMap = this.$store.getters["usermaps/getUserMap"](id);
     }
   },
   created() {

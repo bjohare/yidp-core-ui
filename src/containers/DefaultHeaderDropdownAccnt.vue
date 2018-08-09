@@ -8,17 +8,12 @@
     </template>\
     <template slot="dropdown">
       <div v-show="isAuthenticated">
-        <b-dropdown-header tag="div" class="text-center"><strong>Account</strong></b-dropdown-header>
-        <b-dropdown-item><i class="fa fa-user" /> Profile</b-dropdown-item>
-        <b-dropdown-item>
-          <i class="cui-map icons font-1xl d-inline mt-4"/> Maps
-          <b-badge variant="info">{{ numMaps }}</b-badge>
+        <!-- <b-dropdown-header tag="div" class="text-center"><strong>Account</strong></b-dropdown-header> -->
+        <b-dropdown-item to="/maps">
+            <i class="cui-map icons font-1xl d-inline mt-4"/> Maps
+            <b-badge variant="info">{{ numMaps }}</b-badge>
         </b-dropdown-item>
-        <b-dropdown-item>
-          <i class="cui-layers icons font-1xl d-inline mt-4"/> Layers
-          <b-badge variant="info">{{ numLayers }}</b-badge>
-        </b-dropdown-item>
-        <b-dropdown-item>
+        <b-dropdown-item to="/documents">
           <i class="cui-note icons font-1xl d-inline mt-4"/> Documents
           <b-badge variant="info">{{ numDocuments }}</b-badge>
         </b-dropdown-item>
@@ -86,3 +81,9 @@ export default {
   }
 };
 </script>
+<style scoped>
+.link {
+  text-decoration: none;
+  color: black;
+}
+</style>

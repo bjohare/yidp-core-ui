@@ -6,7 +6,7 @@
           <b-card-group>
             <b-card no-body class="p-4">
               <b-card-body>
-                <h2>Login</h2>
+                <h1>Yemen Integrated Data Platform</h1>
                 <div class="alert alert-danger" v-if="errors.length">
                   <ul>
                     <li v-for="error in errors" :key="error">{{ error }}</li>
@@ -88,3 +88,8 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+.app {
+  height: auto;
+}
+</style>

@@ -59,8 +59,6 @@ import Login from "@/views/pages/Login";
 import Logout from "@/views/pages/Logout";
 // import Register from "@/views/pages/Register";
 
-import store from "../store/store";
-
 Vue.use(Router);
 
 export default new Router({
@@ -94,14 +92,7 @@ export default new Router({
         {
           path: "/map/:id",
           name: "Map",
-          component: Map,
-          beforeEnter(to, from, next) {
-            if (!store.getters["authentication/getUserProfile"]) {
-              next("/account/login");
-            } else {
-              next();
-            }
-          }
+          component: Map
         },
         {
           path: "/catalog",

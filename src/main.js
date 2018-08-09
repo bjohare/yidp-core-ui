@@ -33,13 +33,19 @@ Vue.filter("capitalize", function(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 });
 
-// router.beforeEach((to, from, next) => {
-//   if (!store.getters["authentication/getUserProfile"]) {
-//     next("/account/login");
-//   } else {
-//     next();
-//   }
-// });
+router.beforeEach((to, from, next) => {
+  if (to.path === "/account/login" || to.path === "/account/logout") {
+    next();
+  }
+  if (!store.getters["authentication/getAccessToken"]) {
+    next("/account/login");
+  }
+  if (store.getters["authentication/isAccessTokenExpired"]) {
+    next("/account/login");
+  } else {
+    next();
+  }
+});
 
 /* eslint-disable no-new */
 new Vue({

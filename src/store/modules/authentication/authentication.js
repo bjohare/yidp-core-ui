@@ -1,5 +1,6 @@
 import { geonodeAxios, yidpAxios } from "../../axios";
 import { apiEndpoints } from "./endpoints";
+import * as moment from "moment";
 
 const state = {
   accessToken: null,
@@ -77,6 +78,19 @@ const actions = {
     commit("accessToken", null);
     commit("userData", null);
     commit("userProfile", null);
+  },
+
+  isAccessTokenExpired({ commit, state }) {
+    let accessToken = state.accessToken;
+    let now = moment();
+    let expires = moment(accessToken.expires_at);
+    if (now.isAfter(expires)) {
+      commit("accessToken", null);
+      commit("userData", null);
+      commit("userProfile", null);
+      return true;
+    }
+    return false;
   }
 };
 
