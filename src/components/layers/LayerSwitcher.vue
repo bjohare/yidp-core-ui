@@ -84,7 +84,7 @@
                 <b-dropdown-item v-b-modal.layerPicker>Add / Remove Overlays</b-dropdown-item>
             </b-dropdown>
           </b-list-group-item>
-          <b-collapse id="overlays" visible @shown="updateSliders" v-if="overlaysLoaded">
+          <b-collapse id="overlays" visible @shown="updateSliders">
             <div v-for="(group, index) in wfsOverlays" :key="group.name + index">
               <app-layer-group :map="map" :group="group" :featureGroup="getFeatureGroup(group.name)"
                 :index="index" :toggleLayer="toggleLayer" :toggleGroup="toggleGroup"></app-layer-group>
@@ -310,18 +310,12 @@ export default {
   },
   created() {
     const _vm = this;
-    // this.$root.$on("map-init", map => {
-    //   _vm.map = map;
-    //   _vm.loadUserMap();
-    // });
-    // triggered when WMS base layers are added to the map
     this.$root.$on("base-layers-added", (baseLayers, wmsLayers) => {
       _vm.baseLayers = baseLayers;
       _vm.wmsLayers = wmsLayers;
       _vm.show = true;
     });
     this.$root.$on("map-destroy", $event => {
-      // _vm.$root.$off("map-init");
       _vm.resetMap();
     });
     this.$root.$on("overlays-added", () => {
