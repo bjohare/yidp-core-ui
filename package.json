@@ -42,6 +42,7 @@
     "vue-axios": "^2.1.1",
     "vue-chartjs": "^3.3.1",
     "vue-color": "^2.4.6",
+    "vue-line-clamp-extended": "^1.0.0",
     "vue-loading-spinner": "^1.0.11",
     "vue-perfect-scrollbar": "^0.1.0",
     "vue-router": "^3.0.1",

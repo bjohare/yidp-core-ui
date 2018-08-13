@@ -1,34 +1,82 @@
 <template>
-    <b-card
-    :title="document.title" :img-src="document.thumbnail_url"
-    :img-alt="document.title"
-    style="max-width: 15rem;"
-    border-variant="info">
-    <h5><b-badge variant="primary">{{ document.category__gn_description }}</b-badge></h5><br>
-    <p class="card-text">
-      {{ document.abstract }}
+  <b-card
+    :title="document.title"
+    :img-alt="document.title">
+    <span slot="header">
+      <strong>Date of information:</strong> {{document.date | format-date }}
+      <h5><b-badge pill variant="primary" class="h-5">{{ document.category__gn_description }}</b-badge></h5>
+    </span>
+    <p v-line-clamp="{
+      lines: 3,
+      text: abstract,
+      expanded: more
+    }" class="card-text">
     </p>
-    <router-link :to="{ name: 'Document', params: {id: document.id}}">
-      <b-button variant="primary">
-        View this Document
-      </b-button>
-    </router-link>
-    <em slot="footer">
-      {{ document.date_type | capitalize }}: {{ document.date | format-date }}</em>
-    </b-card>
+    <div v-if="clampAbstract">
+      <span class="toggle" @click="toggle()">{{ toggleText }}</span><br/><br/>
+    </div>
+    <a class="doc-link" :href="document.doc_url" v-if="hasExternalLink" target="_blank">
+        <strong><i class="fa fa-link fa-lg"></i> Open Link</strong>
+    </a>
+    <span slot="footer">
+        <i class="fa fa-tag fa-lg"></i>&nbsp;<em>{{ keywords }}</em>
+    </span>
+  </b-card>
 </template>
 <script>
 export default {
   props: {
     document: null
+  },
+  data() {
+    return {
+      more: false
+    }
+  },
+  computed: {
+    hasExternalLink() {
+      return this.document.doc_url !== null;
+    },
+    keywords() {
+     return this.document.keywords.join(", ");
+    },
+    abstract() {
+      return this.document.abstract
+    },
+    toggleText() {
+      return this.more === true ? 'Read less' : "Read more"
+    },
+    clampAbstract() {
+      return this.document.abstract.length > 300;
+    }
+  },
+  methods: {
+    toggle() {
+      this.more = !this.more;
+    }
   }
 };
 </script>
 <style lang="scss" scoped>
+.card {
+  max-width: 90%;
+  min-width: 90%;
+  margin-bottom: 2em;
+}
+.card-title {
+  font-size: 2em;
+}
 .badge {
   position: absolute;
   top: 20px;
   right: 20px;
+}
+.doc-link {
+  text-decoration: none;
+}
+.toggle {
+  cursor: pointer;
+  color: #20a8d8;
 }
 img {
   // width: 50%;

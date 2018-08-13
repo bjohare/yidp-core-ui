@@ -1,4 +1,4 @@
-import { geonodeEndpoints } from "../../endpoints";
+import { geonodeEndpoints, geoserverEndpoints } from "../../endpoints";
 import { geonodeAxios } from "../../axios";
 
 export const fetchGeonodeMaps = async ({ commit }) => {
@@ -85,8 +85,30 @@ export const fetchGeonodeMapDescription = async ({ commit }, payload) => {
   return response.data;
 };
 
+// TODO: check authentication on these methods
 export const fetchGeonodeDocuments = async ({ commit }) => {
   const response = await geonodeAxios.get(geonodeEndpoints.documentsUrl);
-  commit("geonodeDocuments", response.data.objects);
   return response.data.objects;
+};
+
+export const fetchGeonodeLayers = async () => {
+  const response = await geonodeAxios.get(geonodeEndpoints.layersUrl);
+  return response.data.objects;
+};
+
+export const fetchGeonodeLayer = async (context, id) => {
+  console.log(id);
+  const response = await geonodeAxios.get(geonodeEndpoints.layersUrl + id);
+  return response.data;
+};
+
+export const fetchGeoserverFeatureType = async (context, typename) => {
+  const response = await geonodeAxios.get(
+    geoserverEndpoints.wfsUrl +
+      "SERVICE=WFS&VERSION=2.0.0&request=DescribeFeatureType" +
+      "&typeNames=" +
+      typename +
+      "&outputFormat=application/json"
+  );
+  console.log(response);
 };

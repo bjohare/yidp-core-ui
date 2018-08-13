@@ -6,7 +6,7 @@
       <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-sm float-left mr-3"></i>
       <i style="cursor: pointer;" class="open fa fa-chevron-up fa-sm float-left mr-3"></i>
     </div>
-    <div class="mb-2"><strong>{{ group.name | truncate(32) }}</strong>
+    <div class="mb-2"><strong>{{ group.name | truncate(38) }}</strong>
       <label class="switch switch-sm float-right switch-pill switch-primary">
         <input type="checkbox" class="switch-input" v-model="group.checked" @click="toggleGroup(group)">
         <span class="switch-slider"></span>

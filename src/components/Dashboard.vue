@@ -1,6 +1,8 @@
 <template>
   <div class="animated fadeIn m-4">
-    <h1>Yemen Integrated Data Platform Dashboard</h1>
+    <div class="display-1">Yemen</div>
+    <p>Integrated Data Platform Dashboard</p>
+    <p>A World Bank-United Nations geospatial data and document sharing platform for users across humanitarian and developmental organizations. Learn More.</p>
   </div>
 </template>
 

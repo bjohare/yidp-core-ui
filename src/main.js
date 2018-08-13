@@ -12,6 +12,7 @@ import VueAxios from "vue-axios";
 import VueTruncate from "vue-truncate-filter";
 import axios from "axios";
 import moment from "moment";
+import { lineClamp } from 'vue-line-clamp-extended'
 
 import store from "@/store/store";
 
@@ -22,9 +23,11 @@ Vue.use(BootstrapVue);
 Vue.use(VueAxios, axios);
 Vue.use(VueTruncate);
 
+Vue.directive('line-clamp', lineClamp)
+
 Vue.filter("format-date", function(value) {
   if (!value) return "";
-  return moment(value).format("MMMM Do YYYY, h:mm a");
+  return moment(value).format("MMMM Do YYYY");
 });
 
 Vue.filter("capitalize", function(value) {

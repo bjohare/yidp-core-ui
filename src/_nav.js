@@ -4,16 +4,18 @@ export default {
       name: "Dashboard",
       url: "/dashboard",
       icon: "icon-speedometer"
-      // badge: {
-      //   variant: "primary",
-      //   text: "NEW"
-      // }
+    },
+    {
+      title: false,
+      name: "GeoData",
+      url: "/geodata",
+      icon: "icon-layers"
     },
     {
       title: false,
       name: "Maps",
       url: "/maps",
-      icon: "icon-globe"
+      icon: "icon-map"
     },
     {
       title: false,

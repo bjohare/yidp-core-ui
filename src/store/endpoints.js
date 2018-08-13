@@ -11,6 +11,8 @@ const GEOSERVER_WMS_BASE_URL =
 const GEOSERVER_WMS_CAPABILITIES_URL =
   "/geonode/wms?version=1.0.0&request=GetCapabilities";
 
+const GEOSERVER_WFS_ENDPOINT = "/geoserver/wfs?";
+
 export const geonodeEndpoints = {
   mapsUrl: GEONODE_MAPS_API_URL,
   layersUrl: GEONODE_LAYERS_API_URL,
@@ -21,5 +23,6 @@ export const geonodeEndpoints = {
 export const geoserverEndpoints = {
   layersUrl: GEOSERVER_LAYERS_API_URL,
   wmsBaseUrl: GEOSERVER_WMS_BASE_URL,
-  wmsCapabilitiesUrl: GEOSERVER_WMS_CAPABILITIES_URL
+  wmsCapabilitiesUrl: GEOSERVER_WMS_CAPABILITIES_URL,
+  wfsUrl: GEOSERVER_WFS_ENDPOINT
 };

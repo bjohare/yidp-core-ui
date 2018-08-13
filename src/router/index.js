@@ -10,6 +10,8 @@ import Dashboard from "@/components/Dashboard.vue";
 import Map from "@/components/map/Map.vue";
 import Documents from "@/components/documents/Documents.vue";
 import BaseMaps from "@/components/basemaps/BaseMaps.vue";
+import GeoData from "@/components/geodata/GeoData.vue"
+import GeoDataDetail from "@/components/geodata/GeoDataDetail.vue";
 
 // import Colors from "@/views/theme/Colors";
 // import Typography from "@/views/theme/Typography";
@@ -95,8 +97,14 @@ export default new Router({
           component: Map
         },
         {
-          path: "/catalog",
-          redirect: "/geonode/"
+          path: "/geodata",
+          name: "GeoData",
+          component: GeoData
+        },
+        {
+          path: "/geodata/:id",
+          name: "Layer",
+          component: GeoDataDetail
         }
         // {
         //   path: "theme",

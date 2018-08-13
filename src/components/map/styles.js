@@ -39,9 +39,11 @@ export const filterStyle = {
 
 export const selectedFilterStyle = {
   color: "#FF5733",
+  fillColor: "#FF5733",
   weight: 5,
   opacity: 1,
-  fillOpacity: 0.1,
+  fillOpacity: 0.2,
   stroke: true,
-  fill: true
+  fill: true,
+  zIndex: 3000
 };

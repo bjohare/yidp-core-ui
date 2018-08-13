@@ -1,11 +1,12 @@
 <template>
   <div  class="animated fadeIn m-4">
     <app-spinner :loading="loading"></app-spinner>
-    <b-card-group deck class="mb-3" v-show="!loading">
-    <div v-for="(doc, index) in documents" :key="index">
+    <div>Filter docs here...</div>
+    <!-- <b-card-group deck class="mb-3" v-show="!loading"> -->
+    <div class="mb-3" v-for="(doc, index) in documents" :key="index">
       <app-document-card :document="doc"></app-document-card>
     </div>
-  </b-card-group>
+  <!-- </b-card-group> -->
   </div>
 </template>
 <script>
@@ -14,13 +15,9 @@ import appDocumentCard from "./DocumentCard.vue";
 export default {
   data() {
     return {
+      documents: null,
       loading: false
     };
-  },
-  computed: {
-    documents() {
-      return this.$store.getters["geonode/getGeonodeDocuments"];
-    }
   },
   components: {
     appDocumentCard,
@@ -29,7 +26,7 @@ export default {
   methods: {
     async fetchGeonodeDocuments() {
       this.loading = true;
-      await this.$store.dispatch("geonode/fetchGeonodeDocuments");
+      this.documents = await this.$store.dispatch("geonode/fetchGeonodeDocuments");
       this.loading = false;
     }
   },

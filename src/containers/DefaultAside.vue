@@ -14,7 +14,7 @@
       <template slot="title">
         <i class='fa fa-bar-chart fa-lg' v-b-tooltip.hover.left title="Map Analysis"></i>
       </template>
-      <app-analysis-panel :show="show" :tabs="this.$refs.tabs"></app-analysis-panel>
+      <app-analysis-panel :show="show" :tabs="this.$refs.tabs" :userMap="userMap" :map="map"></app-analysis-panel>
     </b-tab>
     <b-tab id="details" ref="details">
       <template slot="title">

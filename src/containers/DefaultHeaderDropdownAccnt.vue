@@ -17,6 +17,9 @@
           <i class="cui-note icons font-1xl d-inline mt-4"/> Documents
           <b-badge variant="info">{{ numDocuments }}</b-badge>
         </b-dropdown-item>
+        <b-dropdown-item href="http://yidp-geonode.geoweb.io" target="_blank">
+          <i class="cui-note icons font-1xl d-inline mt-4"/> GeoNode
+        </b-dropdown-item>
         <!-- <b-dropdown-header
           tag="div"
           class="text-center">

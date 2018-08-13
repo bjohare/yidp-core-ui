@@ -1,30 +1,23 @@
 <template>
   <div class="app">
     <AppHeader fixed>
+      <b-link class="navbar-brand ml-3" to="/">
+        <img src="assets/yemen-logo.svg"/>
+      </b-link>
       <SidebarToggler class="d-lg-none" display="md" mobile />
       <SidebarToggler class="d-md-down-none" display="lg" />
-      <b-link class="navbar-brand" to="/">
-        <!-- <img class="navbar-brand-full" src="static/img/brand/logo.svg" width="89" height="25" alt="CoreUI Logo">
-        <img class="navbar-brand-minimized" src="static/img/brand/sygnet.svg" width="30" height="30" alt="CoreUI Logo"> -->
-        <i class="flag-icon flag-icon-ye h1"></i>
-      </b-link>
       <b-navbar-nav class="d-md-down-none">
-        <div>Yemen Integrated Data Portal</div>
-        <b-nav-item class="px-3">Home</b-nav-item>
-        <b-nav-item class="px-3">Maps</b-nav-item>
-        <b-nav-item class="px-3" href="http://yidp-geonode.geoweb.io" target="_blank">GeoNode</b-nav-item>
+        <b-nav-item class="px-3"><router-link to="/geodata">GeoData</router-link></b-nav-item>
+        <b-nav-item class="px-3"><router-link to="/maps">Maps</router-link></b-nav-item>
+        <b-nav-item class="px-3"><router-link to="/documents">Documents</router-link></b-nav-item>
       </b-navbar-nav>
+      <b-link class="navbar-brand ml-5">
+        <img src="assets/un-yemen.png" height="36px" class="float-right"/>
+      </b-link>
+      <b-link class="navbar-brand ml-5">
+        <img src="assets/wb.jpg" height="36px" class="float-right"/>
+      </b-link>
       <b-navbar-nav class="ml-auto">
-        <!-- <b-nav-item class="d-md-down-none">
-          <i class="icon-bell"></i>
-          <b-badge pill variant="danger">5</b-badge>
-        </b-nav-item>
-        <b-nav-item class="d-md-down-none">
-          <i class="icon-list"></i>
-        </b-nav-item>
-        <b-nav-item class="d-md-down-none">
-          <i class="icon-location-pin"></i>
-        </b-nav-item> -->
         <DefaultHeaderDropdownAccnt/>
       </b-navbar-nav>
       <AsideToggler class="d-none d-lg-block" />
