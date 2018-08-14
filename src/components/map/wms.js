@@ -48,6 +48,8 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
   initialize: function(url, vm, wmsParams, options) {
     L.TileLayer.WMS.prototype.initialize.call(this, url, wmsParams);
     this.name = options.name;
+    this.featureInfo = options.featureInfo;
+    this.layer = options.layer;
     this.vm = vm;
     this.isOverlay = options.isOverlay;
   },
@@ -69,27 +71,31 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
     // Triggered when the layer is added to a map.
     //   Register a click listener, then do all the upstream WMS things
     L.TileLayer.WMS.prototype.onAdd.call(this, map);
-    if (this.isOverlay) {
-      map.on("click", this.getFeatureInfo, this);
-    }
+    map.on("click", this.getFeatureInfo, this);
+    // if (this.isOverlay) {
+    //   map.on("click", this.getFeatureInfo, this);
+    // }
   },
   onRemove: function(map) {
     // Triggered when the layer is removed from a map.
     //   Unregister a click listener, then do all the upstream WMS things
     L.TileLayer.WMS.prototype.onRemove.call(this, map);
-    if (this.isOverlay) {
-      map.off("click", this.getFeatureInfo, this);
-    }
+    map.off("click", this.getFeatureInfo, this);
+    // if (this.isOverlay) {
+    //   map.off("click", this.getFeatureInfo, this);
+    // }
   },
   getFeatureInfo: function(evt) {
     let layer = this;
+    let featureInfo = this.featureInfo;
     // Make an AJAX request to the server and hope for the best
     let url = this.getFeatureInfoUrl(evt.latlng);
     geoserverAxios.get(url).then(response => {
       if (response.data && response.data.features.length > 0) {
         let feature = {
           name: layer.name,
-          properties: response.data.features[0].properties
+          properties: response.data.features[0].properties,
+          featureInfo: featureInfo
         };
         this.vm.$root.$emit("feature-selected", feature);
       }
@@ -178,8 +184,12 @@ export const loadWMSLayers = async vm => {
       checked: "checked",
       enabled: true,
       opacity: 1,
+      featureInfo: layer.featureInfo,
       layer: L.tileLayer
-        .wms_auth(wmsUrl, vm, wmsParams, { name: layer.title })
+        .wms_auth(wmsUrl, vm, wmsParams, {
+          name: layer.title,
+          featureInfo: layer.featureInfo
+        })
         .addTo(vm.map)
         .setZIndex(zIndex)
     });
@@ -244,7 +254,11 @@ export const loadOverlays = async (vm, selected) => {
         return l.name === layer.title;
       });
       let layerState = state === undefined ? defaultState : state;
-      let options = { name: layer.title, isOverlay: true };
+      let options = {
+        name: layer.title,
+        isOverlay: true,
+        featureInfo: layer.featureInfo
+      };
       L.tileLayer
         .wms_auth(wmsUrl, vm, wmsParams, options)
         .addTo(vm.map)
@@ -258,7 +272,8 @@ export const loadOverlays = async (vm, selected) => {
         checked: layerState.checked,
         opacity: layerState.opacity,
         legendUrl: legendUrl,
-        abstract: layer.abstract
+        abstract: layer.abstract,
+        featureInfo: layer.featureInfo
       };
       subLayers.push(subLayer);
     }, Promise.resolve());

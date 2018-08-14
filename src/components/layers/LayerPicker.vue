@@ -36,7 +36,7 @@ export default {
       const grid = [];
       let sub = null;
       this.categories.forEach((category, index) => {
-        if (index % 5 === 0) {
+        if (index % 4 === 0) {
           sub = [];
           grid.push(sub);
         }

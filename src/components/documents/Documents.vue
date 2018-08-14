@@ -1,7 +1,6 @@
 <template>
   <div  class="animated fadeIn m-4">
     <app-spinner :loading="loading"></app-spinner>
-    <div>Filter docs here...</div>
     <!-- <b-card-group deck class="mb-3" v-show="!loading"> -->
     <div class="mb-3" v-for="(doc, index) in documents" :key="index">
       <app-document-card :document="doc"></app-document-card>
@@ -26,7 +25,9 @@ export default {
   methods: {
     async fetchGeonodeDocuments() {
       this.loading = true;
-      this.documents = await this.$store.dispatch("geonode/fetchGeonodeDocuments");
+      this.documents = await this.$store.dispatch(
+        "geonode/fetchGeonodeDocuments"
+      );
       this.loading = false;
     }
   },

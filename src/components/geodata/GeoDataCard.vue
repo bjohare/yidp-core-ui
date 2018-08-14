@@ -1,41 +1,41 @@
 <template>
-  <b-card
+    <b-card
     :title="layer.title"
-    :img-alt="layer.title">
-    <span slot="header">
-      <strong>Date of information:</strong> {{layer.date | format-date }}
-      <h5><b-badge variant="primary" class="h5">{{ layer.category__gn_description }}</b-badge></h5>
-    </span>
-    <span><strong>{{ layer.category__gn_description }}</strong></span> |
-    <span><strong>{{ layer.supplemental_information }}</strong></span>
-    <p v-line-clamp="{
-      lines: 3,
-      text: abstract,
-      expanded: more
-    }" class="card-text mt-2">
-    </p>
-    <div v-if="clampAbstract">
-      <span class="toggle" @click="toggle()">{{ toggleText }}</span><br/><br/>
-    </div>
-    <router-link :to="{ name: 'Layer', params: {id: layer.id}}">
-      <b-button variant="primary">
-        View Details
-      </b-button>
-    </router-link>
-    <button class="btn btn-primary m-md-2">Add to Map</button>
-    <b-dropdown id="ddown1" text="Download" variant="primary" right>
-      <b-dropdown-item :href="downloadLayer('SHAPE-ZIP')">Zipped Shapefile</b-dropdown-item>
-      <b-dropdown-item :href="downloadLayer('csv')">CSV</b-dropdown-item>
-      <b-dropdown-item :href="downloadLayer('excel')">Excel</b-dropdown-item>
-      <b-dropdown-item :href="downloadLayer('json')">GeoJSON</b-dropdown-item>
-      <b-dropdown-item :href="downloadMap('kml')">KML</b-dropdown-item>
-      <b-dropdown-item :href="downloadMap('application/pdf')">PDF</b-dropdown-item>
-      <b-dropdown-item :href="downloadMap('image/png')" target="_blank">PNG</b-dropdown-item>
-    </b-dropdown>
-    <span slot="footer">
-        <i class="fa fa-tag fa-lg"></i>&nbsp;<em>{{ keywords }}</em>
-    </span>
-  </b-card>
+    :img-alt="layer.title" class="mb-4">
+      <span slot="header">
+        <strong>Date of information:</strong> {{layer.date | format-date }}
+        <h5><b-badge variant="primary" class="h5">{{ layer.category__gn_description }}</b-badge></h5>
+      </span>
+      <span><strong>{{ layer.category__gn_description }}</strong></span> |
+      <span><strong>{{ layer.supplemental_information }}</strong></span>
+      <p v-line-clamp="{
+        lines: 3,
+        text: abstract,
+        expanded: more
+      }" class="card-text mt-2">
+      </p>
+      <div v-if="clampAbstract">
+        <span class="toggle" @click="toggle()">{{ toggleText }}</span><br/><br/>
+      </div>
+      <router-link :to="{ name: 'Layer', params: {id: layer.id}}">
+        <b-button variant="primary">
+          View Details
+        </b-button>
+      </router-link>
+      <button class="btn btn-primary m-md-2">Add to Map</button>
+      <b-dropdown id="ddown1" text="Download" variant="primary" right>
+        <b-dropdown-item :href="downloadLayer('SHAPE-ZIP')">Zipped Shapefile</b-dropdown-item>
+        <b-dropdown-item :href="downloadLayer('csv')">CSV</b-dropdown-item>
+        <b-dropdown-item :href="downloadLayer('excel')">Excel</b-dropdown-item>
+        <b-dropdown-item :href="downloadLayer('json')">GeoJSON</b-dropdown-item>
+        <b-dropdown-item :href="downloadMap('kml')">KML</b-dropdown-item>
+        <b-dropdown-item :href="downloadMap('application/pdf')">PDF</b-dropdown-item>
+        <b-dropdown-item :href="downloadMap('image/png')" target="_blank">PNG</b-dropdown-item>
+      </b-dropdown>
+      <span slot="footer">
+          <i class="fa fa-tag fa-lg"></i>&nbsp;<em>{{ keywords }}</em>
+      </span>
+    </b-card>
 </template>
 <script>
 export default {
@@ -103,9 +103,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .card {
-  max-width: 90%;
-  min-width: 90%;
-  margin-bottom: 2em;
+  max-width: 95%;
+  min-width: 95%;
+  margin: 0 auto;
 }
 .card-title {
   font-size: 2em;

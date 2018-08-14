@@ -27,7 +27,14 @@
       <template slot="title">
         <i class='fa fa-cog fa-lg' v-b-tooltip.hover.left title="Settings"></i>
       </template>
-      <div class="message"><button class="btn btn-primary m-5" @click="resetApplicationState">Reset Application.</button></div>
+      <div class="message">
+        <div class="alert alert-danger">Click to reset all application state.
+          <br/>This will clear all layer selections and log you out.
+          <router-link to="/account/login">
+            <button class="btn btn-danger mt-2" @click="resetApplicationState">Reset Application State</button>
+          </router-link>
+          </div>
+        </div>
     </b-tab>
   </b-tabs>
 </template>

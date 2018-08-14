@@ -1,10 +1,11 @@
 <template>
   <b-card
     :title="document.title"
-    :img-alt="document.title">
+    :img-alt="document.title"
+    class="mb-4">
     <span slot="header">
       <strong>Date of information:</strong> {{document.date | format-date }}
-      <h5><b-badge pill variant="primary" class="h-5">{{ document.category__gn_description }}</b-badge></h5>
+      <h5><b-badge pill variant="primary">{{ document.category__gn_description }}</b-badge></h5>
     </span>
     <p v-line-clamp="{
       lines: 3,
@@ -17,6 +18,9 @@
     </div>
     <a class="doc-link" :href="document.doc_url" v-if="hasExternalLink" target="_blank">
         <strong><i class="fa fa-link fa-lg"></i> Open Link</strong>
+    </a>
+    <a class="doc-link" :href="'http://yidp-geonode.geoweb.io' + document.detail_url + '/download'" v-if="!hasExternalLink">
+      <img class="thumbnail" :src="document.thumbnail_url" width="50px" height="50px"/><strong><i class="fa fa-download fa-lg"></i> Download Document</strong>
     </a>
     <span slot="footer">
         <i class="fa fa-tag fa-lg"></i>&nbsp;<em>{{ keywords }}</em>
@@ -31,20 +35,20 @@ export default {
   data() {
     return {
       more: false
-    }
+    };
   },
   computed: {
     hasExternalLink() {
       return this.document.doc_url !== null;
     },
     keywords() {
-     return this.document.keywords.join(", ");
+      return this.document.keywords.join(", ");
     },
     abstract() {
-      return this.document.abstract
+      return this.document.abstract;
     },
     toggleText() {
-      return this.more === true ? 'Read less' : "Read more"
+      return this.more === true ? "Read less" : "Read more";
     },
     clampAbstract() {
       return this.document.abstract.length > 300;
@@ -61,7 +65,7 @@ export default {
 .card {
   max-width: 90%;
   min-width: 90%;
-  margin-bottom: 2em;
+  margin: 0 auto;
 }
 .card-title {
   font-size: 2em;
@@ -78,8 +82,7 @@ export default {
   cursor: pointer;
   color: #20a8d8;
 }
-img {
-  // width: 50%;
-  // height: 50%;
+.thumbnail {
+  margin: 5px;
 }
 </style>

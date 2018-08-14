@@ -6,8 +6,6 @@ export const resetState = ({ commit }) => {
 };
 
 export const fetchGeonodeMaps = async ({ commit }) => {
-  // do we need to fetch this everytime...
-  // might if geonode maps are changing frequently
   const response = await geonodeAxios.get(geonodeEndpoints.mapsUrl);
   commit("geonodeMaps", response.data.objects);
   return response.data.objects;
