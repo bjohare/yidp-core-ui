@@ -1,6 +1,10 @@
 import { geonodeEndpoints, geoserverEndpoints } from "../../endpoints";
 import { geonodeAxios } from "../../axios";
 
+export const resetState = ({ commit }) => {
+  commit("geonodeMaps", []);
+};
+
 export const fetchGeonodeMaps = async ({ commit }) => {
   // do we need to fetch this everytime...
   // might if geonode maps are changing frequently
@@ -66,8 +70,7 @@ export const fetchGeonodeCategories = async ({ commit, state }, vm) => {
         vm.$store.getters["authentication/getAccessToken"].access_token
     }
   });
-  commit("geonodeCategories", response.data.objects);
-  return state.geonodeCategories;
+  return response.data.objects;
 };
 
 export const fetchGeonodeMapDescription = async ({ commit }, payload) => {

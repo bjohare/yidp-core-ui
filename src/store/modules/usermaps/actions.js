@@ -1,5 +1,9 @@
 import { geoserverEndpoints } from "../../endpoints";
 
+export const resetState = ({ commit }) => {
+  commit("resetState");
+};
+
 export const saveMapPosition = ({ commit }, payload) => {
   commit("saveMapPosition", payload);
 };

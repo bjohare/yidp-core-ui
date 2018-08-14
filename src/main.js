@@ -12,7 +12,7 @@ import VueAxios from "vue-axios";
 import VueTruncate from "vue-truncate-filter";
 import axios from "axios";
 import moment from "moment";
-import { lineClamp } from 'vue-line-clamp-extended'
+import { lineClamp } from "vue-line-clamp-extended";
 
 import store from "@/store/store";
 
@@ -23,7 +23,7 @@ Vue.use(BootstrapVue);
 Vue.use(VueAxios, axios);
 Vue.use(VueTruncate);
 
-Vue.directive('line-clamp', lineClamp)
+Vue.directive("line-clamp", lineClamp);
 
 Vue.filter("format-date", function(value) {
   if (!value) return "";
@@ -40,14 +40,13 @@ router.beforeEach((to, from, next) => {
   if (to.path === "/account/login" || to.path === "/account/logout") {
     next();
   }
-  if (!store.getters["authentication/getAccessToken"]) {
-    next("/account/login");
-  }
-  if (store.getters["authentication/isAccessTokenExpired"]) {
-    next("/account/login");
-  } else {
-    next();
-  }
+  store.dispatch("authentication/isAccessTokenExpired").then(isExpired => {
+    if (isExpired) {
+      next("/account/login");
+    } else {
+      next();
+    }
+  });
 });
 
 /* eslint-disable no-new */

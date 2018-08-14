@@ -27,7 +27,7 @@
       <template slot="title">
         <i class='fa fa-cog fa-lg' v-b-tooltip.hover.left title="Settings"></i>
       </template>
-      <div class="message"><button class="btn btn-primary m-5">Reset Application.</button></div>
+      <div class="message"><button class="btn btn-primary m-5" @click="resetApplicationState">Reset Application.</button></div>
     </b-tab>
   </b-tabs>
 </template>
@@ -58,6 +58,11 @@ export default {
         payload
       );
       this.show = true;
+    },
+    resetApplicationState() {
+      this.$store.dispatch("geonode/resetState");
+      this.$store.dispatch("usermaps/resetState");
+      this.$store.dispatch("authentication/logout");
     }
   },
   components: {

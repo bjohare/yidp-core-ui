@@ -82,6 +82,9 @@ const actions = {
 
   isAccessTokenExpired({ commit, state }) {
     let accessToken = state.accessToken;
+    if (accessToken === null) {
+      return true;
+    }
     let now = moment();
     let expires = moment(accessToken.expires_at);
     if (now.isAfter(expires)) {

@@ -1,16 +1,12 @@
 import * as actions from "./actions";
 
 const state = {
-  geonodeMaps: [],
-  geonodeCategories: []
+  geonodeMaps: []
 };
 
 const mutations = {
   geonodeMaps(state, maps) {
     state.geonodeMaps = maps;
-  },
-  geonodeCategories(state, categories) {
-    state.geonodeCategories = categories;
   }
 };
 
@@ -22,9 +18,6 @@ const getters = {
     return state.geonodeMaps.find(map => {
       return map.id === mapId;
     });
-  },
-  getGeonodeCategories(state) {
-    return state.geonodeCategories;
   },
   getGeonodeMapLayers: state => mapId => {
     const map = state.geonodeMaps.find(m => {

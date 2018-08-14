@@ -45,6 +45,9 @@ const mutations = {
       const index = layers.indexOf(l);
       Vue.set(state.userMaps[mapId].layers, index, group);
     }
+  },
+  resetState(state) {
+    state.userMaps = {};
   }
 };
 
