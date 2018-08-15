@@ -86,18 +86,26 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
     // }
   },
   getFeatureInfo: function(evt) {
+    console.log(this);
     let layer = this;
-    let featureInfo = this.featureInfo;
+    let featureInfo =
+      this.featureInfo !== ({} || undefined)
+        ? this.featureInfo.getFeatureInfo
+        : null;
     // Make an AJAX request to the server and hope for the best
     let url = this.getFeatureInfoUrl(evt.latlng);
+    // let showResults = L.Util.bind(this.showGetFeatureInfo, this);
     geoserverAxios.get(url).then(response => {
       if (response.data && response.data.features.length > 0) {
         let feature = {
           name: layer.name,
           properties: response.data.features[0].properties,
-          featureInfo: featureInfo
+          featureInfo: featureInfo,
+          map: this.vm.map,
+          latlng: evt.latlng
         };
         this.vm.$root.$emit("feature-selected", feature);
+        // showResults("", evt.latlng, response.data.features[0]);
       }
     });
   },
@@ -126,6 +134,18 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
     params[params.version === "1.3.0" ? "j" : "y"] = point.y;
 
     return this._url + L.Util.getParamString(params, this._url, true);
+  },
+  showGetFeatureInfo: function(err, latlng, content) {
+    if (err) {
+      console.log(err);
+      return;
+    } // do nothing if there's an error
+
+    // Otherwise show the content in a popup, or something.
+    L.popup({ maxWidth: 800 })
+      .setLatLng(latlng)
+      .setContent(content.properties)
+      .openOn(this);
   }
 });
 

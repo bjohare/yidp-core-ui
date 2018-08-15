@@ -48,6 +48,10 @@
         <h4>Data Quality Statement</h4>
         <p class="m-2">{{ layer.data_quality_statement }}</p>
       </div>
+      <div v-if="layer.purpose">
+        <h4>Dataset Purpose</h4>
+        <p class="m-2">{{ layer.purpose }}</p>
+      </div>
       <div class="extents">
         <h4>Extents</h4>
         <div id="map"></div>

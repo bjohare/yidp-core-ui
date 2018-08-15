@@ -2,7 +2,7 @@
   <div class="app">
     <AppHeader fixed>
       <b-link class="navbar-brand ml-3" to="/">
-        <img src="assets/yemen-logo.svg"/>
+        <img src="/assets/yemen-logo.svg"/>
       </b-link>
       <SidebarToggler class="d-lg-none" display="md" mobile />
       <SidebarToggler class="d-md-down-none" display="lg" />
@@ -12,10 +12,10 @@
         <b-nav-item class="px-3"><router-link to="/documents">Documents</router-link></b-nav-item>
       </b-navbar-nav>
       <b-link class="navbar-brand ml-5">
-        <img src="assets/un-yemen.png" height="36px" class="float-right"/>
+        <img src="/assets/un-yemen.png" height="36px" class="float-right"/>
       </b-link>
       <b-link class="navbar-brand ml-5">
-        <img src="assets/wb.jpg" height="36px" class="float-right"/>
+        <img src="/assets/wb.jpg" height="36px" class="float-right"/>
       </b-link>
       <b-navbar-nav class="ml-auto">
         <DefaultHeaderDropdownAccnt/>

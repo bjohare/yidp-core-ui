@@ -2,7 +2,8 @@
   <div style="height: inherit;">
       <div id="map" class="d-flex">
         <div ref="overlay">
-          <app-overlay :features="selectedFeatures" :showPopover="showPopover"></app-overlay>
+          <app-overlay :features="selectedFeatures"
+            :showPopover="showPopover" @dismissed="clearSelectedFeatures"></app-overlay>
         </div>
       </div>
   </div>
@@ -11,6 +12,7 @@
 import "leaflet/dist/leaflet.css";
 import { initMap, loadWMSLayers } from "./wms";
 import appOverlay from "../layers/LayerOverlay.vue";
+import * as L from "leaflet";
 
 export default {
   data() {
@@ -18,7 +20,8 @@ export default {
       map: null,
       userMap: null,
       info: null,
-      selectedFeatures: []
+      selectedFeatures: [],
+      selection: null
     };
   },
   computed: {
@@ -30,13 +33,6 @@ export default {
     appOverlay
   },
   methods: {
-    async showGetFeatureInfo(url, coordinate) {
-      this.showPopover = false;
-      const featureInfo = this.map.getOverlayById("featureInfoOverlay");
-      featureInfo.setPosition(coordinate);
-      // const response = await axios.get(url);
-      // const data = response.data;
-    },
     initializeMap() {
       initMap(this);
       this.$root.$emit("map-init", this.map);
@@ -51,29 +47,40 @@ export default {
       const id = this.$route.params.id;
       this.userMap = this.$store.getters["usermaps/getUserMap"](id);
     },
-    resetSelectedFeature() {
-      // this.selectedFeature.layer.setStyle(this.selectedFeature.style);
+    clearSelectedFeatures() {
+      this.selectedFeatures = [];
+      if (this.selection) {
+        this.map.removeLayer(this.selection);
+      }
+    },
+    addSelectedIndicator() {
+      if (this.showPopover) {
+        const latlng = this.selectedFeatures[0].latlng;
+        if (this.selection) {
+          this.map.removeLayer(this.selection);
+        }
+        this.selection = L.circleMarker(latlng, {
+          color: "red",
+          fillColor: "#f03",
+          fillOpacity: 0.8,
+          radius: 12
+        });
+        this.selection.addTo(this.map);
+      }
     }
   },
   mounted() {
     this.initializeMap();
     this.loadInitalLayers();
-    this.$nextTick(() => {
-      this.$refs.overlay.onclick = e => {
-        e.preventDefault();
-      };
-      this.$refs.overlay.onwheel = e => {
-        e.preventDefault();
-      };
-    });
   },
   created() {
     const _vm = this;
     this.loadUserMap();
     this.$root.$on("map-init", map => {
       map.on("click", e => {
-        if (_vm.selectedFeatures.length === 2) {
-          _vm.selectedFeatures = [];
+        this.selectedFeatures = [];
+        if (_vm.selection) {
+          map.removeLayer(_vm.selection);
         }
       });
     });
@@ -82,10 +89,8 @@ export default {
       _vm.userMap = null;
     });
     this.$root.$on("feature-selected", feature => {
-      if (this.selectedFeatures.length === 2) {
-        this.selectedFeatures = [];
-      }
       this.selectedFeatures.push(feature);
+      this.addSelectedIndicator();
     });
   }
 };
