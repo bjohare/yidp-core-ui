@@ -11,10 +11,10 @@
         <b-nav-item class="px-3"><router-link to="/maps">Maps</router-link></b-nav-item>
         <b-nav-item class="px-3"><router-link to="/documents">Documents</router-link></b-nav-item>
       </b-navbar-nav>
-      <b-link class="navbar-brand ml-5">
+      <b-link class="navbar-brand ml-5" href="http://ye.one.un.org/" target="_blank">
         <img src="/assets/un-yemen.png" height="36px" class="float-right"/>
       </b-link>
-      <b-link class="navbar-brand ml-5">
+      <b-link class="navbar-brand ml-5" href="http://www.worldbank.org/en/country/yemen" target="_blank">
         <img src="/assets/wb.jpg" height="36px" class="float-right"/>
       </b-link>
       <b-navbar-nav class="ml-auto">
