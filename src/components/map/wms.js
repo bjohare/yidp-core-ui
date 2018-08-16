@@ -86,7 +86,6 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
     // }
   },
   getFeatureInfo: function(evt) {
-    console.log(this);
     let layer = this;
     let featureInfo =
       this.featureInfo !== ({} || undefined)

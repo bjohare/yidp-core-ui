@@ -60,12 +60,13 @@ export default {
           this.map.removeLayer(this.selection);
         }
         this.selection = L.circleMarker(latlng, {
-          color: "red",
-          fillColor: "#f03",
+          color: "#4000ff",
+          fillColor: "lightblue",
           fillOpacity: 0.8,
-          radius: 12
+          radius: 25
         });
         this.selection.addTo(this.map);
+        // this.map.panTo(latlng);
       }
     }
   },

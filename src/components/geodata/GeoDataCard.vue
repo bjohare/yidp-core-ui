@@ -122,8 +122,4 @@ export default {
   cursor: pointer;
   color: #20a8d8;
 }
-img {
-  // width: 50%;
-  // height: 50%;
-}
 </style>

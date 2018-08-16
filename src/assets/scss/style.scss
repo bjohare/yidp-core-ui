@@ -7,6 +7,10 @@
 // If you want to add something do it here
 @import "custom";
 
+.main .container-fluid {
+  overflow: auto;
+}
+
 .container-fluid {
   padding: 0px !important;
 }

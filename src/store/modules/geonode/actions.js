@@ -113,3 +113,29 @@ export const fetchGeoserverFeatureType = async (context, typename) => {
   );
   console.log(response);
 };
+
+export const filterGeonodeLayers = async (context, payload) => {
+  const { value, type } = payload;
+  let url = "";
+  if (type === "text") {
+    url = geonodeEndpoints.layersUrl + "?title__icontains=" + value;
+  }
+  if (type === "category") {
+    url = geonodeEndpoints.layersUrl + "?category__identifier=" + value;
+  }
+  const response = await geonodeAxios.get(url);
+  return response.data.objects;
+};
+
+export const filterGeonodeDocuments = async (context, payload) => {
+  const { value, type } = payload;
+  let url = "";
+  if (type === "text") {
+    url = geonodeEndpoints.documentsUrl + "?title__icontains=" + value;
+  }
+  if (type === "category") {
+    url = geonodeEndpoints.documentsUrl + "?category__identifier=" + value;
+  }
+  const response = await geonodeAxios.get(url);
+  return response.data.objects;
+};

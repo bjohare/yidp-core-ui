@@ -1,19 +1,16 @@
 <template>
   <b-alert ref="info" id="featureInfo" v-if="showPopover" dismissible show class="alert-light"
     @dismissed="dismissed" @click.native="handleEvents" @mousewheel.native="handleEvents" @dblclick.native="handleEvents">
-    <div class="h4 mr-4"><strong>Selected Features</strong></div>
+    <!-- <div class="h4 mr-4"><strong>Selected Features</strong></div> -->
     <div class="mt-2 mb-2" v-if="features.length > 1">
-        <button class="btn btn-link" @click="prev()" :disabled="pageNum === 0"><i class="fa fa-chevron-left fa-lg"></i></button>
-          {{ pageNum + 1}} of {{ features.length }}
-        <button class="btn btn-link" @click="next()" :disabled="pageNum >= features.length -1"><i class="fa fa-chevron-right fa-lg"></i></button>
-      </div>
+      <button class="btn btn-link" @click="prev()" :disabled="pageNum === 0"><i class="fa fa-chevron-left fa-lg"></i></button>
+        {{ pageNum + 1}} of {{ features.length }}
+      <button class="btn btn-link" @click="next()" :disabled="pageNum >= features.length -1"><i class="fa fa-chevron-right fa-lg"></i></button>
+    </div>
+    <div v-else class="mb-3"></div>
     <div v-for="(feature, index) in paginatedData" :key="index" class="mb-2">
-      <div class="med"><strong>Layer: </strong>{{ feature.name }}</div>
-      <ul class="list-group">
-        <li class="list-item" v-for="(item, key) in getProperties(feature)" :key="key">
-          <span class="small"><strong>{{ key }}: </strong></span><span>{{ item }}</span>
-        </li>
-      </ul>
+      <h5>{{ feature.name }}</h5>
+      <b-table striped hover small fixed stacked bordered responsive :items="[getProperties(feature)]"></b-table>
     </div>
   </b-alert>
 </template>
@@ -53,7 +50,6 @@ export default {
       this.pageNum--;
     },
     getProperties(feature) {
-      console.log(feature, this.showPopover);
       if (feature.featureInfo) {
         const propertyNames = feature.featureInfo.propertyNames;
         let props = {};
@@ -84,9 +80,10 @@ export default {
   height: 100%;
   opacity: 0.95;
   padding: 1rem;
-  overflow: scroll;
+  overflow: auto;
   color: black !important;
   box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.2);
+  /* max-width: 300px; */
 }
 ul.list-group {
   list-style-type: none;

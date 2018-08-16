@@ -63,8 +63,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .card {
-  max-width: 90%;
-  min-width: 90%;
+  max-width: 95%;
+  min-width: 95%;
   margin: 0 auto;
 }
 .card-title {
