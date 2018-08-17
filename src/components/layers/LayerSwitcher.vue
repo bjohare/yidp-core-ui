@@ -38,9 +38,6 @@
                   </label>
                 </div>
               </div>
-              <!-- <div class="mt-1">
-
-              </div> -->
             </b-list-group-item>
           </b-collapse>
           <hr class="transparent mx-3 my-0">

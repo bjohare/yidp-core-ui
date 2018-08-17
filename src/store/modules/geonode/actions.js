@@ -73,14 +73,6 @@ export const fetchGeonodeCategories = async ({ dispatch }) => {
   return response.data.objects;
 };
 
-/* Build the sector/cluster layer catalog */
-export const buildCatalog = async ({ commit, dispatch }) => {
-  const categories = await dispatch("fetchGeonodeCategories");
-  console.log(categories);
-  const layers = await dispatch("fetchGeonodeLayers");
-  console.log(layers);
-};
-
 export const fetchGeonodeMapDescription = async ({ dispatch }, payload) => {
   const { mapId } = payload;
   const auth = await dispatch("getGeonodeAxiosConfig");

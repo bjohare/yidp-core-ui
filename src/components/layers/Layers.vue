@@ -1,10 +1,10 @@
 <template>
-  <b-tabs ref="tabs">
+  <b-tabs ref="tabs" fixed>
     <b-tab id="layers" ref="layers">
       <template slot="title">
         Catalog
       </template>
-      <app-categories :mapConfig="mapConfig"></app-categories>
+      <app-categories :mapConfig="mapConfig" :map="map"></app-categories>
     </b-tab>
     <b-tab id="legend" ref="legend">
       <template slot="title">

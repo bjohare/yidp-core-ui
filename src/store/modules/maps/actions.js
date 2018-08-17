@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 export const resetState = ({ commit }) => {
   commit("resetState");
 };
@@ -52,4 +54,20 @@ export const syncMaps = ({ commit, state }, geonodeMaps) => {
       }
     }
   }
+};
+
+/* Build the sector/cluster layer catalog */
+export const buildCatalog = async ({ commit, dispatch }) => {
+  const categories = await dispatch("geonode/fetchGeonodeCategories", null, {
+    root: true
+  });
+  const layers = await dispatch("geonode/fetchGeonodeLayers", null, {
+    root: true
+  });
+  categories.forEach(category => {
+    category["layers"] = _.filter(layers, layer => {
+      return layer.category__identifier === category.identifier;
+    });
+  });
+  commit("saveCategories", categories);
 };

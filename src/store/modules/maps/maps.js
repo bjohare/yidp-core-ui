@@ -23,7 +23,8 @@ const initialState = function() {
         ...mapDefaults()
       }
     },
-    mapDefaults: mapDefaults()
+    mapDefaults: mapDefaults(),
+    categories: []
   };
 };
 
@@ -33,6 +34,9 @@ const mutations = {
   saveMap(state, map) {
     const id = map.id;
     state.maps[id] = map;
+  },
+  saveCategories(state, categories) {
+    state.categories = categories;
   },
   saveMapPosition(state, payload) {
     const { mapId, zoom, center } = payload;
@@ -78,6 +82,9 @@ const mutations = {
 const getters = {
   getMap: state => id => {
     return state.maps[id];
+  },
+  getCategories(state) {
+    return state.categories;
   },
   getSelectedCategories: state => id => {
     return state.maps[id].selectedCategories;

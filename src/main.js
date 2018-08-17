@@ -60,7 +60,7 @@ new Vue({
   },
   methods: {
     async loadCategories() {
-      this.$store.dispatch("geonode/buildCatalog", this);
+      this.$store.dispatch("maps/buildCatalog");
     }
   },
   created() {
