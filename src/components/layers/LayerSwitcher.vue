@@ -182,7 +182,7 @@ export default {
         this.map.removeLayer(featureLayer);
         layer.checked = false;
       }
-      this.$store.dispatch("mapConfigs/saveFeatureGroup", group);
+      this.$store.dispatch("maps/saveFeatureGroup", group);
     },
     toggleGroup(group) {
       const featureGroup = this.featureGroups.find(lyr => {
@@ -215,7 +215,7 @@ export default {
         });
         group.checked = true;
       }
-      this.$store.dispatch("mapConfigs/saveFeatureGroup", group);
+      this.$store.dispatch("maps/saveFeatureGroup", group);
     },
     setLayerOpacity(item) {
       const layer = item.layer;
@@ -243,7 +243,7 @@ export default {
         mapId: this.mapConfig.id,
         selected
       };
-      this.$store.dispatch("mapConfigs/saveSelectedCategories", payload);
+      this.$store.dispatch("maps/saveSelectedCategories", payload);
       if (layersToLoad) {
         this.overlaysLoaded = false;
         loadOverlays(this, layersToLoad);
@@ -269,7 +269,7 @@ export default {
           this.map.removeLayer(l);
         }
       });
-      this.$store.dispatch("mapConfigs/addFeatureGroup", group);
+      this.$store.dispatch("maps/addFeatureGroup", group);
     },
     removeOverlay(group) {
       const featureGroups = _.remove(this.featureGroups, fg => {
@@ -277,7 +277,7 @@ export default {
       });
       if (featureGroups) {
         this.map.removeLayer(featureGroups[0]);
-        this.$store.dispatch("mapConfigs/removeFeatureGroup", group);
+        this.$store.dispatch("maps/removeFeatureGroup", group);
       }
     },
     resetMap() {
@@ -291,7 +291,7 @@ export default {
     },
     async loadmapConfig() {
       const id = this.$route.params.id;
-      this.mapConfig = this.$store.getters["mapConfigs/getmapConfig"](id);
+      this.mapConfig = this.$store.getters["maps/getmapConfig"](id);
       await loadOverlays(this, this.mapConfig.selectedCategories);
     },
     getFeatureGroup(group) {

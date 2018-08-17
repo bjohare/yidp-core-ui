@@ -8,7 +8,7 @@
         <i class='icon-layers' v-b-tooltip.hover.left title="Map Layers"></i>
       </template>
       <div v-if="!show">No map selected.</div>
-      <app-layer-switcher :mapConfig="mapConfig" :map="map"></app-layer-switcher>
+      <app-layers :mapConfig="mapConfig" :map="map"></app-layers>
     </b-tab>
     <b-tab id="analysis" ref="analysis">
       <template slot="title">
@@ -41,7 +41,8 @@
 
 <script>
 import { Switch as cSwitch } from "@coreui/vue";
-import appLayerSwitcher from "@/components/layers/LayerSwitcher.vue";
+// import appLayerSwitcher from "@/components/layers/LayerSwitcher.vue";
+import appLayers from "@/components/layers/Layers.vue";
 import appMapDescription from "@/components/maps/MapDescription.vue";
 import appAnalysisPanel from "@/components/analysis/AnalysisPanel.vue";
 export default {
@@ -60,7 +61,7 @@ export default {
       const id = this.$route.params.id;
       this.mapConfig = this.$store.getters["maps/getMap"](id);
       if (id !== "default") {
-        const payload = { vm: this, mapId: this.mapConfig.id };
+        const payload = { mapId: this.mapConfig.id };
         this.mapDescription = await this.$store.dispatch(
           "geonode/fetchGeonodeMapDescription",
           payload
@@ -71,6 +72,7 @@ export default {
       this.show = true;
     },
     resetApplicationState() {
+      this.$store.dispatch("maps/resetState");
       this.$store.dispatch("geonode/resetState");
       this.$store.dispatch("projects/resetState");
       this.$store.dispatch("authentication/logout");
@@ -78,7 +80,7 @@ export default {
   },
   components: {
     cSwitch,
-    appLayerSwitcher,
+    appLayers,
     appMapDescription,
     appAnalysisPanel
   },

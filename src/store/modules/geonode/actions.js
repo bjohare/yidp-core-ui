@@ -5,16 +5,27 @@ export const resetState = ({ commit }) => {
   commit("geonodeMaps", []);
 };
 
-export const fetchGeonodeMaps = async ({ commit }) => {
-  const response = await geonodeAxios.get(geonodeEndpoints.mapsUrl);
+export const getGeonodeAxiosConfig = ({ rootState }) => {
+  return {
+    headers: {
+      Authorization:
+        "Bearer " + rootState.authentication.accessToken.acccess_token
+    }
+  };
+};
+
+export const fetchGeonodeMaps = async ({ commit, dispatch }) => {
+  const auth = await dispatch("getGeonodeAxiosConfig");
+  const response = await geonodeAxios.get(geonodeEndpoints.mapsUrl, auth);
   commit("geonodeMaps", response.data.objects);
   return response.data.objects;
 };
 
-export const fetchGeonodeWMSLayers = async ({ commit, dispatch }, vm) => {
-  const lyrs = vm.$store.getters["geonode/getGeonodeMapLayers"](
-    vm.mapConfig.id
-  );
+export const fetchGeonodeWMSLayers = async (
+  { dispatch, getters },
+  mapConfig
+) => {
+  const lyrs = getters["getGeonodeMapLayers"](mapConfig.id);
   const defaultOverlays = lyrs.filter(lyr => {
     if (lyr.group === null) {
       return true;
@@ -23,100 +34,99 @@ export const fetchGeonodeWMSLayers = async ({ commit, dispatch }, vm) => {
     }
   });
   const layers = [];
+  const auth = await dispatch("getGeonodeAxiosConfig");
   await defaultOverlays.reduce(async (promise, overlay) => {
     await promise;
     const response = await geonodeAxios.get(
       geonodeEndpoints.layersUrl + "?name=" + overlay.name.split(":")[1],
-      {
-        headers: {
-          Authorization:
-            "Bearer " +
-            vm.$store.getters["authentication/getAccessToken"].access_token
-        }
-      }
+      auth
     );
     layers.push(response.data.objects[0]);
   }, Promise.resolve());
   return layers;
 };
 
-export const fetchGeonodeSelectedLayers = async ({ commit }, payload) => {
-  const { vm, selected } = payload;
+export const fetchGeonodeSelectedLayers = async (
+  { commit, dispatch },
+  payload
+) => {
+  const { selected } = payload;
   let layerGroups = {};
   for (let idx in selected) {
     let identifier = selected[idx].identifier;
     let category = selected[idx].gn_description;
     let query = "category__identifier__in=" + identifier;
+    const auth = await dispatch("getGeonodeAxiosConfig");
     const response = await geonodeAxios.get(
       geonodeEndpoints.layersUrl + "?" + query,
-      {
-        headers: {
-          Authorization:
-            "Bearer " +
-            vm.$store.getters["authentication/getAccessToken"].access_token
-        }
-      }
+      auth
     );
     layerGroups[category] = response.data.objects;
   }
   return layerGroups;
 };
 
-export const fetchGeonodeCategories = async ({ commit, state }, vm) => {
-  const response = await geonodeAxios.get(geonodeEndpoints.categoriesUrl, {
-    headers: {
-      Authorization:
-        "Bearer " +
-        vm.$store.getters["authentication/getAccessToken"].access_token
-    }
-  });
+/* Get the categories from geonode */
+export const fetchGeonodeCategories = async ({ dispatch }) => {
+  const auth = await dispatch("getGeonodeAxiosConfig");
+  const response = await geonodeAxios.get(geonodeEndpoints.categoriesUrl, auth);
   return response.data.objects;
 };
 
-export const fetchGeonodeMapDescription = async ({ commit }, payload) => {
-  const { vm, mapId } = payload;
+/* Build the sector/cluster layer catalog */
+export const buildCatalog = async ({ commit, dispatch }) => {
+  const categories = await dispatch("fetchGeonodeCategories");
+  console.log(categories);
+  const layers = await dispatch("fetchGeonodeLayers");
+  console.log(layers);
+};
+
+export const fetchGeonodeMapDescription = async ({ dispatch }, payload) => {
+  const { mapId } = payload;
+  const auth = await dispatch("getGeonodeAxiosConfig");
   const response = await geonodeAxios.get(
     geonodeEndpoints.mapsUrl + "/" + mapId,
-    {
-      headers: {
-        Authorization:
-          "Bearer" +
-          vm.$store.getters["authentication/getAccessToken"].access_token
-      }
-    }
+    auth
   );
   return response.data;
 };
 
-// TODO: check authentication on these methods
-export const fetchGeonodeDocuments = async ({ commit }) => {
-  const response = await geonodeAxios.get(geonodeEndpoints.documentsUrl);
+export const fetchGeonodeDocuments = async ({ dispatch }) => {
+  const auth = await dispatch("getGeonodeAxiosConfig");
+  const response = await geonodeAxios.get(geonodeEndpoints.documentsUrl, auth);
   return response.data.objects;
 };
 
-export const fetchGeonodeLayers = async () => {
-  const response = await geonodeAxios.get(geonodeEndpoints.layersUrl);
+export const fetchGeonodeLayers = async ({ dispatch }) => {
+  const auth = await dispatch("getGeonodeAxiosConfig");
+  const response = await geonodeAxios.get(geonodeEndpoints.layersUrl, auth);
   return response.data.objects;
 };
 
-export const fetchGeonodeLayer = async (context, id) => {
-  console.log(id);
-  const response = await geonodeAxios.get(geonodeEndpoints.layersUrl + id);
+export const fetchGeonodeLayer = async ({ dispatch }, id) => {
+  const auth = await dispatch("getGeonodeAxiosConfig");
+  const response = await geonodeAxios.get(
+    geonodeEndpoints.layersUrl + id,
+    auth
+  );
   return response.data;
 };
 
-export const fetchGeoserverFeatureType = async (context, typename) => {
+export const fetchGeoserverFeatureType = async ({ dispatch }, typename) => {
+  const auth = await dispatch("getGeonodeAxiosConfig");
   const response = await geonodeAxios.get(
     geoserverEndpoints.wfsUrl +
       "SERVICE=WFS&VERSION=2.0.0&request=DescribeFeatureType" +
       "&typeNames=" +
       typename +
-      "&outputFormat=application/json"
+      "&outputFormat=application/json",
+    auth
   );
-  console.log(response);
+  return response.data;
 };
 
-export const filterGeonodeLayers = async (context, payload) => {
+export const filterGeonodeLayers = async ({ dispatch }, payload) => {
+  const auth = await dispatch("getGeonodeAxiosConfig");
   const { value, type } = payload;
   let url = "";
   if (type === "text") {
@@ -125,11 +135,12 @@ export const filterGeonodeLayers = async (context, payload) => {
   if (type === "category") {
     url = geonodeEndpoints.layersUrl + "?category__identifier=" + value;
   }
-  const response = await geonodeAxios.get(url);
+  const response = await geonodeAxios.get(url, auth);
   return response.data.objects;
 };
 
-export const filterGeonodeDocuments = async (context, payload) => {
+export const filterGeonodeDocuments = async ({ dispatch }, payload) => {
+  const auth = await dispatch("getGeonodeAxiosConfig");
   const { value, type } = payload;
   let url = "";
   if (type === "text") {
@@ -138,6 +149,6 @@ export const filterGeonodeDocuments = async (context, payload) => {
   if (type === "category") {
     url = geonodeEndpoints.documentsUrl + "?category__identifier=" + value;
   }
-  const response = await geonodeAxios.get(url);
+  const response = await geonodeAxios.get(url, auth);
   return response.data.objects;
 };

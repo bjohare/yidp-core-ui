@@ -3,9 +3,9 @@ import * as _ from "lodash";
 import { geoserverEndpoints } from "../../endpoints";
 import Vue from "vue";
 
-export const mapDefaults = function() {
+export const mapDefaults = () => {
   return {
-    id: null,
+    id: "default",
     zoom: 7,
     minZoom: 5,
     center: [15.51, 48.47],
@@ -20,7 +20,6 @@ const initialState = function() {
   return {
     maps: {
       default: {
-        ...{ id: "default" },
         ...mapDefaults()
       }
     },
@@ -28,7 +27,7 @@ const initialState = function() {
   };
 };
 
-const state = initialState();
+const state = initialState;
 
 const mutations = {
   saveMap(state, map) {
@@ -71,8 +70,8 @@ const mutations = {
     }
   },
   resetState(state) {
-    const initialState = initialState();
-    state.maps = initialState.maps; // Object.assign?
+    const initial = initialState();
+    state.maps = initial.maps;
   }
 };
 

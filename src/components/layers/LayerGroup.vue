@@ -78,7 +78,7 @@ export default {
   methods: {
     setLayerOpacity(layer) {
       this.getFeature(layer.name).setOpacity(layer.opacity);
-      this.$store.dispatch("usermaps/saveFeatureGroup", this.group);
+      this.$store.dispatch("maps/saveFeatureGroup", this.group);
     },
     updateSliders() {
       this.$refs.opacity.forEach(slider => {

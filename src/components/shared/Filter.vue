@@ -55,14 +55,12 @@ export default {
       this.$emit("reset");
     },
     async loadCategories() {
-      const _vm = this;
       this.options.push({
         value: null,
         text: "Please select a Sector/Cluster"
       });
       const categories = await this.$store.dispatch(
-        "geonode/fetchGeonodeCategories",
-        _vm
+        "geonode/fetchGeonodeCategories"
       );
       for (let idx in categories) {
         let category = categories[idx];

@@ -7,7 +7,7 @@ const mapDefaults = {
   center: [15.51, 48.47]
 };
 
-const resetMapViewControl = (vm, map) => {
+const resetMapViewControl = map => {
   let control = new L.Control({ position: "topleft" });
   control.onAdd = function(map) {
     var reset = L.DomUtil.create("div", "leaflet-bar");
@@ -28,16 +28,15 @@ const resetMapViewControl = (vm, map) => {
 
 export const initMap = vm => {
   vm.map = L.map("map").setView(vm.mapConfig.center, vm.mapConfig.zoom);
-  resetMapViewControl(vm, vm.map).addTo(vm.map);
+  resetMapViewControl(vm.map).addTo(vm.map);
 };
 
-const fetchGeonodeWMSLayers = async vm => {
-  return vm.$store.dispatch("geonode/fetchGeonodeWMSLayers", vm);
+const fetchGeonodeWMSLayers = async (vm, mapConfig) => {
+  return vm.$store.dispatch("geonode/fetchGeonodeWMSLayers", mapConfig);
 };
 
 export const fetchGeonodeSelectedLayers = async (vm, selected) => {
   const payload = {
-    vm,
     selected
   };
   return vm.$store.dispatch("geonode/fetchGeonodeSelectedLayers", payload);
@@ -181,7 +180,7 @@ export const loadBaseLayers = async map => {
 
 export const loadWMSLayers = async vm => {
   let baseLayers = await loadBaseLayers(vm.map);
-  const layers = await fetchGeonodeWMSLayers(vm);
+  const layers = await fetchGeonodeWMSLayers(vm, vm.mapConfig);
   let wmsLayers = [];
   const wmsUrl = vm.mapConfig.wmsBaseUrl;
   let zIndex = 400;
@@ -250,10 +249,7 @@ export const loadOverlays = async (vm, selected) => {
   for (let group in layerGroups) {
     zIndex++;
     const layers = layerGroups[group];
-    let state = vm.$store.getters["mapConfigs/getFeatureGroup"](
-      mapConfig.id,
-      group
-    );
+    let state = vm.$store.getters["maps/getFeatureGroup"](mapConfig.id, group);
     const groupState =
       state === undefined
         ? { checked: true, enabled: true, layers: [] }

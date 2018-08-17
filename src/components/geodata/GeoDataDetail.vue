@@ -125,7 +125,6 @@ export default {
     async loadLayer() {
       this.loading = true;
       const id = this.$route.params.id;
-      console.log(id);
       this.layer = await this.$store.dispatch("geonode/fetchGeonodeLayer", id);
       this.featureType = await this.$store.dispatch(
         "geonode/fetchGeoserverFeatureType",

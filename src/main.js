@@ -57,5 +57,13 @@ new Vue({
   template: "<App/>",
   components: {
     App
+  },
+  methods: {
+    async loadCategories() {
+      this.$store.dispatch("geonode/buildCatalog", this);
+    }
+  },
+  created() {
+    this.loadCategories();
   }
 });
