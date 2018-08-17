@@ -12,7 +12,9 @@ export const fetchGeonodeMaps = async ({ commit }) => {
 };
 
 export const fetchGeonodeWMSLayers = async ({ commit, dispatch }, vm) => {
-  const lyrs = vm.$store.getters["geonode/getGeonodeMapLayers"](vm.userMap.id);
+  const lyrs = vm.$store.getters["geonode/getGeonodeMapLayers"](
+    vm.mapConfig.id
+  );
   const defaultOverlays = lyrs.filter(lyr => {
     if (lyr.group === null) {
       return true;

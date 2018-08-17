@@ -8,13 +8,13 @@
         <i class='icon-layers' v-b-tooltip.hover.left title="Map Layers"></i>
       </template>
       <div v-if="!show">No map selected.</div>
-      <app-layer-switcher :userMap="userMap" :map="map"></app-layer-switcher>
+      <app-layer-switcher :mapConfig="mapConfig" :map="map"></app-layer-switcher>
     </b-tab>
     <b-tab id="analysis" ref="analysis">
       <template slot="title">
         <i class='fa fa-bar-chart fa-lg' v-b-tooltip.hover.left title="Map Analysis"></i>
       </template>
-      <app-analysis-panel :show="show" :tabs="this.$refs.tabs" :userMap="userMap" :map="map"></app-analysis-panel>
+      <app-analysis-panel :show="show" :tabs="this.$refs.tabs" :mapConfig="mapConfig" :map="map"></app-analysis-panel>
     </b-tab>
     <b-tab id="details" ref="details">
       <template slot="title">
@@ -42,7 +42,7 @@
 <script>
 import { Switch as cSwitch } from "@coreui/vue";
 import appLayerSwitcher from "@/components/layers/LayerSwitcher.vue";
-import appMapDescription from "@/components/map/MapDescription.vue";
+import appMapDescription from "@/components/maps/MapDescription.vue";
 import appAnalysisPanel from "@/components/analysis/AnalysisPanel.vue";
 export default {
   name: "DefaultAside",
@@ -51,24 +51,28 @@ export default {
       show: false,
       map: null,
       mapDescription: null,
-      userMap: null,
+      mapConfig: null,
       showLayersTab: true
     };
   },
   methods: {
-    async loadUserMap() {
+    async loadMapConfig() {
       const id = this.$route.params.id;
-      this.userMap = this.$store.getters["usermaps/getUserMap"](id);
-      const payload = { vm: this, mapId: this.userMap.id };
-      this.mapDescription = await this.$store.dispatch(
-        "geonode/fetchGeonodeMapDescription",
-        payload
-      );
+      this.mapConfig = this.$store.getters["maps/getMap"](id);
+      if (id !== "default") {
+        const payload = { vm: this, mapId: this.mapConfig.id };
+        this.mapDescription = await this.$store.dispatch(
+          "geonode/fetchGeonodeMapDescription",
+          payload
+        );
+      } else {
+        this.mapDescription = { id: "default" };
+      }
       this.show = true;
     },
     resetApplicationState() {
       this.$store.dispatch("geonode/resetState");
-      this.$store.dispatch("usermaps/resetState");
+      this.$store.dispatch("projects/resetState");
       this.$store.dispatch("authentication/logout");
     }
   },
@@ -82,7 +86,7 @@ export default {
     const _vm = this;
     this.$root.$on("map-init", map => {
       _vm.map = map;
-      _vm.loadUserMap();
+      _vm.loadMapConfig();
     });
     this.$root.$on("map-destroy", () => {
       this.show = false;

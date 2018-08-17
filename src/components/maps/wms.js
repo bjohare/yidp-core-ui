@@ -27,7 +27,7 @@ const resetMapViewControl = (vm, map) => {
 };
 
 export const initMap = vm => {
-  vm.map = L.map("map").setView(vm.userMap.center, vm.userMap.zoom);
+  vm.map = L.map("map").setView(vm.mapConfig.center, vm.mapConfig.zoom);
   resetMapViewControl(vm, vm.map).addTo(vm.map);
 };
 
@@ -183,7 +183,7 @@ export const loadWMSLayers = async vm => {
   let baseLayers = await loadBaseLayers(vm.map);
   const layers = await fetchGeonodeWMSLayers(vm);
   let wmsLayers = [];
-  const wmsUrl = vm.userMap.wmsBaseUrl;
+  const wmsUrl = vm.mapConfig.wmsBaseUrl;
   let zIndex = 400;
   for (let idx in layers) {
     zIndex++;
@@ -195,8 +195,8 @@ export const loadWMSLayers = async vm => {
       format: "image/png",
       transparent: "true",
       tiled: true,
-      minZoom: vm.userMap.minZoom,
-      maxZoom: vm.userMap.maxZoom
+      minZoom: vm.mapConfig.minZoom,
+      maxZoom: vm.mapConfig.maxZoom
     };
     wmsLayers.push({
       name: layer.title,
@@ -217,18 +217,18 @@ export const loadWMSLayers = async vm => {
 
   vm.map.on("moveend", event => {
     const position = {
-      mapId: vm.userMap.id,
+      mapId: vm.mapConfig.id,
       zoom: event.target.getZoom(),
       center: event.target.getCenter()
     };
-    vm.$store.dispatch("usermaps/saveMapPosition", position);
+    vm.$store.dispatch("maps/saveMapPosition", position);
   });
 };
 
 export const loadOverlays = async (vm, selected) => {
   const layerGroups = await fetchGeonodeSelectedLayers(vm, selected);
-  const userMap = vm.userMap;
-  const wmsUrl = vm.userMap.wmsBaseUrl;
+  const mapConfig = vm.mapConfig;
+  const wmsUrl = vm.mapConfig.wmsBaseUrl;
   let zIndex = 700;
   let params = {
     service: "WMS",
@@ -236,8 +236,8 @@ export const loadOverlays = async (vm, selected) => {
     format: "image/png",
     transparent: "true",
     tiled: true,
-    minZoom: vm.userMap.minZoom,
-    maxZoom: vm.userMap.maxZoom
+    minZoom: vm.mapConfig.minZoom,
+    maxZoom: vm.mapConfig.maxZoom
   };
   let legendParams = {
     request: "GetLegendGraphic",
@@ -250,8 +250,8 @@ export const loadOverlays = async (vm, selected) => {
   for (let group in layerGroups) {
     zIndex++;
     const layers = layerGroups[group];
-    let state = vm.$store.getters["usermaps/getFeatureGroup"](
-      userMap.id,
+    let state = vm.$store.getters["mapConfigs/getFeatureGroup"](
+      mapConfig.id,
       group
     );
     const groupState =
@@ -287,7 +287,7 @@ export const loadOverlays = async (vm, selected) => {
       var subLayer = {
         name: layer.title,
         groupName: group,
-        mapId: userMap.id,
+        mapId: mapConfig.id,
         checked: layerState.checked,
         opacity: layerState.opacity,
         legendUrl: legendUrl,
@@ -299,7 +299,7 @@ export const loadOverlays = async (vm, selected) => {
     let layerGroup = {
       name: group,
       layers: subLayers,
-      mapId: userMap.id,
+      mapId: mapConfig.id,
       checked: groupState.checked
     };
     vm.addOverlay(layerGroup, lyrGroup);

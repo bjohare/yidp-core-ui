@@ -1,8 +1,8 @@
 <template>
   <div class="p-3">
     <div class="message" v-if="show">
-      <span class="h3">Map Details</span>
-      <div class="py-3 pb-5 mr-3 float-left">
+      <h3>Map Details</h3>
+      <div class="py-3 pb-5 mr-3 float-left" v-if="!isDefault">
         <h4>{{ map.title }}</h4>
         <img style="border: 1px solid grey" class="mb-2" :src="map.thumbnail_url"/>
         <span>{{ map.abstract }}</span>
@@ -13,12 +13,21 @@
         <span><strong>{{ map.date_type | capitalize }}: </strong>{{ map.date | format-date }}</span><br>
         <span><strong>Last Modified: </strong> {{ map.last_modified | format-date }}</span>
       </div>
+      <div class="py-3 pb-5 mr-3 float-left" v-else>
+        <h4>Default Map</h4>
+        <span>This is the default map.</span>
+      </div>
     </div>
   </div>
 </template>
 <script>
 export default {
-  props: ["map", "show"]
+  props: ["map", "show"],
+  computed: {
+    isDefault() {
+      return this.map.id === "default";
+    }
+  }
 };
 </script>
 <style>

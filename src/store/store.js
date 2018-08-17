@@ -2,10 +2,10 @@ import Vue from "vue";
 import Vuex from "vuex";
 import createPersistedState from "vuex-persistedstate";
 
-import * as actions from "./actions";
 import authentication from "./modules/authentication/authentication";
 import geonode from "./modules/geonode/geonode";
-import usermaps from "./modules/usermaps/usermaps";
+import projects from "./modules/projects/projects";
+import maps from "./modules/maps/maps";
 
 Vue.use(Vuex);
 
@@ -13,11 +13,12 @@ export default new Vuex.Store({
   state: {},
   mutations: {},
   getters: {},
-  actions, // modularized
+  actions: {},
   modules: {
     authentication,
     geonode,
-    usermaps
+    projects,
+    maps
   },
   plugins: [createPersistedState()]
 });

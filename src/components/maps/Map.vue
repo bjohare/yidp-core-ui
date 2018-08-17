@@ -15,10 +15,11 @@ import appOverlay from "../layers/LayerOverlay.vue";
 import * as L from "leaflet";
 
 export default {
+  props: ["mapId"],
   data() {
     return {
       map: null,
-      userMap: null,
+      mapConfig: null,
       info: null,
       selectedFeatures: [],
       selection: null
@@ -43,9 +44,9 @@ export default {
     triggerLayersAdded(baseLayers, wmsLayers) {
       this.$root.$emit("base-layers-added", baseLayers, wmsLayers);
     },
-    loadUserMap() {
-      const id = this.$route.params.id;
-      this.userMap = this.$store.getters["usermaps/getUserMap"](id);
+    loadMapConfig() {
+      this.mapConfig = this.$store.getters["maps/getMap"](this.mapId);
+      this.mapConfig.id = this.mapId;
     },
     clearSelectedFeatures() {
       this.selectedFeatures = [];
@@ -76,7 +77,7 @@ export default {
   },
   created() {
     const _vm = this;
-    this.loadUserMap();
+    this.loadMapConfig();
     this.$root.$on("map-init", map => {
       map.on("click", e => {
         this.selectedFeatures = [];
@@ -87,7 +88,7 @@ export default {
     });
     this.$root.$on("map-destroy", () => {
       _vm.map = null;
-      _vm.userMap = null;
+      _vm.mapConfig = null;
     });
     this.$root.$on("feature-selected", feature => {
       this.selectedFeatures.push(feature);

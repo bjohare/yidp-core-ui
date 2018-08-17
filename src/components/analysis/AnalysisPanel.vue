@@ -29,7 +29,7 @@
 <script>
 import axios from "axios";
 import * as L from "leaflet";
-import { filterStyle, selectedFilterStyle } from "@/components/map/styles";
+import { filterStyle, selectedFilterStyle } from "@/components/maps/styles";
 export default {
   props: ["show", "tabs", "userMap", "map"],
   data() {
@@ -80,7 +80,7 @@ export default {
           });
           layer.on("click", e => {
             this.selectFilter(e.target);
-            // prevent featureinfo from showing..
+            e.stopPropagation();
           });
         }
       };

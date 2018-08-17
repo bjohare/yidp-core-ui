@@ -97,7 +97,7 @@
       </div>
     </transition>
     <app-layer-picker ref="layerPicker" @selected="loadSelectedOverlays"
-        v-if="userMap" :userMap="userMap" :selected="selected">
+        v-if="mapConfig" :mapConfig="mapConfig" :selected="selected">
     </app-layer-picker>
   </div>
 </template>
@@ -107,13 +107,12 @@ import appSlider from "vue-slider-component";
 import appLayerPicker from "./LayerPicker.vue";
 import appLayerGroup from "./LayerGroup.vue";
 // import { loadVectors } from "../map/wfs";
-import { loadOverlays } from "../map/wms";
+import { loadOverlays } from "../maps/wms";
 import { Stretch } from "vue-loading-spinner";
-import * as mapInteractions from "@/components/map/interactions";
 import * as _ from "lodash";
 
 export default {
-  props: ["userMap", "map"],
+  props: ["mapConfig", "map"],
   data() {
     return {
       baseLayers: [],
@@ -137,26 +136,25 @@ export default {
   computed: {
     selected() {
       const selected = [];
-      const selectedCategories = this.userMap.selectedCategories;
+      const selectedCategories = this.mapConfig.selectedCategories;
       selectedCategories.forEach(category => {
         selected.push(category.identifier);
       });
       return selected;
     },
     wfsOverlays() {
-      return this.userMap.layers;
+      return this.mapConfig.layers;
     },
     showPopover() {
       return this.selectedFeature !== null;
     }
   },
   watch: {
-    userMap: function(userMap) {
-      loadOverlays(this, userMap.selectedCategories);
+    mapConfig: function(mapConfig) {
+      loadOverlays(this, mapConfig.selectedCategories);
     }
   },
   methods: {
-    ...mapInteractions,
     toggleBaseLayer(layer) {
       if (!layer.checked && !this.map.hasLayer(layer.layer)) {
         this.map.addLayer(layer.layer);
@@ -184,7 +182,7 @@ export default {
         this.map.removeLayer(featureLayer);
         layer.checked = false;
       }
-      this.$store.dispatch("usermaps/saveFeatureGroup", group);
+      this.$store.dispatch("mapConfigs/saveFeatureGroup", group);
     },
     toggleGroup(group) {
       const featureGroup = this.featureGroups.find(lyr => {
@@ -217,7 +215,7 @@ export default {
         });
         group.checked = true;
       }
-      this.$store.dispatch("usermaps/saveFeatureGroup", group);
+      this.$store.dispatch("mapConfigs/saveFeatureGroup", group);
     },
     setLayerOpacity(item) {
       const layer = item.layer;
@@ -242,10 +240,10 @@ export default {
         }
       });
       const payload = {
-        mapId: this.userMap.id,
+        mapId: this.mapConfig.id,
         selected
       };
-      this.$store.dispatch("usermaps/saveSelectedCategories", payload);
+      this.$store.dispatch("mapConfigs/saveSelectedCategories", payload);
       if (layersToLoad) {
         this.overlaysLoaded = false;
         loadOverlays(this, layersToLoad);
@@ -271,7 +269,7 @@ export default {
           this.map.removeLayer(l);
         }
       });
-      this.$store.dispatch("usermaps/addFeatureGroup", group);
+      this.$store.dispatch("mapConfigs/addFeatureGroup", group);
     },
     removeOverlay(group) {
       const featureGroups = _.remove(this.featureGroups, fg => {
@@ -279,22 +277,22 @@ export default {
       });
       if (featureGroups) {
         this.map.removeLayer(featureGroups[0]);
-        this.$store.dispatch("usermaps/removeFeatureGroup", group);
+        this.$store.dispatch("mapConfigs/removeFeatureGroup", group);
       }
     },
     resetMap() {
       // this.map = null;
-      // this.userMap = null;
+      // this.mapConfig = null;
       this.baseLayers = [];
       this.wmsLayers = [];
       this.featureGroups = [];
       this.show = false;
       this.overlaysLoaded = false;
     },
-    async loadUserMap() {
+    async loadmapConfig() {
       const id = this.$route.params.id;
-      this.userMap = this.$store.getters["usermaps/getUserMap"](id);
-      await loadOverlays(this, this.userMap.selectedCategories);
+      this.mapConfig = this.$store.getters["mapConfigs/getmapConfig"](id);
+      await loadOverlays(this, this.mapConfig.selectedCategories);
     },
     getFeatureGroup(group) {
       return this.featureGroups.find(g => {
