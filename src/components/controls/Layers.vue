@@ -21,10 +21,9 @@ import { loadWMSLayer } from "@/components/maps/wms";
 import * as _ from "lodash";
 
 export default {
-  props: ["mapConfig"],
+  props: ["mapConfig", "map"],
   data() {
     return {
-      map: null,
       layers: [],
       layer: {
         name: null,
@@ -83,11 +82,7 @@ export default {
     appLegendControl
   },
   created() {
-    const _vm = this;
-    this.$root.$on("map-init", map => {
-      _vm.map = map;
-      _vm.loadLayers();
-    });
+    this.loadLayers();
   }
 };
 </script>

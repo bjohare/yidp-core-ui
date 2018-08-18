@@ -43,6 +43,7 @@ export default {
         }
       });
       this.$root.$emit("map-init", this.map);
+      console.log("map-init called");
     },
     async loadInitalLayers() {
       await loadInitialWMSLayers(this);
