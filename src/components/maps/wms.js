@@ -29,6 +29,14 @@ const resetMapViewControl = map => {
 export const initMap = vm => {
   vm.map = L.map("map").setView(vm.mapConfig.center, vm.mapConfig.zoom);
   resetMapViewControl(vm.map).addTo(vm.map);
+  vm.map.on("moveend", event => {
+    const position = {
+      mapId: vm.mapConfig.id,
+      zoom: event.target.getZoom(),
+      center: event.target.getCenter()
+    };
+    vm.$store.dispatch("maps/saveMapPosition", position);
+  });
 };
 
 const fetchGeonodeWMSLayers = async (vm, mapConfig) => {
@@ -46,15 +54,15 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
   isOverlay: false,
   initialize: function(url, vm, wmsParams, options) {
     L.TileLayer.WMS.prototype.initialize.call(this, url, wmsParams);
-    this.name = options.name;
+    this.title = options.title;
+    this.typename = options.typename;
     this.featureInfo = options.featureInfo;
-    this.layer = options.layer;
     this.vm = vm;
-    this.isOverlay = options.isOverlay;
   },
   createTile(coords, done) {
     const url = this.getTileUrl(coords);
     const img = document.createElement("img");
+    // TODO: switch to geonodeAxios and test access_token works..
     geoserverAxios
       .get(url, {
         responseType: "blob"
@@ -67,22 +75,12 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
   },
 
   onAdd: function(map) {
-    // Triggered when the layer is added to a map.
-    //   Register a click listener, then do all the upstream WMS things
     L.TileLayer.WMS.prototype.onAdd.call(this, map);
     map.on("click", this.getFeatureInfo, this);
-    // if (this.isOverlay) {
-    //   map.on("click", this.getFeatureInfo, this);
-    // }
   },
   onRemove: function(map) {
-    // Triggered when the layer is removed from a map.
-    //   Unregister a click listener, then do all the upstream WMS things
     L.TileLayer.WMS.prototype.onRemove.call(this, map);
     map.off("click", this.getFeatureInfo, this);
-    // if (this.isOverlay) {
-    //   map.off("click", this.getFeatureInfo, this);
-    // }
   },
   getFeatureInfo: function(evt) {
     let layer = this;
@@ -90,25 +88,22 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
       this.featureInfo !== ({} || undefined)
         ? this.featureInfo.getFeatureInfo
         : null;
-    // Make an AJAX request to the server and hope for the best
     let url = this.getFeatureInfoUrl(evt.latlng);
-    // let showResults = L.Util.bind(this.showGetFeatureInfo, this);
+    // TODO: switch to geonodeAxios and test access_token works..
     geoserverAxios.get(url).then(response => {
       if (response.data && response.data.features.length > 0) {
         let feature = {
-          name: layer.name,
+          title: layer.title,
           properties: response.data.features[0].properties,
           featureInfo: featureInfo,
           map: this.vm.map,
           latlng: evt.latlng
         };
         this.vm.$root.$emit("feature-selected", feature);
-        // showResults("", evt.latlng, response.data.features[0]);
       }
     });
   },
   getFeatureInfoUrl: function(latlng) {
-    // Construct a GetFeatureInfo request URL given a point
     let point = this._map.latLngToContainerPoint(latlng, this._map.getZoom());
     let size = this._map.getSize();
     let params = {
@@ -132,18 +127,6 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
     params[params.version === "1.3.0" ? "j" : "y"] = point.y;
 
     return this._url + L.Util.getParamString(params, this._url, true);
-  },
-  showGetFeatureInfo: function(err, latlng, content) {
-    if (err) {
-      console.log(err);
-      return;
-    } // do nothing if there's an error
-
-    // Otherwise show the content in a popup, or something.
-    L.popup({ maxWidth: 800 })
-      .setLatLng(latlng)
-      .setContent(content.properties)
-      .openOn(this);
   }
 });
 
@@ -178,7 +161,7 @@ export const loadBaseLayers = async map => {
   return baseLayers;
 };
 
-export const loadWMSLayers = async vm => {
+export const loadInitialWMSLayers = async vm => {
   let baseLayers = await loadBaseLayers(vm.map);
   const layers = await fetchGeonodeWMSLayers(vm, vm.mapConfig);
   let wmsLayers = [];
@@ -199,6 +182,7 @@ export const loadWMSLayers = async vm => {
     };
     wmsLayers.push({
       name: layer.title,
+      typename: layer.typename,
       checked: "checked",
       enabled: true,
       opacity: 1,
@@ -213,15 +197,31 @@ export const loadWMSLayers = async vm => {
     });
   }
   vm.triggerLayersAdded(baseLayers, wmsLayers);
+};
 
-  vm.map.on("moveend", event => {
-    const position = {
-      mapId: vm.mapConfig.id,
-      zoom: event.target.getZoom(),
-      center: event.target.getCenter()
-    };
-    vm.$store.dispatch("maps/saveMapPosition", position);
-  });
+export const loadWMSLayer = (vm, layer) => {
+  const wmsUrl = vm.mapConfig.wmsBaseUrl;
+  let zIndex = 400;
+  zIndex++;
+  let typename = layer.typename;
+  let wmsParams = {
+    layers: typename,
+    version: "1.1.1",
+    format: "image/png",
+    transparent: "true",
+    tiled: true,
+    minZoom: vm.mapConfig.minZoom,
+    maxZoom: vm.mapConfig.maxZoom
+  };
+  const wmsLayer = L.tileLayer
+    .wms_auth(wmsUrl, vm, wmsParams, {
+      title: layer.title,
+      typename: layer.typename,
+      featureInfo: layer.featureInfo
+    })
+    .addTo(vm.map)
+    .setZIndex(zIndex);
+  return wmsLayer;
 };
 
 export const loadOverlays = async (vm, selected) => {

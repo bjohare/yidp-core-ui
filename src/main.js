@@ -16,9 +16,6 @@ import { lineClamp } from "vue-line-clamp-extended";
 
 import store from "@/store/store";
 
-// todo
-// cssVars()
-
 Vue.use(BootstrapVue);
 Vue.use(VueAxios, axios);
 Vue.use(VueTruncate);
@@ -61,9 +58,16 @@ new Vue({
   methods: {
     async loadCategories() {
       this.$store.dispatch("maps/buildCatalog");
+    },
+    async loadGeonodeMaps() {
+      const geonodeMaps = await this.$store.dispatch(
+        "geonode/fetchGeonodeMaps"
+      );
+      await this.$store.dispatch("maps/syncMaps", geonodeMaps);
     }
   },
   created() {
     this.loadCategories();
+    this.loadGeonodeMaps();
   }
 });

@@ -2,7 +2,7 @@
 <transition name="fade" mode="out-in">
   <div>
     <b-list-group class="list-group-accent">
-      <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-uppercase">
+      <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-uppercase small">
         <div v-b-toggle.baseLayers>
           <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
           <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
@@ -27,11 +27,7 @@
         </b-list-group-item>
       </b-collapse>
       <hr class="transparent mx-3 my-0">
-      <b-list-group-item class="list-group-item-accent-info bg-light text-left font-weight-bold text-uppercase">
-        <!-- <div v-b-toggle.sectors>
-          <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
-          <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
-        </div> -->
+      <b-list-group-item class="list-group-item-accent-info bg-light text-left font-weight-bold text-uppercase small">
         Sectors / Clusters
       </b-list-group-item>
       <div id="sectors">
@@ -44,16 +40,10 @@
           <div class="layer-name"><strong>{{ category.gn_description }}</strong></div>
           <b-collapse :id="category.identifier">
             <b-list-group-item class="d-flex text-sm-left" v-for="(layer, idx) in category.layers" :key="layer.typename + idx">
-              <!-- <app-layer-group :map="map" :group="group" :featureGroup="getFeatureGroup(group.name)"
-                :index="index" :toggleLayer="toggleLayer" :toggleGroup="toggleGroup"></app-layer-group> -->
-                <b-form-checkbox :id="'check-layer' + layer.id"></b-form-checkbox>
+                <b-form-checkbox :id="'check-layer' + layer.id" @change="toggleLayer($event, layer)" :checked="isActive(layer.typename)"></b-form-checkbox>
                 <router-link :to="'/geodata/' + layer.id">
-                  <i style="cursor: pointer;" class="fa fa-info-circle m-2 fa-lg text-primary"></i>
+                  <i style="cursor: pointer;" class="fa fa-info-circle ml-2 mr-2 mt-1 fa-lg text-primary"></i>
                 </router-link>
-                <!-- <label class="switch switch-sm switch-pill switch-primary ml-4">
-                  <input type="checkbox" class="switch-input" checked @click="toggleLayer(layer)">
-                  <span class="switch-slider"></span>
-                </label> -->
                 <span class="layer-title">{{ layer.title}}</span>
             </b-list-group-item>
           </b-collapse>
@@ -66,6 +56,7 @@
 </template>
 <script>
 import appSlider from "vue-slider-component";
+
 export default {
   props: ["mapConfig", "map"],
   data() {
@@ -90,7 +81,7 @@ export default {
     appSlider
   },
   methods: {
-    async getCategories() {
+    getCategories() {
       this.categories = this.$store.getters["maps/getCategories"];
     },
     toggleBaseLayer(layer) {
@@ -102,8 +93,9 @@ export default {
         layer.checked = false;
       }
     },
-    toggleLayer(layer) {
-      console.log(layer);
+    toggleLayer(checked, layer) {
+      const payload = { checked: checked, selectedLayer: layer };
+      this.$emit("toggle-layer", payload);
     },
     setLayerOpacity(item) {
       const layer = item.layer;
@@ -113,6 +105,13 @@ export default {
       this.$refs.opacity.forEach(slider => {
         slider.refresh();
       });
+    },
+    isActive(typename) {
+      const layers = this.mapConfig.layers;
+      const found = layers.find(layer => {
+        return layer.typename === typename;
+      });
+      return found !== undefined;
     }
   },
   created() {
@@ -133,7 +132,7 @@ export default {
 }
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.75s;
+  transition: opacity 1s;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;

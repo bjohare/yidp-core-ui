@@ -14,7 +14,7 @@
       <template slot="title">
         <i class='fa fa-bar-chart fa-lg' v-b-tooltip.hover.left title="Map Analysis"></i>
       </template>
-      <app-analysis-panel :show="show" :tabs="this.$refs.tabs" :mapConfig="mapConfig" :map="map"></app-analysis-panel>
+      <app-analysis-panel :show="show" :tabs="this.$refs.tabs" :mapConfig="mapConfig"></app-analysis-panel>
     </b-tab>
     <b-tab id="details" ref="details">
       <template slot="title">
@@ -41,8 +41,7 @@
 
 <script>
 import { Switch as cSwitch } from "@coreui/vue";
-// import appLayerSwitcher from "@/components/layers/LayerSwitcher.vue";
-import appLayers from "@/components/layers/Layers.vue";
+import appLayers from "@/components/controls/Layers.vue";
 import appMapDescription from "@/components/maps/MapDescription.vue";
 import appAnalysisPanel from "@/components/analysis/AnalysisPanel.vue";
 export default {
@@ -57,11 +56,14 @@ export default {
     };
   },
   methods: {
-    async loadMapConfig() {
+    loadMapConfig() {
       const id = this.$route.params.id;
       this.mapConfig = this.$store.getters["maps/getMap"](id);
-      if (id !== "default") {
-        const payload = { mapId: this.mapConfig.id };
+    },
+    async loadMapDescription() {
+      const mapId = this.mapConfig.id;
+      if (mapId !== "default") {
+        const payload = { mapId: mapId };
         this.mapDescription = await this.$store.dispatch(
           "geonode/fetchGeonodeMapDescription",
           payload
@@ -69,7 +71,6 @@ export default {
       } else {
         this.mapDescription = { id: "default" };
       }
-      this.show = true;
     },
     resetApplicationState() {
       this.$store.dispatch("maps/resetState");
@@ -85,13 +86,14 @@ export default {
     appAnalysisPanel
   },
   created() {
+    this.loadMapConfig();
+    this.loadMapDescription();
     const _vm = this;
     this.$root.$on("map-init", map => {
-      _vm.map = map;
-      _vm.loadMapConfig();
+      _vm.show = true;
     });
     this.$root.$on("map-destroy", () => {
-      this.show = false;
+      _vm.show = false;
     });
   }
 };

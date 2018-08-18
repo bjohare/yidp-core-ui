@@ -76,6 +76,16 @@ const mutations = {
   resetState(state) {
     const initial = initialState();
     state.maps = initial.maps;
+  },
+  addLayer(state, payload) {
+    const { mapId, layer } = payload;
+    state.maps[mapId].layers.push(layer);
+  },
+  removeLayer(state, payload) {
+    const { mapId, typename } = payload;
+    _.remove(state.maps[mapId].layers, lyr => {
+      return lyr.typename === typename;
+    });
   }
 };
 
@@ -97,6 +107,12 @@ const getters = {
   },
   getLayers: state => id => {
     return state.maps[id].layers;
+  },
+  getLayer: state => (id, typename) => {
+    const map = state.maps[id];
+    return map.layers.find(l => {
+      return l.typename === typename;
+    });
   }
 };
 

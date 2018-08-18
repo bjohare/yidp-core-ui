@@ -9,7 +9,7 @@
     </div>
     <div v-else class="mb-3"></div>
     <div v-for="(feature, index) in paginatedData" :key="index" class="mb-2">
-      <h5>{{ feature.name }}</h5>
+      <h5>{{ feature.title }}</h5>
       <b-table striped hover small fixed stacked bordered responsive :items="[getProperties(feature)]"></b-table>
     </div>
   </b-alert>

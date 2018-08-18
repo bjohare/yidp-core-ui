@@ -10,16 +10,16 @@
 </template>
 <script>
 import "leaflet/dist/leaflet.css";
-import { initMap, loadWMSLayers } from "./wms";
-import appOverlay from "../layers/LayerOverlay.vue";
+import { initMap, loadInitialWMSLayers } from "./wms";
+import appOverlay from "@/components/controls/FeatureInfoControl.vue";
 import * as L from "leaflet";
 
 export default {
-  props: ["mapId"],
+  props: ["id"],
   data() {
     return {
       map: null,
-      mapConfig: null,
+      mapConfig: this.$store.getters["maps/getMap"](this.id),
       info: null,
       selectedFeatures: [],
       selection: null
@@ -36,17 +36,19 @@ export default {
   methods: {
     initializeMap() {
       initMap(this);
+      this.map.on("click", e => {
+        this.selectedFeatures = [];
+        if (this.selection) {
+          this.map.removeLayer(this.selection);
+        }
+      });
       this.$root.$emit("map-init", this.map);
     },
     async loadInitalLayers() {
-      await loadWMSLayers(this);
+      await loadInitialWMSLayers(this);
     },
     triggerLayersAdded(baseLayers, wmsLayers) {
       this.$root.$emit("base-layers-added", baseLayers, wmsLayers);
-    },
-    loadMapConfig() {
-      this.mapConfig = this.$store.getters["maps/getMap"](this.mapId);
-      this.mapConfig.id = this.mapId;
     },
     clearSelectedFeatures() {
       this.selectedFeatures = [];
@@ -76,20 +78,6 @@ export default {
     this.loadInitalLayers();
   },
   created() {
-    const _vm = this;
-    this.loadMapConfig();
-    this.$root.$on("map-init", map => {
-      map.on("click", e => {
-        this.selectedFeatures = [];
-        if (_vm.selection) {
-          map.removeLayer(_vm.selection);
-        }
-      });
-    });
-    this.$root.$on("map-destroy", () => {
-      _vm.map = null;
-      _vm.mapConfig = null;
-    });
     this.$root.$on("feature-selected", feature => {
       this.selectedFeatures.push(feature);
       this.addSelectedIndicator();

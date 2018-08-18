@@ -38,7 +38,8 @@ export default new Router({
         {
           path: "/map/:id",
           name: "Map",
-          component: MapView
+          component: MapView,
+          props: true
         },
         {
           path: "/projects",

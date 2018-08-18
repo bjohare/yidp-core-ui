@@ -71,3 +71,14 @@ export const buildCatalog = async ({ commit, dispatch }) => {
   });
   commit("saveCategories", categories);
 };
+
+export const addLayer = ({ commit }, payload) => {
+  const { mapId, layer } = payload;
+  commit("addLayer", { mapId: mapId, layer: layer });
+};
+
+export const removeLayer = async ({ commit }, payload) => {
+  const { mapId, layer } = payload;
+  const { typename } = layer;
+  commit("removeLayer", { mapId: mapId, typename: typename });
+};
