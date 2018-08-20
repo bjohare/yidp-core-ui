@@ -113,15 +113,7 @@ export default {
         );
       }
     },
-    addLayer(selectedLayer) {
-      let layer = this.$store.getters[("map/getLayer", selectedLayer.typename)];
-      if (!layer) {
-        layer = Object.assign({}, this.$store.state.maps.layer);
-        layer.name = selectedLayer.name;
-        layer.title = selectedLayer.title;
-        layer.typename = selectedLayer.typename;
-        layer.featureInfo = selectedLayer.featureInfo;
-      }
+    addLayer(layer) {
       this.$store.dispatch("maps/addLayer", layer);
     },
     removeLayer(layer) {

@@ -72,8 +72,16 @@ export const buildCatalog = async ({ commit, dispatch }) => {
   commit("saveCategories", categories);
 };
 
-export const addLayer = ({ commit }, layer) => {
-  commit("addLayer", layer);
+export const addLayer = ({ commit, state, getters }, selectedLayer) => {
+  let layer = getters[("getLayer", selectedLayer.typename)];
+  if (!layer) {
+    layer = Object.assign({}, state.layer);
+    layer.name = selectedLayer.name;
+    layer.title = selectedLayer.title;
+    layer.typename = selectedLayer.typename;
+    layer.featureInfo = selectedLayer.featureInfo;
+    commit("addLayer", layer);
+  }
 };
 
 export const removeLayer = ({ commit }, typename) => {

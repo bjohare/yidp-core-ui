@@ -35,15 +35,10 @@ export default {
           ("map/getLayer", selectedLayer.typename)
         ];
         if (!layer) {
-          layer = Object.assign({}, this.$store.state.maps.layer);
-          layer.name = selectedLayer.name;
-          layer.title = selectedLayer.title;
-          layer.typename = selectedLayer.typename;
-          layer.featureInfo = selectedLayer.featureInfo;
+          let wmsLayer = loadWMSLayer(this, selectedLayer);
+          this.wmsLayers.push(wmsLayer);
+          this.$store.dispatch("maps/addLayer", selectedLayer);
         }
-        let wmsLayer = loadWMSLayer(this, selectedLayer);
-        this.wmsLayers.push(wmsLayer);
-        this.$store.dispatch("maps/addLayer", layer);
       } else {
         let wmsLyr = this.wmsLayers.find(layer => {
           return layer.typename === selectedLayer.typename;
