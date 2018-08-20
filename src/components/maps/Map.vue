@@ -81,6 +81,7 @@ export default {
   created() {
     this.$root.$on("feature-selected", feature => {
       this.selectedFeatures.push(feature);
+      this.selectedFeatures.reverse();
       this.addSelectedIndicator();
     });
   }

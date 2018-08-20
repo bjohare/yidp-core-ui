@@ -27,6 +27,7 @@ export default {
       layers: [],
       layer: {
         name: null,
+        title: null,
         typename: null,
         opacity: 1,
         featureInfo: null
@@ -42,6 +43,7 @@ export default {
       if (!layer) {
         layer = Object.assign({}, this.layer);
         layer.name = selectedLayer.name;
+        layer.title = selectedLayer.title;
         layer.typename = selectedLayer.typename;
         layer.featureInfo = selectedLayer.featureInfo;
       }

@@ -38,7 +38,7 @@
             <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
           </div>
           <div class="layer-name"><strong>{{ category.gn_description }}</strong></div>
-          <b-collapse :id="category.identifier">
+          <b-collapse :id="category.identifier" :visible="showCollapse(category.layers)">
             <b-list-group-item class="d-flex text-sm-left" v-for="(layer, idx) in category.layers" :key="layer.typename + idx">
                 <b-form-checkbox :id="'check-layer' + layer.id" @change="toggleLayer($event, layer)" :checked="isActive(layer.typename)"></b-form-checkbox>
                 <router-link :to="'/geodata/' + layer.id">
@@ -112,6 +112,15 @@ export default {
         return layer.typename === typename;
       });
       return found !== undefined;
+    },
+    showCollapse(layers) {
+      const visible = layers.some(layer => {
+        let found = this.mapConfig.layers.find(l => {
+          return l.typename === layer.typename;
+        });
+        return found !== undefined;
+      });
+      return visible;
     }
   },
   created() {
