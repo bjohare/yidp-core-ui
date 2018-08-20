@@ -10,7 +10,7 @@
 </template>
 <script>
 import "leaflet/dist/leaflet.css";
-import { initMap, loadInitialWMSLayers } from "./wms";
+import { initMap, loadBaseLayers } from "./wms";
 import appOverlay from "@/components/controls/FeatureInfoControl.vue";
 import * as L from "leaflet";
 
@@ -44,11 +44,9 @@ export default {
       });
       this.$root.$emit("map-init", this.map);
     },
-    async loadInitalLayers() {
-      await loadInitialWMSLayers(this);
-    },
-    triggerLayersAdded(baseLayers, wmsLayers) {
-      this.$root.$emit("base-layers-added", baseLayers, wmsLayers);
+    async loadBaseLayers() {
+      const baseLayers = await loadBaseLayers(this.map);
+      this.$root.$emit("base-layers-added", baseLayers);
     },
     clearSelectedFeatures() {
       this.selectedFeatures = [];
@@ -75,7 +73,7 @@ export default {
   },
   mounted() {
     this.initializeMap();
-    this.loadInitalLayers();
+    this.loadBaseLayers();
   },
   created() {
     this.$root.$on("feature-selected", feature => {

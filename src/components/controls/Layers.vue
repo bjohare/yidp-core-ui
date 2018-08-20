@@ -35,25 +35,38 @@ export default {
           ("map/getLayer", selectedLayer.typename)
         ];
         if (!layer) {
-          let wmsLayer = loadWMSLayer(this, selectedLayer);
-          this.wmsLayers.push(wmsLayer);
-          this.$store.dispatch("maps/addLayer", selectedLayer);
+          this.addLayer(selectedLayer);
         }
       } else {
-        let wmsLyr = this.wmsLayers.find(layer => {
-          return layer.typename === selectedLayer.typename;
-        });
-        if (wmsLyr && this.map.hasLayer(wmsLyr)) {
-          _.remove(this.wmsLayers, lyr => {
-            return lyr.typename === wmsLyr.typename;
-          });
-          wmsLyr.removeFrom(this.map);
-        }
-        this.$store.dispatch("maps/removeLayer", selectedLayer.typename);
+        this.removeLayer(selectedLayer);
       }
     },
-    loadLayers() {
+    addLayer(selectedLayer) {
+      let wmsLayer = loadWMSLayer(this, selectedLayer);
+      this.wmsLayers.push(wmsLayer);
+      this.$store.dispatch("maps/addLayer", selectedLayer);
+    },
+    removeLayer(selectedLayer) {
+      let wmsLyr = this.wmsLayers.find(layer => {
+        return layer.typename === selectedLayer.typename;
+      });
+      if (wmsLyr && this.map.hasLayer(wmsLyr)) {
+        _.remove(this.wmsLayers, lyr => {
+          return lyr.typename === wmsLyr.typename;
+        });
+        wmsLyr.removeFrom(this.map);
+      }
+      this.$store.dispatch("maps/removeLayer", selectedLayer.typename);
+    },
+    async loadLayers() {
       const _vm = this;
+      const defaultLayers = await this.$store.dispatch(
+        "geonode/fetchGeonodeWMSLayers",
+        this.mapConfig
+      );
+      defaultLayers.forEach(layer => {
+        this.$store.dispatch("maps/addLayer", layer);
+      });
       const layers = this.$store.getters["maps/getLayers"];
       layers.forEach(layer => {
         const wmsLayer = loadWMSLayer(_vm, layer);

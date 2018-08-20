@@ -56,13 +56,13 @@
 </template>
 <script>
 import appSlider from "vue-slider-component";
+import { mapGetters } from "vuex";
 
 export default {
   props: ["mapConfig", "map"],
   data() {
     return {
       baseLayers: [],
-      categories: [],
       show: false,
       slider: {
         value: 1,
@@ -78,17 +78,15 @@ export default {
     };
   },
   computed: {
-    layers() {
-      return this.$store.getters["maps/getLayers"];
-    }
+    ...mapGetters({
+      categories: "maps/getCategories",
+      layers: "maps/getLayers"
+    })
   },
   components: {
     appSlider
   },
   methods: {
-    getCategories() {
-      this.categories = this.$store.getters["maps/getCategories"];
-    },
     toggleBaseLayer(layer) {
       if (!layer.checked && !this.map.hasLayer(layer.layer)) {
         this.map.addLayer(layer.layer);
@@ -129,10 +127,8 @@ export default {
   },
   created() {
     const _vm = this;
-    this.getCategories();
-    this.$root.$on("base-layers-added", (baseLayers, wmsLayers) => {
+    this.$root.$on("base-layers-added", baseLayers => {
       _vm.baseLayers = baseLayers;
-      _vm.wmsLayers = wmsLayers;
       _vm.show = true;
     });
   }

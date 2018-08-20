@@ -46,26 +46,6 @@ export const fetchGeonodeWMSLayers = async (
   return layers;
 };
 
-export const fetchGeonodeSelectedLayers = async (
-  { commit, dispatch },
-  payload
-) => {
-  const { selected } = payload;
-  let layerGroups = {};
-  for (let idx in selected) {
-    let identifier = selected[idx].identifier;
-    let category = selected[idx].gn_description;
-    let query = "category__identifier__in=" + identifier;
-    const auth = await dispatch("getGeonodeAxiosConfig");
-    const response = await geonodeAxios.get(
-      geonodeEndpoints.layersUrl + "?" + query,
-      auth
-    );
-    layerGroups[category] = response.data.objects;
-  }
-  return layerGroups;
-};
-
 /* Get the categories from geonode */
 export const fetchGeonodeCategories = async ({ dispatch }) => {
   const auth = await dispatch("getGeonodeAxiosConfig");
