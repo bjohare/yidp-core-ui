@@ -5,9 +5,8 @@
                 @selected="filterData($event, 'category')"
                 @reset="fetchGeonodeLayers"></app-filter>
     <div v-if="!loading">
-      <div v-for="(layer, index) in paginatedData" :key="index">
-        <app-geodata-card :layer="layer"></app-geodata-card>
-      </div>
+      <app-geodata-card v-for="(layer, index) in paginatedData" :key="index"
+        :layer="layer" :selected="selectedLayers"></app-geodata-card>
       <b-alert variant="warning" show class="nodata" v-if="layers.length === 0 && !loading">No geodata found.</b-alert>
       <div v-if="pageCount > 1">
         <b-pagination-nav align="center" base-url="#" :number-of-pages="pageCount" v-model="pageNum" />
@@ -35,6 +34,9 @@ export default {
     appFilter
   },
   computed: {
+    selectedLayers() {
+      return this.$store.getters["maps/getLayers"];
+    },
     paginatedData() {
       const start = this.pageNum * this.size;
       const end = start + this.size;

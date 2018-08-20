@@ -42,7 +42,7 @@
             <b-list-group-item class="d-flex text-sm-left" v-for="(layer, idx) in category.layers" :key="layer.typename + idx">
                 <b-form-checkbox :id="'check-layer' + layer.id" @change="toggleLayer($event, layer)" :checked="isActive(layer.typename)"></b-form-checkbox>
                 <router-link :to="'/geodata/' + layer.id">
-                  <i style="cursor: pointer;" class="fa fa-info-circle ml-2 mr-2 mt-1 fa-lg text-primary"></i>
+                  <i style="cursor: pointer;" class="fa fa-info-circle fa-lg mr-2 mt-1 text-primary"></i>
                 </router-link>
                 <span class="layer-title">{{ layer.title}}</span>
             </b-list-group-item>

@@ -54,9 +54,10 @@ const mutations = {
     state.layers.push(layer);
   },
   removeLayer(state, typename) {
-    _.remove(state.layers, lyr => {
-      return lyr.typename === typename;
+    let filtered = _.filter(state.layers, lyr => {
+      return lyr.typename !== typename;
     });
+    state.layers = filtered;
   }
 };
 

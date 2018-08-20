@@ -76,6 +76,6 @@ export const addLayer = ({ commit }, layer) => {
   commit("addLayer", layer);
 };
 
-export const removeLayer = async ({ commit }, typename) => {
+export const removeLayer = ({ commit }, typename) => {
   commit("removeLayer", typename);
 };

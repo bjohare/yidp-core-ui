@@ -3,8 +3,11 @@
     :title="layer.title"
     :img-alt="layer.title" class="mb-4">
       <span slot="header">
-        <strong>Date of information:</strong> {{layer.date | format-date }}
-        <h5><b-badge variant="primary" class="h5">{{ layer.category__gn_description }}</b-badge></h5>
+        <span><strong>Date of information:</strong> {{layer.date | format-date }}</span>
+        <div class="float-right">
+          <b-badge variant="primary" class="mr-2"><span class="h6 font-weight-bold">{{ layer.category__gn_description }}</span></b-badge>
+          <i v-if="isActive" class="fa fa-check-circle fa-lg mt-2 text-success"></i>
+        </div>
       </span>
       <span><strong>{{ layer.category__gn_description }}</strong></span> |
       <span><strong>{{ layer.supplemental_information }}</strong></span>
@@ -22,7 +25,8 @@
           View Details
         </b-button>
       </router-link>
-      <button class="btn btn-primary m-md-2" @click="addLayer(layer)">Add to Map</button>
+      <b-button v-show="isActive" variant="success" class="m-md-2" @click="removeLayer(layer)">Remove from Map</b-button>
+      <b-button v-show="!isActive" variant="primary" class="m-md-2" @click="addLayer(layer)">Add to Map</b-button>
       <b-dropdown id="ddown1" text="Download" variant="primary" right>
         <b-dropdown-item :href="downloadLayer('SHAPE-ZIP')">Zipped Shapefile</b-dropdown-item>
         <b-dropdown-item :href="downloadLayer('csv')">CSV</b-dropdown-item>
@@ -33,14 +37,17 @@
         <b-dropdown-item :href="downloadMap('image/png')" target="_blank">PNG</b-dropdown-item>
       </b-dropdown>
       <span slot="footer">
-          <i class="fa fa-tag fa-lg"></i>&nbsp;<em>{{ keywords }}</em>
+          <i class="fa fa-tags fa-lg text-primary mr-2"></i>&nbsp;<em>{{ keywords }}</em>
       </span>
     </b-card>
 </template>
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   props: {
     layer: null,
+    selected: null,
     wmsUrl: "",
     wfsUrl: ""
   },
@@ -51,6 +58,9 @@ export default {
     };
   },
   computed: {
+    ...mapGetters({
+      selectedLayers: "maps/getLayers"
+    }),
     keywords() {
       return this.layer.keywords.join(", ");
     },
@@ -62,6 +72,11 @@ export default {
     },
     clampAbstract() {
       return this.layer.abstract.length > 300;
+    },
+    isActive() {
+      return this.selectedLayers.find(lyr => {
+        return lyr.typename === this.layer.typename;
+      });
     }
   },
   methods: {
@@ -98,8 +113,19 @@ export default {
         );
       }
     },
-    addLayer(layer) {
-      this.$root.$emit("add-layer", layer);
+    addLayer(selectedLayer) {
+      let layer = this.$store.getters[("map/getLayer", selectedLayer.typename)];
+      if (!layer) {
+        layer = Object.assign({}, this.$store.state.maps.layer);
+        layer.name = selectedLayer.name;
+        layer.title = selectedLayer.title;
+        layer.typename = selectedLayer.typename;
+        layer.featureInfo = selectedLayer.featureInfo;
+      }
+      this.$store.dispatch("maps/addLayer", layer);
+    },
+    removeLayer(layer) {
+      this.$store.dispatch("maps/removeLayer", layer.typename);
     }
   }
 };
@@ -112,11 +138,6 @@ export default {
 }
 .card-title {
   font-size: 2em;
-}
-.badge {
-  position: absolute;
-  top: 20px;
-  right: 20px;
 }
 .doc-link {
   text-decoration: none;

@@ -10,7 +10,10 @@
     :img-alt="layer.title" class="mb-4">
       <span slot="header">
         <span><strong>Date of information:</strong> {{layer.date | format-date }}</span>
-        <h5><b-badge pill variant="info" class="float-right">{{ layer.category.gn_description }}</b-badge></h5>
+        <div class="float-right">
+          <b-badge variant="primary" class="mr-2"><span class="h6 font-weight-bold">{{ layer.category.gn_description }}</span></b-badge>
+          <i v-if="isSelected(layer)" class="fa fa-check-circle fa-lg mt-2 text-success text-lg"></i>
+        </div>
       </span>
       <div v-if="layer.thumbnail_url" class="d-flex float-right">
         <img class="thumb m-2" :src="layer.thumbnail_url" width="100px" height="100px"/>
@@ -25,7 +28,8 @@
       </div>
 
       <div class="mb-3 mt-3">
-        <button class="btn btn-primary mr-2" @click="addLayer(layer)">Add to Map</button>
+        <button v-if="isSelected(layer)" class="btn btn-success m-md-2" @click="removeLayer(layer); isSelected(layer)">Remove from Map</button>
+        <button v-show="!isSelected(layer)" class="btn btn-primary m-md-2" @click="addLayer(layer); isSelected(layer)">Add to Map</button>
         <b-dropdown id="ddown1" text="Download" variant="primary" right>
           <b-dropdown-item :href="downloadLayer('SHAPE-ZIP')">Zipped Shapefile</b-dropdown-item>
           <b-dropdown-item :href="downloadLayer('csv')">CSV</b-dropdown-item>
@@ -83,6 +87,9 @@ export default {
     appSpinner
   },
   computed: {
+    selectedLayers() {
+      return this.$store.getters["maps/getLayers"];
+    },
     keywords() {
       return this.layer.keywords.join(", ");
     },
@@ -139,6 +146,12 @@ export default {
     toggle() {
       this.more = !this.more;
     },
+    isSelected(layer) {
+      const found = this.selectedLayers.find(lyr => {
+        return lyr.typename === layer.typename;
+      });
+      return found !== undefined;
+    },
     downloadLayer(type) {
       return (
         "http://yidp-geonode.geoweb.io/geoserver/wfs?outputFormat=" +
@@ -169,7 +182,20 @@ export default {
         );
       }
     },
-    addLayer(layer) {}
+    addLayer(selectedLayer) {
+      let layer = this.$store.getters[("map/getLayer", selectedLayer.typename)];
+      if (!layer) {
+        layer = Object.assign({}, this.$store.state.maps.layer);
+        layer.name = selectedLayer.name;
+        layer.title = selectedLayer.title;
+        layer.typename = selectedLayer.typename;
+        layer.featureInfo = selectedLayer.featureInfo;
+      }
+      this.$store.dispatch("maps/addLayer", layer);
+    },
+    removeLayer(layer) {
+      this.$store.dispatch("maps/removeLayer", layer.typename);
+    }
   },
   created() {
     this.loadLayer();
@@ -183,7 +209,7 @@ export default {
   margin: 0 auto;
 }
 .card-title {
-  font-size: 22pt;
+  font-size: 2em;
 }
 .link {
   max-width: 90%;

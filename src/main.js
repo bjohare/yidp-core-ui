@@ -57,7 +57,7 @@ new Vue({
   },
   methods: {
     async loadCategories() {
-      this.$store.dispatch("maps/buildCatalog");
+      await this.$store.dispatch("maps/buildCatalog");
     },
     async loadGeonodeMaps() {
       const geonodeMaps = await this.$store.dispatch(
