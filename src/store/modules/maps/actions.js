@@ -73,7 +73,7 @@ export const buildCatalog = async ({ commit, dispatch }) => {
 };
 
 export const addLayer = ({ commit, state, getters }, selectedLayer) => {
-  let layer = getters[("getLayer", selectedLayer.typename)];
+  let layer = getters["getLayer"](selectedLayer.typename);
   if (!layer) {
     layer = Object.assign({}, state.layer);
     layer.name = selectedLayer.name;

@@ -72,9 +72,10 @@ const getters = {
     return state.layers;
   },
   getLayer: state => typename => {
-    return state.layers.find(l => {
+    const layer = state.layers.find(l => {
       return l.typename === typename;
     });
+    return layer;
   }
 };
 
