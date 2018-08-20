@@ -77,6 +77,11 @@ export default {
       }
     };
   },
+  computed: {
+    layers() {
+      return this.$store.getters["maps/getLayers"];
+    }
+  },
   components: {
     appSlider
   },
@@ -107,15 +112,14 @@ export default {
       });
     },
     isActive(typename) {
-      const layers = this.mapConfig.layers;
-      const found = layers.find(layer => {
+      const found = this.layers.find(layer => {
         return layer.typename === typename;
       });
       return found !== undefined;
     },
     showCollapse(layers) {
       const visible = layers.some(layer => {
-        let found = this.mapConfig.layers.find(l => {
+        let found = this.layers.find(l => {
           return l.typename === layer.typename;
         });
         return found !== undefined;

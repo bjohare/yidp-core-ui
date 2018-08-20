@@ -24,58 +24,45 @@ export default {
   props: ["mapConfig", "map"],
   data() {
     return {
-      layers: [],
-      layer: {
-        name: null,
-        title: null,
-        typename: null,
-        opacity: 1,
-        featureInfo: null
-      }
+      wmsLayers: []
     };
   },
   methods: {
     toggleLayer($event) {
       const { checked, selectedLayer } = $event;
-      let layer = this.$store.getters[
-        ("map/getLayer", (this.mapConfig.id, selectedLayer.typename))
-      ];
-      if (!layer) {
-        layer = Object.assign({}, this.layer);
-        layer.name = selectedLayer.name;
-        layer.title = selectedLayer.title;
-        layer.typename = selectedLayer.typename;
-        layer.featureInfo = selectedLayer.featureInfo;
-      }
       if (checked) {
-        let wmsLayer = loadWMSLayer(this, selectedLayer);
-        this.layers.push(wmsLayer);
-        const payload = {
-          mapId: this.mapConfig.id,
-          layer: layer
-        };
-        this.$store.dispatch("maps/addLayer", payload);
-      } else {
-        const layers = _.remove(this.layers, lyr => {
-          return selectedLayer.typename === lyr.typename;
-        });
-        if (layers.length > 0) {
-          this.map.removeLayer(layers[0]);
-          const payload = {
-            mapId: this.mapConfig.id,
-            layer: layer
-          };
-          this.$store.dispatch("maps/removeLayer", payload);
+        let layer = this.$store.getters[
+          ("map/getLayer", selectedLayer.typename)
+        ];
+        if (!layer) {
+          layer = Object.assign({}, this.$store.state.maps.layer);
+          layer.name = selectedLayer.name;
+          layer.title = selectedLayer.title;
+          layer.typename = selectedLayer.typename;
+          layer.featureInfo = selectedLayer.featureInfo;
         }
+        let wmsLayer = loadWMSLayer(this, selectedLayer);
+        this.wmsLayers.push(wmsLayer);
+        this.$store.dispatch("maps/addLayer", layer);
+      } else {
+        let wmsLyr = this.wmsLayers.find(layer => {
+          return layer.typename === selectedLayer.typename;
+        });
+        if (wmsLyr && this.map.hasLayer(wmsLyr)) {
+          _.remove(this.wmsLayers, lyr => {
+            return lyr.typename === wmsLyr.typename;
+          });
+          wmsLyr.removeFrom(this.map);
+        }
+        this.$store.dispatch("maps/removeLayer", selectedLayer.typename);
       }
     },
     loadLayers() {
       const _vm = this;
-      this.layers = [];
-      const layers = this.mapConfig.layers;
+      const layers = this.$store.getters["maps/getLayers"];
       layers.forEach(layer => {
         const wmsLayer = loadWMSLayer(_vm, layer);
-        _vm.layers.push(wmsLayer);
+        this.wmsLayers.push(wmsLayer);
       });
     }
   },
