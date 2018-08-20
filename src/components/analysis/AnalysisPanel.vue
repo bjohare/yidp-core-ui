@@ -31,7 +31,7 @@ import axios from "axios";
 import * as L from "leaflet";
 import { filterStyle, selectedFilterStyle } from "@/components/maps/styles";
 export default {
-  props: ["show", "tabs", "userMap", "map"],
+  props: ["show", "tabs", "mapConfig", "map"],
   data() {
     return {
       featureGroup: L.featureGroup(),
@@ -54,7 +54,7 @@ export default {
     //   });
   },
   watch: {
-    "userMap.layers": function(layers) {
+    "mapConfig.layers": function(layers) {
       layers.forEach(layer => {
         this.options[layer.name] = [];
         layer.layers.forEach(subLayer => {

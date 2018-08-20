@@ -83,6 +83,9 @@ export default {
   },
   created() {
     this.loadLayers();
+    this.$root.$on("add-layer", layer => {
+      console.log(layer);
+    });
   }
 };
 </script>

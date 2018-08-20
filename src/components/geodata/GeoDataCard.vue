@@ -22,7 +22,7 @@
           View Details
         </b-button>
       </router-link>
-      <button class="btn btn-primary m-md-2">Add to Map</button>
+      <button class="btn btn-primary m-md-2" @click="addLayer(layer)">Add to Map</button>
       <b-dropdown id="ddown1" text="Download" variant="primary" right>
         <b-dropdown-item :href="downloadLayer('SHAPE-ZIP')">Zipped Shapefile</b-dropdown-item>
         <b-dropdown-item :href="downloadLayer('csv')">CSV</b-dropdown-item>
@@ -97,6 +97,9 @@ export default {
           this.accessToken
         );
       }
+    },
+    addLayer(layer) {
+      this.$root.$emit("add-layer", layer);
     }
   }
 };
