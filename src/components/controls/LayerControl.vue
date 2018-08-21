@@ -30,7 +30,10 @@
       <b-list-group-item class="list-group-item-accent-info bg-light text-left font-weight-bold text-uppercase small">
         Sectors / Clusters
       </b-list-group-item>
-      <div id="sectors">
+      <div class="m-3" v-if="!showCategories">
+        <appSpinner :background="'#4DBD74'"></appSpinner>
+      </div>
+      <div id="sectors" v-else>
         <b-list-group-item v-for="(category, index) in categories" :key="category.identifier + index"
           class="list-group-item-accent-success text-left font-weight-bold text-uppercase small">
           <div v-b-toggle="category.identifier">
@@ -56,6 +59,7 @@
 </template>
 <script>
 import appSlider from "vue-slider-component";
+import { Stretch } from "vue-loading-spinner";
 import { mapGetters } from "vuex";
 
 export default {
@@ -63,7 +67,7 @@ export default {
   data() {
     return {
       baseLayers: [],
-      show: false,
+      showCategories: false,
       slider: {
         value: 1,
         min: 0,
@@ -83,10 +87,19 @@ export default {
       layers: "maps/getLayers"
     })
   },
+  watch: {
+    categories() {
+      this.showCategories = true;
+    }
+  },
   components: {
-    appSlider
+    appSlider,
+    appSpinner: Stretch
   },
   methods: {
+    loadCategories() {
+      this.$store.dispatch("maps/buildCatalog");
+    },
     toggleBaseLayer(layer) {
       if (!layer.checked && !this.map.hasLayer(layer.layer)) {
         this.map.addLayer(layer.layer);
@@ -126,10 +139,14 @@ export default {
     }
   },
   created() {
+    if (this.categories.length === 0) {
+      this.loadCategories();
+    } else {
+      this.showCategories = true;
+    }
     const _vm = this;
     this.$root.$on("base-layers-added", baseLayers => {
       _vm.baseLayers = baseLayers;
-      _vm.show = true;
     });
   }
 };

@@ -56,14 +56,14 @@ new Vue({
     App
   },
   methods: {
-    async loadCategories() {
-      await this.$store.dispatch("maps/buildCatalog");
+    loadCategories() {
+      this.$store.dispatch("maps/buildCatalog");
     },
     async loadGeonodeMaps() {
       const geonodeMaps = await this.$store.dispatch(
         "geonode/fetchGeonodeMaps"
       );
-      await this.$store.dispatch("maps/syncMaps", geonodeMaps);
+      this.$store.dispatch("maps/syncMaps", geonodeMaps);
     }
   },
   created() {

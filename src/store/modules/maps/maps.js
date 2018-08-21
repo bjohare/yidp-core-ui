@@ -13,19 +13,26 @@ export const mapDefaults = () => {
   };
 };
 
+export const layerDefaults = () => {
+  return {
+    name: null,
+    title: null,
+    typename: null,
+    opacity: 1,
+    featureInfo: null,
+    checked: true,
+    abstract: null,
+    zIndex: 400
+  };
+};
+
 const initialState = function() {
   return {
     maps: { default: { ...mapDefaults() } },
     mapDefaults: mapDefaults(),
     layers: [],
     categories: [],
-    layer: {
-      name: null,
-      title: null,
-      typename: null,
-      opacity: 1,
-      featureInfo: null
-    }
+    layerDefaults: layerDefaults()
   };
 };
 
@@ -58,6 +65,17 @@ const mutations = {
       return lyr.typename !== typename;
     });
     state.layers = filtered;
+  },
+  updateLayers(state, layers) {
+    state.layers = layers;
+  },
+  setLayerOpacity(state, layer) {
+    const lyr = state.layers.find(l => {
+      return l.typename === layer.typename;
+    });
+    if (lyr) {
+      lyr.opacity = layer.opacity;
+    }
   }
 };
 

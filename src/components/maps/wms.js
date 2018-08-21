@@ -152,8 +152,6 @@ L.layerGroup.yidp = options => new L.LayerGroup.YIDP(options);
 
 export const loadWMSLayer = (vm, layer) => {
   const wmsUrl = vm.mapConfig.wmsBaseUrl;
-  let zIndex = 400;
-  zIndex++;
   let typename = layer.typename;
   let wmsParams = {
     layers: typename,
@@ -171,6 +169,7 @@ export const loadWMSLayer = (vm, layer) => {
       featureInfo: layer.featureInfo
     })
     .addTo(vm.map)
-    .setZIndex(zIndex);
+    .setOpacity(layer.opacity)
+    .setZIndex(400);
   return wmsLayer;
 };

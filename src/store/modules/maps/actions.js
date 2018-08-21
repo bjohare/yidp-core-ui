@@ -12,20 +12,8 @@ export const saveMap = ({ commit }, map) => {
   commit("saveMap", map);
 };
 
-export const saveSelectedCategories = ({ commit }, payload) => {
-  commit("saveSelectedCategories", payload);
-};
-
-export const saveFeatureGroup = ({ commit }, group) => {
-  commit("saveFeatureGroup", group);
-};
-
-export const addFeatureGroup = ({ commit }, group) => {
-  commit("addFeatureGroup", group);
-};
-
-export const removeFeatureGroup = ({ commit }, group) => {
-  commit("removeFeatureGroup", group);
+export const setLayerOpacity = ({ commit }, layer) => {
+  commit("setLayerOpacity", layer);
 };
 
 export const syncMaps = ({ commit, state }, geonodeMaps) => {
@@ -75,9 +63,10 @@ export const buildCatalog = async ({ commit, dispatch }) => {
 export const addLayer = ({ commit, state, getters }, selectedLayer) => {
   let layer = getters["getLayer"](selectedLayer.typename);
   if (!layer) {
-    layer = Object.assign({}, state.layer);
+    layer = Object.assign({}, state.layerDefaults);
     layer.name = selectedLayer.name;
     layer.title = selectedLayer.title;
+    layer.abstract = selectedLayer.abstract;
     layer.typename = selectedLayer.typename;
     layer.featureInfo = selectedLayer.featureInfo;
     commit("addLayer", layer);

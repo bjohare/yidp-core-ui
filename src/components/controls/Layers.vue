@@ -1,5 +1,5 @@
 <template>
-  <b-tabs ref="tabs" fixed>
+  <b-tabs ref="tabs" fixed @input="setActive">
     <b-tab id="layers" ref="layers">
       <template slot="title">
         Catalog
@@ -10,7 +10,10 @@
       <template slot="title">
         Legend
       </template>
-      <app-legend-control></app-legend-control>
+      <div v-show="!hasLayers">
+        No layers selected.
+      </div>
+      <app-legend-control :wmsLayers="wmsLayers" :map="map" :active="legendActive"></app-legend-control>
     </b-tab>
   </b-tabs>
 </template>
@@ -24,8 +27,14 @@ export default {
   props: ["mapConfig", "map"],
   data() {
     return {
-      wmsLayers: []
+      wmsLayers: [],
+      legendActive: false
     };
+  },
+  computed: {
+    hasLayers() {
+      return this.wmsLayers.length > 0;
+    }
   },
   methods: {
     toggleLayer($event) {
@@ -72,6 +81,14 @@ export default {
         const wmsLayer = loadWMSLayer(_vm, layer);
         this.wmsLayers.push(wmsLayer);
       });
+    },
+    setActive(index) {
+      // detect when legend becomes active
+      if (index === 1) {
+        this.legendActive = true;
+      } else {
+        this.legendActive = false;
+      }
     }
   },
   components: {
@@ -80,9 +97,6 @@ export default {
   },
   created() {
     this.loadLayers();
-    this.$root.$on("add-layer", layer => {
-      console.log(layer);
-    });
   }
 };
 </script>

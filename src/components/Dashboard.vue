@@ -7,12 +7,7 @@
 </template>
 
 <script>
-export default {
-  beforeRouteEnter(to, from, next) {
-    console.log("dashboard..");
-    next();
-  }
-};
+export default {};
 </script>
 <style>
 </style>

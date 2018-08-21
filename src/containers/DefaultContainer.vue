@@ -8,7 +8,8 @@
       <SidebarToggler class="d-md-down-none" display="lg" />
       <b-navbar-nav class="d-md-down-none">
         <b-nav-item class="px-3"><router-link to="/geodata">GeoData</router-link></b-nav-item>
-        <b-nav-item class="px-3"><router-link to="/maps">Maps</router-link></b-nav-item>
+        <b-nav-item class="px-3"><router-link to="/map">Map</router-link></b-nav-item>
+        <b-nav-item class="px-3"><router-link to="/projects">Projects</router-link></b-nav-item>
         <b-nav-item class="px-3"><router-link to="/documents">Documents</router-link></b-nav-item>
       </b-navbar-nav>
       <b-link class="navbar-brand ml-5" href="http://ye.one.un.org/" target="_blank">
