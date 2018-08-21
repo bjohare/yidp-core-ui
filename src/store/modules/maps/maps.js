@@ -22,7 +22,18 @@ export const layerDefaults = () => {
     featureInfo: null,
     checked: true,
     abstract: null,
-    zIndex: 400
+    zIndex: 400,
+    legendUrl: null
+  };
+};
+
+export const legendParams = () => {
+  return {
+    request: "GetLegendGraphic",
+    version: "1.1.1",
+    format: "image/png",
+    width: 20,
+    height: 20
   };
 };
 
@@ -32,7 +43,8 @@ const initialState = function() {
     mapDefaults: mapDefaults(),
     layers: [],
     categories: [],
-    layerDefaults: layerDefaults()
+    layerDefaults: layerDefaults(),
+    legendParams: legendParams()
   };
 };
 
@@ -58,7 +70,7 @@ const mutations = {
     state.categories = initial.categories;
   },
   addLayer(state, layer) {
-    state.layers.push(layer);
+    state.layers.unshift(layer);
   },
   removeLayer(state, typename) {
     let filtered = _.filter(state.layers, lyr => {

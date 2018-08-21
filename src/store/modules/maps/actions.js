@@ -1,4 +1,5 @@
 import * as _ from "lodash";
+import * as L from "leaflet";
 
 export const resetState = ({ commit }) => {
   commit("resetState");
@@ -64,11 +65,17 @@ export const addLayer = ({ commit, state, getters }, selectedLayer) => {
   let layer = getters["getLayer"](selectedLayer.typename);
   if (!layer) {
     layer = Object.assign({}, state.layerDefaults);
+    let legendParam = L.Util.extend(state.legendParams, {
+      layer: selectedLayer.typename
+    });
+    let wmsUrl = state.mapDefaults.wmsBaseUrl;
+    let legendUrl = wmsUrl + L.Util.getParamString(legendParam);
     layer.name = selectedLayer.name;
     layer.title = selectedLayer.title;
     layer.abstract = selectedLayer.abstract;
     layer.typename = selectedLayer.typename;
     layer.featureInfo = selectedLayer.featureInfo;
+    layer.legendUrl = legendUrl;
     commit("addLayer", layer);
   }
 };

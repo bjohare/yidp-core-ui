@@ -31,6 +31,7 @@
               </div>
               <!-- <span class="icon-question font-lg" v-b-popover.click="layer.abstract"></span> -->
             </div>
+            <img :src="layer.legendUrl"/>
           </b-list-group-item>
         </transition-group>
       </draggable>
@@ -64,7 +65,6 @@ export default {
       },
       set(value) {
         this.$store.commit("maps/updateLayers", value);
-        this.updateSliders();
       }
     }
   },
@@ -73,9 +73,6 @@ export default {
       if (active) {
         this.updateSliders();
       }
-    },
-    layers() {
-      this.updateSliders();
     }
   },
   methods: {
@@ -100,9 +97,6 @@ export default {
   components: {
     draggable,
     appSlider
-  },
-  mounted() {
-    this.updateSliders();
   }
 };
 </script>
