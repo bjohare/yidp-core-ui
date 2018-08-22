@@ -13,8 +13,8 @@ export const saveMap = ({ commit }, map) => {
   commit("saveMap", map);
 };
 
-export const setLayerOpacity = ({ commit }, layer) => {
-  commit("setLayerOpacity", layer);
+export const updateLayer = ({ commit }, layer) => {
+  commit("updateLayer", layer);
 };
 
 export const syncMaps = ({ commit, state }, geonodeMaps) => {

@@ -81,12 +81,12 @@ const mutations = {
   updateLayers(state, layers) {
     state.layers = layers;
   },
-  setLayerOpacity(state, layer) {
-    const lyr = state.layers.find(l => {
+  updateLayer(state, layer) {
+    let lyr = state.layers.find(l => {
       return l.typename === layer.typename;
     });
     if (lyr) {
-      lyr.opacity = layer.opacity;
+      lyr = layer;
     }
   }
 };

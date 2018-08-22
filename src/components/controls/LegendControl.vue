@@ -99,7 +99,7 @@ export default {
     },
     setLayerOpacity(layer) {
       this.getWMSLayer(layer.typename).setOpacity(layer.opacity);
-      this.$store.dispatch("maps/setLayerOpacity", layer);
+      this.$store.dispatch("maps/updateLayer", layer);
     },
     updateSliders() {
       this.$refs.opacity.forEach(slider => {
@@ -119,6 +119,7 @@ export default {
       } else {
         wmsLayer.setOpacity(opacity);
       }
+      this.$store.dispatch("maps/updateLayer", layer);
     }
   },
   components: {
