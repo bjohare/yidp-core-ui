@@ -10,9 +10,6 @@
       <template slot="title">
         Legend
       </template>
-      <div v-show="!hasLayers">
-        No layers selected.
-      </div>
       <app-legend-control :wmsLayers="wmsLayers" :map="map" :active="legendActive"></app-legend-control>
     </b-tab>
   </b-tabs>
@@ -30,11 +27,6 @@ export default {
       wmsLayers: [],
       legendActive: false
     };
-  },
-  computed: {
-    hasLayers() {
-      return this.wmsLayers.length > 0;
-    }
   },
   methods: {
     toggleLayer($event) {
@@ -66,6 +58,7 @@ export default {
         wmsLyr.removeFrom(this.map);
       }
       this.$store.dispatch("maps/removeLayer", selectedLayer.typename);
+      console.log(this.wmsLayers);
     },
     async loadLayers() {
       const _vm = this;

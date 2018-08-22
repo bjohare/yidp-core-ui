@@ -1,6 +1,9 @@
 <template>
   <div>
-    <b-list-group class="list-group-accent">
+    <div v-if="!hasLayers" class="alert alert-info">
+        No layers selected.
+    </div>
+    <b-list-group v-else class="list-group-accent">
       <draggable v-model="layers" :options="{handle: '.handle'}" @end="dragEnd">
         <transition-group>
           <b-list-group-item v-for="(layer, index) in layers" :key="index"
@@ -23,15 +26,27 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-2 my-auto">
+              <div class="col-sm-2 my-auto mb-2">
                 <label class="switch switch-sm float-right switch-pill switch-primary">
-                  <input type="checkbox" class="switch-input" v-model="layer.checked" @change="updateSliders">
+                  <input type="checkbox" class="switch-input" v-model="layer.checked"
+                  @change="toggleLayer(layer)">
                   <span class="switch-slider"></span>
                 </label>
+                <div class="mt-3" v-b-toggle="'legend-' + index">
+                  <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
+                  <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
+                </div>
               </div>
-              <!-- <span class="icon-question font-lg" v-b-popover.click="layer.abstract"></span> -->
             </div>
-            <img :src="layer.legendUrl"/>
+            <b-collapse :id="'legend-' + index">
+              <div class="row">
+                <div class="col-sm-2">&nbsp;</div>
+                <div class="col-sm-10 p-0 mt-1 mb-1">
+                  <img :src="layer.legendUrl"/>
+                </div>
+              </div>
+            </b-collapse>
+
           </b-list-group-item>
         </transition-group>
       </draggable>
@@ -66,6 +81,9 @@ export default {
       set(value) {
         this.$store.commit("maps/updateLayers", value);
       }
+    },
+    hasLayers() {
+      return this.layers.length > 0;
     }
   },
   watch: {
@@ -92,6 +110,15 @@ export default {
       return this.wmsLayers.find(lyr => {
         return lyr.typename === typename;
       });
+    },
+    toggleLayer(layer) {
+      const { checked, typename, opacity } = layer;
+      const wmsLayer = this.getWMSLayer(typename);
+      if (!checked) {
+        wmsLayer.setOpacity(0);
+      } else {
+        wmsLayer.setOpacity(opacity);
+      }
     }
   },
   components: {
@@ -117,5 +144,12 @@ export default {
 }
 .handle::after {
   content: ".. .. .. ..";
+}
+.collapsed > .open,
+:not(.collapsed) > .closed {
+  display: none;
+}
+.alert {
+  border-radius: 0px;
 }
 </style>
