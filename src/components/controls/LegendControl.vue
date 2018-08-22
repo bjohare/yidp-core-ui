@@ -4,7 +4,7 @@
         No layers selected.
     </div>
     <b-list-group v-else class="list-group-accent">
-      <draggable v-model="layers" :options="{handle: '.handle'}" @change="changeLayerOrder">
+      <draggable v-model="layers" :options="{handle: '.handle'}">
         <transition-group>
           <b-list-group-item v-for="(layer, index) in layers" :key="index"
           class="legend list-group-item-accent-success list-group-item-divider text-left font-weight-bold text-uppercase small">
@@ -80,8 +80,14 @@ export default {
         let lyrs = layers.slice();
         return lyrs.reverse();
       },
-      set(value) {
-        const reordered = value.slice();
+      set(values) {
+        let zIndex = 400;
+        // set zindex on wmslayers by layer order
+        values.forEach(layer => {
+          let wmsLayer = this.getWMSLayer(layer.typename);
+          wmsLayer.setZIndex(zIndex--);
+        });
+        const reordered = values.slice();
         this.$store.commit("maps/updateLayers", reordered.reverse());
       }
     },
@@ -97,21 +103,23 @@ export default {
     }
   },
   methods: {
-    changeLayerOrder($event) {
-      const { element, oldIndex, newIndex } = $event.moved;
-
-      const wmsLayer = this.getWMSLayer(element.typename);
-      if (wmsLayer) {
-        let zIndex = wmsLayer.options.zIndex;
-        if (newIndex > oldIndex) {
-          zIndex--;
-        } else {
-          zIndex++;
-        }
-        wmsLayer.setZIndex(zIndex);
-      }
-      this.$store.dispatch("maps/updateLayer", element);
-    },
+    // changeLayerOrder($event) {
+    //   const { element, oldIndex, newIndex } = $event.moved;
+    //   const wmsLayer = this.getWMSLayer(element.typename);
+    //   let d = 0;
+    //   if (wmsLayer) {
+    //     var idx = wmsLayer.options["zIndex"];
+    //     if (newIndex > oldIndex) {
+    //       d = newIndex - oldIndex;
+    //       idx = idx - d * 10;
+    //     } else {
+    //       d = oldIndex - newIndex;
+    //       idx = idx + d * 10;
+    //     }
+    //     wmsLayer.setZIndex(idx);
+    //   }
+    //   this.$store.dispatch("maps/updateLayer", element);
+    // },
     setLayerOpacity(layer) {
       this.getWMSLayer(layer.typename).setOpacity(layer.opacity);
       this.$store.dispatch("maps/updateLayer", layer);
