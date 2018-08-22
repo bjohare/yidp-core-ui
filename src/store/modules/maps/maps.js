@@ -22,9 +22,7 @@ export const layerDefaults = () => {
     featureInfo: null,
     checked: true,
     abstract: null,
-    zIndex: 400,
-    legendUrl: null,
-    index: 0
+    legendUrl: null
   };
 };
 

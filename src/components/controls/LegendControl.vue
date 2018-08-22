@@ -46,7 +46,6 @@
                 </div>
               </div>
             </b-collapse>
-
           </b-list-group-item>
         </transition-group>
       </draggable>
@@ -87,8 +86,8 @@ export default {
           let wmsLayer = this.getWMSLayer(layer.typename);
           wmsLayer.setZIndex(zIndex--);
         });
-        const reordered = values.slice();
-        this.$store.commit("maps/updateLayers", reordered.reverse());
+        const reordered = values.slice().reverse();
+        this.$store.commit("maps/updateLayers", reordered);
       }
     },
     hasLayers() {

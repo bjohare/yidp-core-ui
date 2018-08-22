@@ -96,4 +96,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.aside-menu .nav-tabs .nav-link.active {
+  color: red;
+  border-right-color: #c8ced3;
+  border-left-color: #c8ced3;
+}
 </style>

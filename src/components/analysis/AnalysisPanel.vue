@@ -1,5 +1,5 @@
 <template>
-  <div class="message p-3" v-if="show">
+  <div class="message p-3">
     <div class="pb-5 mr-3 float-left">
       <b-form-group label="Select filter layer:" class="h5">
         <b-form-radio-group stacked name="layers" v-for="(layer, index) in layers" :key="index" v-model="filterLayer">
@@ -16,11 +16,9 @@
           <template slot="first">
             <option :value="null" disabled>-- Please select the input layer --</option>
           </template>
-          <optgroup v-for="(group, name) in options" :key="name" :label="name">
-            <option v-for="(option, index) in group" :key="index" :value="option.value">
-              {{ option.text }}
-            </option>
-          </optgroup>
+          <option v-for="(option, index) in options" :key="index" :value="option.value">
+            {{ option.text }}
+          </option>
         </b-form-select>
       </b-form-group>
     </div>
@@ -31,27 +29,26 @@ import axios from "axios";
 import * as L from "leaflet";
 import { filterStyle, selectedFilterStyle } from "@/components/maps/styles";
 export default {
-  props: ["show", "tabs", "mapConfig", "map"],
+  props: ["tabs", "mapConfig", "map"],
   data() {
     return {
       featureGroup: L.featureGroup(),
       layers: [],
       filterLayer: "admin1",
       dataLayer: null,
-      selectedLayer: null,
-      options: {}
+      selectedLayer: null
     };
   },
   computed: {
-    // datalyers() {
-    //   let layers = this.userMap.layers;
-    //   layers.forEach(layer => {
-    //     this.options[layer.name] = [];
-    //     layer.layers.forEach(subLayer => {
-    //       let opt = { value: subLayer.name, text: subLayer.name };
-    //       this.options[layer.name].push(opt);
-    //     });
-    //   });
+    options() {
+      let options = [];
+      let layers = this.$store.state.maps.layers;
+      layers.forEach(layer => {
+        let opt = { value: layer.typename, text: layer.title };
+        options.push(opt);
+      });
+      return options;
+    }
   },
   watch: {
     "mapConfig.layers": function(layers) {
@@ -62,7 +59,6 @@ export default {
           this.options[layer.name].push(opt);
         });
       });
-      console.log(this.options);
     }
   },
   methods: {
@@ -79,8 +75,9 @@ export default {
             className: "analysis-tooltip"
           });
           layer.on("click", e => {
+            e.originalEvent.preventDefault();
+            e.originalEvent.stopImmediatePropagation();
             this.selectFilter(e.target);
-            e.stopPropagation();
           });
         }
       };
@@ -118,19 +115,15 @@ export default {
   },
   created() {
     const _vm = this;
-    this.$root.$on("map-init", map => {
-      if (_vm.layers.length === 0) {
-        _vm.loadAnalysisLayers();
-      }
-    });
+    this.loadAnalysisLayers();
     this.$root.$on("changed::tab", $event => {
       if ($event.tabs[$event.currentTab].id === "analysis") {
         this.featureGroup.addTo(_vm.map);
       } else this.featureGroup.removeFrom(_vm.map);
-      _vm.selectedLayer = null;
+      _vm.clearSelectedLayer();
     });
     this.$root.$on("map-destroy", () => {
-      _vm.selectedLayer = null;
+      _vm.clearSelectedLayer();
     });
   }
 };

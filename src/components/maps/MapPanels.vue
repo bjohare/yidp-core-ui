@@ -2,25 +2,25 @@
   <b-tabs ref="tabs">
     <b-tab id="layers" ref="layers">
       <template slot="title">
-        <i class='icon-layers' v-b-tooltip.hover.left title="Map Layers"></i>
+        <i class='icon-layers' title="Map Layers"></i>
       </template>
       <app-layers :mapConfig="mapConfig" :map="map"></app-layers>
     </b-tab>
     <b-tab id="analysis" ref="analysis">
       <template slot="title">
-        <i class='fa fa-bar-chart fa-lg' v-b-tooltip.hover.left title="Map Analysis"></i>
+        <i class='fa fa-bar-chart fa-lg' title="Map Analysis"></i>
       </template>
       <app-analysis-panel :tabs="this.$refs.tabs" :mapConfig="mapConfig" :map="map"></app-analysis-panel>
     </b-tab>
     <b-tab id="details" ref="details">
       <template slot="title">
-        <i class='fa fa-info fa-lg' v-b-tooltip.hover.left title="Map Information"></i>
+        <i class='fa fa-info fa-lg' title="Map Information"></i>
       </template>
-      <app-map-description :map="mapDescription"></app-map-description>
+      <app-map-description :map="mapDescription" :show="showMapDescription"></app-map-description>
     </b-tab>
     <b-tab id="settings" ref="settings">
       <template slot="title">
-        <i class='fa fa-cog fa-lg' v-b-tooltip.hover.left title="Settings"></i>
+        <i class='fa fa-cog fa-lg' title="Settings"></i>
       </template>
       <div class="message">
         <div class="alert alert-danger">Click to reset all application state.
@@ -42,7 +42,8 @@ export default {
   data() {
     return {
       mapConfig: null,
-      mapDescription: null
+      mapDescription: null,
+      showMapDescription: false
     };
   },
   methods: {
@@ -61,6 +62,7 @@ export default {
       } else {
         this.mapDescription = { id: "default" };
       }
+      this.showMapDescription = true;
     },
     resetApplicationState() {
       this.$store.dispatch("maps/resetState");
