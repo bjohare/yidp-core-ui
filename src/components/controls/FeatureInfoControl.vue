@@ -82,10 +82,13 @@ export default {
   padding: 1rem;
   overflow: auto;
   color: black !important;
-  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 0 6px rgba(0, 0, 0, 0.2);
   /* max-width: 300px; */
 }
 ul.list-group {
   list-style-type: none;
+}
+.alert {
+  border-radius: 0px;
 }
 </style>

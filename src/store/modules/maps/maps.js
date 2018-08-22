@@ -23,7 +23,8 @@ export const layerDefaults = () => {
     checked: true,
     abstract: null,
     zIndex: 400,
-    legendUrl: null
+    legendUrl: null,
+    index: 0
   };
 };
 
@@ -70,7 +71,8 @@ const mutations = {
     state.categories = initial.categories;
   },
   addLayer(state, layer) {
-    state.layers.unshift(layer);
+    // state.layers.unshift(layer);
+    state.layers.push(layer);
   },
   removeLayer(state, typename) {
     let filtered = _.filter(state.layers, lyr => {

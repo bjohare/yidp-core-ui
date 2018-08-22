@@ -106,6 +106,7 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
       if (response.data && response.data.features.length > 0) {
         let feature = {
           title: layer.title,
+          typename: layer.typename,
           properties: response.data.features[0].properties,
           featureInfo: featureInfo,
           map: this.vm.map,

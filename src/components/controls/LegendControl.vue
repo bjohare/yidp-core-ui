@@ -4,7 +4,7 @@
         No layers selected.
     </div>
     <b-list-group v-else class="list-group-accent">
-      <draggable v-model="layers" :options="{handle: '.handle'}" @end="dragEnd">
+      <draggable v-model="layers" :options="{handle: '.handle'}" @change="changeLayerOrder">
         <transition-group>
           <b-list-group-item v-for="(layer, index) in layers" :key="index"
           class="legend list-group-item-accent-success list-group-item-divider text-left font-weight-bold text-uppercase small">
@@ -76,10 +76,13 @@ export default {
   computed: {
     layers: {
       get() {
-        return this.$store.state.maps.layers;
+        const layers = this.$store.state.maps.layers;
+        let lyrs = layers.slice();
+        return lyrs.reverse();
       },
       set(value) {
-        this.$store.commit("maps/updateLayers", value);
+        const reordered = value.slice();
+        this.$store.commit("maps/updateLayers", reordered.reverse());
       }
     },
     hasLayers() {
@@ -94,8 +97,20 @@ export default {
     }
   },
   methods: {
-    dragEnd($event) {
-      this.updateSliders();
+    changeLayerOrder($event) {
+      const { element, oldIndex, newIndex } = $event.moved;
+
+      const wmsLayer = this.getWMSLayer(element.typename);
+      if (wmsLayer) {
+        let zIndex = wmsLayer.options.zIndex;
+        if (newIndex > oldIndex) {
+          zIndex--;
+        } else {
+          zIndex++;
+        }
+        wmsLayer.setZIndex(zIndex);
+      }
+      this.$store.dispatch("maps/updateLayer", element);
     },
     setLayerOpacity(layer) {
       this.getWMSLayer(layer.typename).setOpacity(layer.opacity);

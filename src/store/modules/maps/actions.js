@@ -61,6 +61,7 @@ export const buildCatalog = async ({ commit, dispatch }) => {
   commit("saveCategories", categories);
 };
 
+/* Add a layer to the selected layers. */
 export const addLayer = ({ commit, state, getters }, selectedLayer) => {
   let layer = getters["getLayer"](selectedLayer.typename);
   if (!layer) {
@@ -76,6 +77,7 @@ export const addLayer = ({ commit, state, getters }, selectedLayer) => {
     layer.typename = selectedLayer.typename;
     layer.featureInfo = selectedLayer.featureInfo;
     layer.legendUrl = legendUrl;
+    layer.checked = true;
     commit("addLayer", layer);
   }
 };

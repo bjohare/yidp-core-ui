@@ -77,9 +77,12 @@ export default {
   },
   created() {
     this.$root.$on("feature-selected", feature => {
-      this.selectedFeatures.push(feature);
-      this.selectedFeatures.reverse();
-      this.addSelectedIndicator();
+      const lyr = this.$store.getters["maps/getLayer"](feature.typename);
+      if (lyr && lyr.checked) {
+        this.selectedFeatures.push(feature);
+        this.selectedFeatures.reverse();
+        this.addSelectedIndicator();
+      }
     });
   }
 };

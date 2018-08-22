@@ -58,7 +58,6 @@ export default {
         wmsLyr.removeFrom(this.map);
       }
       this.$store.dispatch("maps/removeLayer", selectedLayer.typename);
-      console.log(this.wmsLayers);
     },
     async loadLayers() {
       const _vm = this;
@@ -72,6 +71,9 @@ export default {
       const layers = this.$store.getters["maps/getLayers"];
       layers.forEach(layer => {
         const wmsLayer = loadWMSLayer(_vm, layer);
+        if (!layer.checked) {
+          wmsLayer.setOpacity(0);
+        }
         this.wmsLayers.push(wmsLayer);
       });
     },
