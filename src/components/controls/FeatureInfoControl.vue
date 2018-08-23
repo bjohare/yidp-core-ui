@@ -49,12 +49,15 @@ export default {
       this.pageNum--;
     },
     getProperties(feature) {
+      console.log(feature);
       if (feature.featureInfo) {
+        const fields = feature.featureInfo.fields;
         const propertyNames = feature.featureInfo.propertyNames;
         let props = {};
-        for (var prop in propertyNames) {
-          let propName = propertyNames[prop];
-          props[propName] = feature.properties[prop];
+        for (var prop in fields) {
+          let fieldName = fields[prop];
+          let propName = propertyNames[fieldName];
+          props[propName] = feature.properties[fieldName];
         }
         return props;
       }

@@ -50,23 +50,12 @@ export default {
       return options;
     }
   },
-  // watch: {
-  //   layers: function(layers) {
-  //     layers.forEach(layer => {
-  //       this.options[layer.name] = [];
-  //       layer.layers.forEach(subLayer => {
-  //         let opt = { value: subLayer.name, text: subLayer.name };
-  //         this.options[layer.name].push(opt);
-  //       });
-  //     });
-  //   }
-  // },
   methods: {
     async loadAnalysisLayers() {
       let layers = [];
       layers[0] = await axios.get("/assets/layers/yem_admin_1.geojson");
       layers[1] = await axios.get("/assets/layers/yem_admin_2.geojson");
-      this.featureGroup.setZIndex(2000);
+      this.featureGroup.setZIndex(200);
       let options = {
         style: filterStyle,
         onEachFeature: (feature, layer) => {
@@ -100,6 +89,7 @@ export default {
     selectLayer(layer) {
       this.featureGroup.clearLayers();
       this.featureGroup.addLayer(layer.layer);
+      this.clearSelectedLayer();
     },
     selectFilter(layer) {
       if (this.selectedLayer) {
@@ -107,10 +97,12 @@ export default {
       }
       this.selectedLayer = layer;
       layer.setStyle(selectedFilterStyle);
+      layer.bringToFront();
     },
     clearSelectedLayer() {
       if (this.selectedLayer) this.selectedLayer.setStyle(filterStyle);
       this.selectedLayer = null;
+      this.dataLayer = null;
     }
   },
   created() {
