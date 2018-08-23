@@ -50,17 +50,17 @@ export default {
       return options;
     }
   },
-  watch: {
-    "mapConfig.layers": function(layers) {
-      layers.forEach(layer => {
-        this.options[layer.name] = [];
-        layer.layers.forEach(subLayer => {
-          let opt = { value: subLayer.name, text: subLayer.name };
-          this.options[layer.name].push(opt);
-        });
-      });
-    }
-  },
+  // watch: {
+  //   layers: function(layers) {
+  //     layers.forEach(layer => {
+  //       this.options[layer.name] = [];
+  //       layer.layers.forEach(subLayer => {
+  //         let opt = { value: subLayer.name, text: subLayer.name };
+  //         this.options[layer.name].push(opt);
+  //       });
+  //     });
+  //   }
+  // },
   methods: {
     async loadAnalysisLayers() {
       let layers = [];

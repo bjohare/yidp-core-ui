@@ -22,12 +22,13 @@ export default {
       mapConfig: this.$store.getters["maps/getMap"](this.id),
       info: null,
       selectedFeatures: [],
-      selection: null
+      selection: null,
+      isAnalysisActive: false
     };
   },
   computed: {
     showPopover() {
-      return this.selectedFeatures.length > 0;
+      return this.selectedFeatures.length > 0 && !this.isAnalysisActive;
     }
   },
   components: {
@@ -83,6 +84,14 @@ export default {
         this.selectedFeatures.reverse();
         this.addSelectedIndicator();
       }
+    });
+    this.$root.$on("changed::tab", $event => {
+      if ($event.tabs[$event.currentTab].id === "analysis") {
+        this.isAnalysisActive = true;
+      } else {
+        this.isAnalysisActive = false;
+      }
+      this.clearSelectedFeatures();
     });
   }
 };

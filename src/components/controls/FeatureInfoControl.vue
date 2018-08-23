@@ -1,7 +1,6 @@
 <template>
   <b-alert ref="info" id="featureInfo" v-if="showPopover" dismissible show class="alert-light"
     @dismissed="dismissed" @click.native="handleEvents" @mousewheel.native="handleEvents" @dblclick.native="handleEvents">
-    <!-- <div class="h4 mr-4"><strong>Selected Features</strong></div> -->
     <div class="mt-2 mb-2" v-if="features.length > 1">
       <button class="btn btn-link" @click="prev()" :disabled="pageNum === 0"><i class="fa fa-chevron-left fa-lg"></i></button>
         {{ pageNum + 1}} of {{ features.length }}
