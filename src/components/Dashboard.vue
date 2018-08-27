@@ -4,19 +4,27 @@
      <div class="col-9">
        <div class="row align-items-end pl-4">
          <div class="col-4">
-           <img class="img-fluid" src="/assets/dashboard/yemen-page-title.png"/>
+          <img class="img-fluid" src="/assets/dashboard/yemen-page-title.png"/>
          </div>
          <div class="col-2">
-           <img class="img-fluid pb-3" src="/assets/dashboard/nav-geofiles.png"/>
+            <router-link to="/geodata">
+              <img class="link img-fluid mb-3" src="/assets/dashboard/nav-geofiles.png"/>
+            </router-link>
          </div>
          <div class="col-2">
-           <img class="img-fluid pb-3" src="/assets/dashboard/nav-maps.png"/>
+           <router-link to="/map/default">
+              <img class="link img-fluid mb-3" src="/assets/dashboard/nav-maps.png"/>
+           </router-link>
          </div>
          <div class="col-2">
-           <img class="img-fluid pb-3" src="/assets/dashboard/nav-docsharing.png"/>
+           <router-link to="/documents">
+            <img class="link img-fluid mb-3" src="/assets/dashboard/nav-docsharing.png"/>
+           </router-link>
          </div>
          <div class="col-2">
-           <img class="img-fluid pb-3" src="/assets/dashboard/nav-projects.png"/>
+           <router-link to="/projects">
+            <img class="link img-fluid mb-3" src="/assets/dashboard/nav-projects.png"/>
+           </router-link>
          </div>
        </div>
        <hr class="ml-3"/>
@@ -139,5 +147,14 @@ hr {
 .col-12 {
   padding: 0;
   margin: 0;
+}
+img.link {
+  -webkit-box-shadow: 5px 5px 5px 0px rgb(117, 90, 49);
+  -moz-box-shadow: 5px 5px 5px 0px rgb(117, 90, 49);
+  box-shadow: 5px 5px 5px 0px rgb(117, 90, 49);
+}
+img.link:hover {
+  margin-bottom: 1em;
+  box-shadow: 8px 8px 8px 0px rgb(117, 90, 49);
 }
 </style>
