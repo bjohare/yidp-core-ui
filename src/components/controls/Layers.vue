@@ -32,9 +32,9 @@ export default {
     toggleLayer($event) {
       const { checked, selectedLayer } = $event;
       if (checked) {
-        let layer = this.$store.getters[
-          ("map/getLayer", selectedLayer.typename)
-        ];
+        let layer = this.$store.getters["maps/getLayer"](
+          selectedLayer.typename
+        );
         if (!layer) {
           this.addLayer(selectedLayer);
         }
@@ -84,6 +84,11 @@ export default {
       } else {
         this.legendActive = false;
       }
+    },
+    getLayer(typename) {
+      return this.wmsLayers.find(layer => {
+        return layer.typename === typename;
+      });
     }
   },
   components: {
@@ -92,6 +97,17 @@ export default {
   },
   created() {
     this.loadLayers();
+    this.$root.$on("filter-wms", typename => {
+      let layer = this.getLayer(typename);
+      layer.setOpacity(0);
+    });
+    this.$root.$on("clear-filter", typename => {
+      if (typename) {
+        let layer = this.$store.getters["maps/getLayer"](typename);
+        let wmsLayer = this.getLayer(typename);
+        wmsLayer.setOpacity(layer.opacity);
+      }
+    });
   }
 };
 </script>

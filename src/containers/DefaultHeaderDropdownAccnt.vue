@@ -1,6 +1,6 @@
 <template>
 <div>
-  <AppHeaderDropdown right no-caret>
+  <AppHeaderDropdown right no-caret class="pr-2">
     <template slot="header">
        <span v-show="isAuthenticated">{{ fullName }}</span>
        <i class="cui-user icons font-2xm d-inline mt-2"></i>

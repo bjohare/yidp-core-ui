@@ -183,7 +183,7 @@ export default {
       }
     },
     addLayer(selectedLayer) {
-      let layer = this.$store.getters[("map/getLayer", selectedLayer.typename)];
+      let layer = this.$store.getters["maps/getLayer"](selectedLayer.typename);
       if (!layer) {
         this.$store.dispatch("maps/addLayer", selectedLayer);
       }

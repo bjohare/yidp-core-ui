@@ -30,7 +30,7 @@
       <b-dropdown id="ddown1" text="Download" variant="primary" right>
         <b-dropdown-item :href="downloadLayer('SHAPE-ZIP')">Zipped Shapefile</b-dropdown-item>
         <b-dropdown-item :href="downloadLayer('csv')">CSV</b-dropdown-item>
-        <b-dropdown-item :href="downloadLayer('excel')">Excel</b-dropdown-item>
+        <b-dropdown-item :href="downloadLayer('excel2007')">Excel</b-dropdown-item>
         <b-dropdown-item :href="downloadLayer('json')">GeoJSON</b-dropdown-item>
         <b-dropdown-item :href="downloadMap('kml')">KML</b-dropdown-item>
         <b-dropdown-item :href="downloadMap('application/pdf')">PDF</b-dropdown-item>

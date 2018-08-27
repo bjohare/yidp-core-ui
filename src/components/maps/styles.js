@@ -42,7 +42,7 @@ export const selectedFilterStyle = {
   fillColor: "#FF5733",
   weight: 5,
   opacity: 1,
-  fillOpacity: 0.5,
+  fillOpacity: 0.1,
   stroke: true,
   fill: true
 };

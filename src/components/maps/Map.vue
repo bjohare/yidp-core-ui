@@ -1,17 +1,26 @@
 <template>
   <div style="height: inherit;">
-      <div id="map" class="d-flex">
+    <multipane layout="horizontal" @paneResize="resize" id="multipane">
+      <div id="map" :style="{ height: mapHeight}">
         <div ref="overlay">
           <app-overlay :features="selectedFeatures"
             :showPopover="showPopover" @dismissed="clearSelectedFeatures"></app-overlay>
         </div>
       </div>
+      <multipane-resizer v-if="showDataPane"></multipane-resizer>
+      <div id="datapane" ref="datatable" :style="{ height: dataHeight, flexGrow: 1 }" v-if="showDataPane">
+          <app-data-table></app-data-table>
+      </div>
+    </multipane>
   </div>
 </template>
 <script>
 import "leaflet/dist/leaflet.css";
 import { initMap, loadBaseLayers } from "./wms";
 import appOverlay from "@/components/controls/FeatureInfoControl.vue";
+import appDataTable from "@/components/analysis/DataTable.vue";
+import { Multipane, MultipaneResizer } from "vue-multipane";
+
 import * as L from "leaflet";
 
 export default {
@@ -29,10 +38,36 @@ export default {
   computed: {
     showPopover() {
       return this.selectedFeatures.length > 0 && !this.isAnalysisActive;
+    },
+    mapHeight() {
+      if (
+        this.isAnalysisActive &&
+        this.$store.state.analysis.filteredData !== null
+      ) {
+        return "60%";
+      } else {
+        return "100%";
+      }
+    },
+    dataHeight() {
+      if (
+        this.isAnalysisActive &&
+        this.$store.state.analysis.filteredData !== null
+      ) {
+        return "40%";
+      } else {
+        return "0";
+      }
+    },
+    showDataPane() {
+      return this.$store.state.analysis.filteredData !== null;
     }
   },
   components: {
-    appOverlay
+    appOverlay,
+    appDataTable,
+    Multipane,
+    MultipaneResizer
   },
   methods: {
     initializeMap() {
@@ -70,6 +105,11 @@ export default {
         this.selection.addTo(this.map);
         // this.map.panTo(latlng);
       }
+    },
+    resize() {
+      this.$nextTick(() => {
+        this.map.invalidateSize();
+      });
     }
   },
   mounted() {
@@ -99,6 +139,13 @@ export default {
 <style lang="scss" scoped>
 #map {
   width: auto;
+  min-height: 30%;
+}
+#datapane {
+  overflow: auto;
+  min-height: 30%;
+}
+#multipane {
   height: 100%;
 }
 </style>

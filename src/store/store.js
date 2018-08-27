@@ -6,6 +6,7 @@ import authentication from "./modules/authentication/authentication";
 import geonode from "./modules/geonode/geonode";
 import projects from "./modules/projects/projects";
 import maps from "./modules/maps/maps";
+import analysis from "./modules/analysis/analysis";
 
 Vue.use(Vuex);
 
@@ -18,7 +19,8 @@ export default new Vuex.Store({
     authentication,
     geonode,
     projects,
-    maps
+    maps,
+    analysis
   },
   plugins: [createPersistedState()]
 });

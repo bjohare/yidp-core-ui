@@ -69,20 +69,24 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
     this.title = options.title;
     this.typename = options.typename;
     this.featureInfo = options.featureInfo;
+    this.data = options.data;
     this.vm = vm;
   },
   createTile(coords, done) {
-    const url = this.getTileUrl(coords);
+    const wmsUrl = this.getTileUrl(coords);
     const img = document.createElement("img");
     // TODO: switch to geonodeAxios and test access_token works..
-    geoserverAxios
-      .get(url, {
-        responseType: "blob"
-      })
-      .then(response => {
-        img.src = URL.createObjectURL(response.data);
-        done(null, img);
-      });
+    // const url = this._url;
+    geoserverAxios({
+      method: "post",
+      url: wmsUrl,
+      responseType: "blob",
+      data: this.data,
+      headers: { "Content-Type": "application/x-www-form-urlencoded " }
+    }).then(response => {
+      img.src = URL.createObjectURL(response.data);
+      done(null, img);
+    });
     return img;
   },
 
@@ -168,6 +172,30 @@ export const loadWMSLayer = (vm, layer) => {
       title: layer.title,
       typename: layer.typename,
       featureInfo: layer.featureInfo
+    })
+    .addTo(vm.map)
+    .setOpacity(layer.opacity)
+    .setZIndex(400);
+  return wmsLayer;
+};
+
+export const filterWMSLayer = (vm, layer, query) => {
+  const wmsUrl = vm.mapConfig.wmsBaseUrl;
+  let wmsParams = {
+    layers: layer.typename,
+    version: "1.3.0",
+    format: "image/png",
+    transparent: "true",
+    tiled: true,
+    minZoom: vm.mapConfig.minZoom,
+    maxZoom: vm.mapConfig.maxZoom
+  };
+  const wmsLayer = L.tileLayer
+    .wms_auth(wmsUrl, vm, wmsParams, {
+      title: layer.title,
+      typename: layer.typename,
+      featureInfo: layer.featureInfo,
+      data: query !== undefined ? query : ""
     })
     .addTo(vm.map)
     .setOpacity(layer.opacity)

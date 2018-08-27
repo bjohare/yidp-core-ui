@@ -32,7 +32,8 @@ export const legendParams = () => {
     version: "1.1.1",
     format: "image/png",
     width: 20,
-    height: 20
+    height: 20,
+    legend_options: "fontAntiAliasing:true;fontSize:12"
   };
 };
 
@@ -95,7 +96,7 @@ const getters = {
   getMap: state => id => {
     return state.maps[id];
   },
-  getCategories(state) {
+  getCategories: state => {
     return state.categories;
   },
   getLayers: state => {
