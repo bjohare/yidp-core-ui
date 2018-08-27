@@ -13,12 +13,14 @@ import VueTruncate from "vue-truncate-filter";
 import axios from "axios";
 import moment from "moment";
 import { lineClamp } from "vue-line-clamp-extended";
+import VueSplit from "vue-split-panel";
 
 import store from "@/store/store";
 
 Vue.use(BootstrapVue);
 Vue.use(VueAxios, axios);
 Vue.use(VueTruncate);
+Vue.use(VueSplit);
 
 Vue.directive("line-clamp", lineClamp);
 

@@ -1,17 +1,20 @@
 <template>
   <div style="height: inherit;">
-    <multipane layout="horizontal" @paneResize="resize" id="multipane">
-      <div id="map" :style="{ height: mapHeight}">
-        <div ref="overlay">
-          <app-overlay :features="selectedFeatures"
-            :showPopover="showPopover" @dismissed="clearSelectedFeatures"></app-overlay>
+    <Split :gutterSize="gutterSize" @onDragEnd="onDragEnd" direction="vertical">
+      <SplitArea :size="mapHeight">
+      <div id="map" style="height: 100%;">
+          <div ref="overlay">
+            <app-overlay :features="selectedFeatures"
+              :showPopover="showPopover" @dismissed="clearSelectedFeatures"></app-overlay>
+          </div>
         </div>
-      </div>
-      <multipane-resizer v-if="showDataPane"></multipane-resizer>
-      <div id="datapane" ref="datatable" :style="{ height: dataHeight, flexGrow: 1 }" v-if="showDataPane">
-          <app-data-table></app-data-table>
-      </div>
-    </multipane>
+      </SplitArea>
+      <SplitArea :size="dataHeight">
+        <div id="datapane">
+          <app-data-table :show="showDataPane"></app-data-table>
+        </div>
+      </SplitArea>
+    </Split>
   </div>
 </template>
 <script>
@@ -19,7 +22,6 @@ import "leaflet/dist/leaflet.css";
 import { initMap, loadBaseLayers } from "./wms";
 import appOverlay from "@/components/controls/FeatureInfoControl.vue";
 import appDataTable from "@/components/analysis/DataTable.vue";
-import { Multipane, MultipaneResizer } from "vue-multipane";
 
 import * as L from "leaflet";
 
@@ -40,34 +42,32 @@ export default {
       return this.selectedFeatures.length > 0 && !this.isAnalysisActive;
     },
     mapHeight() {
-      if (
-        this.isAnalysisActive &&
-        this.$store.state.analysis.filteredData !== null
-      ) {
-        return "60%";
+      if (this.showDataPane) {
+        return 60;
       } else {
-        return "100%";
+        return 100;
       }
     },
     dataHeight() {
-      if (
-        this.isAnalysisActive &&
-        this.$store.state.analysis.filteredData !== null
-      ) {
-        return "40%";
+      if (this.showDataPane) {
+        return 40;
       } else {
-        return "0";
+        return 0;
       }
     },
     showDataPane() {
-      return this.$store.state.analysis.filteredData !== null;
+      return (
+        this.isAnalysisActive &&
+        this.$store.state.analysis.filteredData !== null
+      );
+    },
+    gutterSize() {
+      return this.showDataPane ? 8 : 0;
     }
   },
   components: {
     appOverlay,
-    appDataTable,
-    Multipane,
-    MultipaneResizer
+    appDataTable
   },
   methods: {
     initializeMap() {
@@ -110,6 +110,9 @@ export default {
       this.$nextTick(() => {
         this.map.invalidateSize();
       });
+    },
+    onDragEnd() {
+      this.map.invalidateSize();
     }
   },
   mounted() {
@@ -137,15 +140,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-#map {
-  width: auto;
-  min-height: 30%;
-}
 #datapane {
   overflow: auto;
-  min-height: 30%;
-}
-#multipane {
-  height: 100%;
 }
 </style>

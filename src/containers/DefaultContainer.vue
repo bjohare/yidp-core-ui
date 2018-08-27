@@ -7,10 +7,13 @@
       <SidebarToggler class="d-lg-none" display="md" mobile />
       <SidebarToggler class="d-md-down-none" display="lg" v-if="!dashboard"/>
       <b-navbar-nav class="d-md-down-none">
-        <b-nav-item class="px-3"><router-link to="/geodata">GeoData</router-link></b-nav-item>
-        <b-nav-item class="px-3"><router-link to="/map/default">Map</router-link></b-nav-item>
-        <b-nav-item class="px-3"><router-link to="/documents">Documents</router-link></b-nav-item>
-        <b-nav-item class="px-3"><router-link to="/projects">Projects</router-link></b-nav-item>
+        <b-nav-item class="p-3"><router-link to="/geodata" class="nav-link">GeoData</router-link></b-nav-item>
+        <b-nav-item class="p-3">
+          <router-link to="/map/default" class="nav-link">Map</router-link>
+           <b-badge variant="info" class="ml-3">{{ layerCount }}</b-badge>
+        </b-nav-item>
+        <b-nav-item class="p-3"><router-link to="/documents" class="nav-link">Documents</router-link></b-nav-item>
+        <b-nav-item class="p-3"><router-link to="/projects" class="nav-link">Projects</router-link></b-nav-item>
       </b-navbar-nav>
       <b-link class="navbar-brand ml-5" href="http://ye.one.un.org/" target="_blank">
         <img src="/assets/un-yemen.png" height="36px" class="float-right"/>
@@ -107,6 +110,9 @@ export default {
     },
     list() {
       return this.$route.matched;
+    },
+    layerCount() {
+      return this.$store.state.maps.layers.length;
     }
   }
 };
@@ -130,4 +136,13 @@ export default {
   padding: 0 1rem !important;
   margin: 0;
 }
+.nav-link {
+  color: #73818f;
+}
+.nav-link:hover {
+  color: #2f353a;
+}
+/* li.nav-item:hover {
+  background-color: #2f353a;
+} */
 </style>

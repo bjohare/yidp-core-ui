@@ -27,7 +27,7 @@
            </router-link>
          </div>
        </div>
-       <hr class="ml-3"/>
+       <hr class="ml-3 w-80"/>
        <div class="row middle m-0">
          <div class="col-4">
            Market image here..
@@ -68,12 +68,6 @@
 </template>
 
 <script>
-import {
-  sidebarCssClasses,
-  validBreakpoints,
-  checkBreakpoint
-} from "../shared/classes";
-import toggleClasses from "../shared/toggle-classes";
 export default {
   data() {
     return {
