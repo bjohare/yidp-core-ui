@@ -9,29 +9,21 @@
     <template slot="dropdown">
       <div v-show="isAuthenticated">
         <!-- <b-dropdown-header tag="div" class="text-center"><strong>Account</strong></b-dropdown-header> -->
-        <b-dropdown-item to="/maps">
-            <i class="cui-map icons font-1xl d-inline mt-4"/> Maps
-            <b-badge variant="info">{{ numMaps }}</b-badge>
+        <b-dropdown-item to="/geodata">
+          <i class="cui-note icons font-1xl d-inline mt-4"/> GeoData
+        </b-dropdown-item>
+        <b-dropdown-item to="/maps/default">
+            <i class="cui-map icons font-1xl d-inline mt-4"/> Map
         </b-dropdown-item>
         <b-dropdown-item to="/documents">
           <i class="cui-note icons font-1xl d-inline mt-4"/> Documents
-          <b-badge variant="info">{{ numDocuments }}</b-badge>
+        </b-dropdown-item>
+        <b-dropdown-item to="/projects">
+          <i class="cui-note icons font-1xl d-inline mt-4"/> Projects
         </b-dropdown-item>
         <b-dropdown-item href="http://yidp-geonode.geoweb.io" target="_blank">
-          <i class="cui-note icons font-1xl d-inline mt-4"/> GeoNode
+          <i class="cui-note icons font-1xl d-inline mt-4"/> Admin
         </b-dropdown-item>
-        <!-- <b-dropdown-header
-          tag="div"
-          class="text-center">
-          <strong>Settings</strong>
-        </b-dropdown-header>
-        <b-dropdown-item><i class="fa fa-wrench" /> Settings</b-dropdown-item>
-        <b-dropdown-item><i class="fa fa-usd" /> Payments
-          <b-badge variant="secondary">{{ itemsCount }}</b-badge>
-        </b-dropdown-item>
-        <b-dropdown-item><i class="fa fa-file" /> Projects
-          <b-badge variant="primary">{{ itemsCount }}</b-badge>
-        </b-dropdown-item> -->
         <b-dropdown-item to="/account/logout"><i class="fa fa-lock" /> Logout</b-dropdown-item>
       </div>
       <div v-show="!isAuthenticated">

@@ -1,6 +1,6 @@
 <template>
   <div style="height: inherit;">
-    <Split :gutterSize="gutterSize" @onDragEnd="onDragEnd" direction="vertical">
+    <Split :gutterSize="gutterSize" @onDrag="onDrag" direction="vertical">
       <SplitArea :size="mapHeight">
       <div id="map" style="height: 100%;">
           <div ref="overlay">
@@ -9,10 +9,8 @@
           </div>
         </div>
       </SplitArea>
-      <SplitArea :size="dataHeight">
-        <div id="datapane">
-          <app-data-table :show="showDataPane"></app-data-table>
-        </div>
+      <SplitArea :size="dataHeight" style="overflow: scroll;">
+        <app-data-table :show="showDataPane"></app-data-table>
       </SplitArea>
     </Split>
   </div>
@@ -106,12 +104,7 @@ export default {
         // this.map.panTo(latlng);
       }
     },
-    resize() {
-      this.$nextTick(() => {
-        this.map.invalidateSize();
-      });
-    },
-    onDragEnd() {
+    onDrag() {
       this.map.invalidateSize();
     }
   },
@@ -140,7 +133,4 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-#datapane {
-  overflow: auto;
-}
 </style>

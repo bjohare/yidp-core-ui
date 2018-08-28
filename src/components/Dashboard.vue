@@ -1,52 +1,54 @@
 <template>
   <div class="dashboard animated fadeIn">
-   <div class="row">
-     <div class="col-9">
-       <div class="row align-items-end pl-4">
-         <div class="col-4">
-          <img class="img-fluid" src="/assets/dashboard/yemen-page-title.png"/>
-         </div>
-         <div class="col-2">
+    <div class="row align-items-center pl-4">
+      <div class="col-3">
+        <img class="img-fluid mb-3" src="/assets/dashboard/yemen-page-title.png"/>
+      </div>
+      <div class="col-6 flex-row">
+        <div class="row">
+          <div class="col-3">
             <router-link to="/geodata">
-              <img class="link img-fluid mb-3" src="/assets/dashboard/nav-geofiles.png"/>
+            <img class="link img-fluid" src="/assets/dashboard/nav-geofiles.png"/>
+          </router-link>
+          </div>
+          <div class="col-3">
+            <router-link to="/map/default">
+            <img class="link img-fluid" src="/assets/dashboard/nav-maps.png"/>
             </router-link>
-         </div>
-         <div class="col-2">
-           <router-link to="/map/default">
-              <img class="link img-fluid mb-3" src="/assets/dashboard/nav-maps.png"/>
-           </router-link>
-         </div>
-         <div class="col-2">
-           <router-link to="/documents">
-            <img class="link img-fluid mb-3" src="/assets/dashboard/nav-docsharing.png"/>
-           </router-link>
-         </div>
-         <div class="col-2">
-           <router-link to="/projects">
-            <img class="link img-fluid mb-3" src="/assets/dashboard/nav-projects.png"/>
-           </router-link>
-         </div>
-       </div>
-       <hr class="ml-3 w-80"/>
-       <div class="row middle m-0">
-         <div class="col-4">
-           Market image here..
-         </div>
-         <div class="col-4">
-           <img class="img-fluid" src="/assets/dashboard/slideshow-box.png"/>
-         </div>
-         <div class="col-4">
-           <div class="description text-light p-4">
-             PROJECT DESCRIPTION OR LATEST NEWS HERE
-             Text here describing the project.
-           </div>
-         </div>
-       </div>
-     </div>
-     <div class="col-3">
-       <img class="img-fluid" src="/assets/dashboard/market-photo-right-endcap.png"/>
-     </div>
-   </div>
+          </div>
+          <div class="col-3">
+            <router-link to="/documents">
+            <img class="link img-fluid" src="/assets/dashboard/nav-docsharing.png"/>
+            </router-link>
+          </div>
+          <div class="col-3">
+            <router-link to="/projects">
+              <img class="link img-fluid" src="/assets/dashboard/nav-projects.png"/>
+            </router-link>
+          </div>
+        </div>
+      </div>
+      <div class="col-3">
+        <img class="img-fluid" src="/assets/dashboard/market-photo-right-top.png"/>
+      </div>
+    </div>
+    <div class="row middle align-items-start">
+      <div class="col-3">
+        <img class="img-fluid" src="/assets/dashboard/slideshow-left-image.png"/>
+      </div>
+      <div class="col-3">
+        <img class="img-fluid" src="/assets/dashboard/slideshow-box.png"/>
+      </div>
+      <div class="col-3">
+        <div class="description text-light p-3">
+          PROJECT DESCRIPTION OR LATEST NEWS HERE
+          Text here describing the project.
+        </div>
+      </div>
+      <div class="col-3">
+      <img class="img-fluid" src="/assets/dashboard/market-photo-right-bottom.png"/>
+      </div>
+    </div>
    <div class="row">
      <div class="col-6 mission text-white p-4">
        THE YEMEN INTEGRATED DATA PLATFORM is a World Bank Group - United Nations joint initiative
@@ -83,6 +85,7 @@ export default {
     showSideBar() {
       document.body.classList.add("sidebar-md-show");
       document.body.classList.remove("sidebar-hidden");
+      // document.body.classList.remove("aside-menu-show");
     }
   },
   created() {
@@ -148,7 +151,6 @@ img.link {
   box-shadow: 5px 5px 5px 0px rgb(117, 90, 49);
 }
 img.link:hover {
-  margin-bottom: 1em;
   box-shadow: 8px 8px 8px 0px rgb(117, 90, 49);
 }
 </style>

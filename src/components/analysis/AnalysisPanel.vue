@@ -136,11 +136,16 @@ export default {
       this.$store.dispatch("analysis/saveFilteredData", null);
     },
     clearFilteredLayers() {
-      this.map.invalidateSize();
       this.wmsLayers.forEach(layer => {
         layer.removeFrom(this.map);
       });
       this.wmsLayers = [];
+      this.featureGroup.eachLayer(layer => {
+        layer.eachLayer(lyr => {
+          lyr.redraw();
+        });
+      });
+      this.map.invalidateSize();
     },
     getLayer(typename) {
       return this.mapLayers.find(layer => {
