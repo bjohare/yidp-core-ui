@@ -1,15 +1,15 @@
 <template>
   <div style="height: inherit;">
-    <Split :gutterSize="gutterSize" @onDrag="onDrag" direction="vertical">
+    <Split :gutterSize="gutterSize" @onDrag="onDrag" direction="vertical" ref="split" style="height: inherit;">
       <SplitArea :size="mapHeight">
-      <div id="map" style="height: 100%;">
+        <div id="map">
           <div ref="overlay">
             <app-overlay :features="selectedFeatures"
               :showPopover="showPopover" @dismissed="clearSelectedFeatures"></app-overlay>
           </div>
         </div>
       </SplitArea>
-      <SplitArea :size="dataHeight" style="overflow: scroll;">
+      <SplitArea id="datapane" :size="dataHeight">
         <app-data-table :show="showDataPane"></app-data-table>
       </SplitArea>
     </Split>
@@ -35,23 +35,22 @@ export default {
       isAnalysisActive: false
     };
   },
+  watch: {
+    showDataPane() {
+      this.$nextTick(() => {
+        this.map.invalidateSize(false);
+      });
+    }
+  },
   computed: {
     showPopover() {
       return this.selectedFeatures.length > 0 && !this.isAnalysisActive;
     },
     mapHeight() {
-      if (this.showDataPane) {
-        return 60;
-      } else {
-        return 100;
-      }
+      return this.showDataPane ? 60 : 100;
     },
     dataHeight() {
-      if (this.showDataPane) {
-        return 40;
-      } else {
-        return 0;
-      }
+      return this.showDataPane ? 40 : 0;
     },
     showDataPane() {
       return (
@@ -133,4 +132,13 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+#map {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+#datapane {
+  overflow: auto;
+  background-color: white;
+}
 </style>

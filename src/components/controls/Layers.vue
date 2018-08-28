@@ -97,15 +97,15 @@ export default {
   },
   created() {
     this.loadLayers();
+    const _vm = this;
     this.$root.$on("filter-wms", typename => {
       let layer = this.getLayer(typename);
-      layer.setOpacity(0);
+      layer.removeFrom(this.map);
     });
     this.$root.$on("clear-filter", typename => {
       if (typename) {
-        let layer = this.$store.getters["maps/getLayer"](typename);
         let wmsLayer = this.getLayer(typename);
-        wmsLayer.setOpacity(layer.opacity);
+        wmsLayer.addTo(this.map);
       }
     });
   }

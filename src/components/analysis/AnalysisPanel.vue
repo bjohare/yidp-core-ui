@@ -22,8 +22,10 @@
         </b-form-select>
       </b-form-group>
       <b-button v-if="dataLayer !== null" variant="primary" @click="filterData">Filter Data</b-button>
+      <b-button v-if="filteredData" variant="danger" class="ml-2" @click="clearSelectedLayer">Clear Filters</b-button>
     </div>
-    <div id="filteredData" v-if="filteredData">
+    <app-spinner v-if="filtering"></app-spinner>
+    <div id="filteredData" class="alert alert-info" v-if="filteredData && !filtering">
      Found {{ filteredData.totalFeatures }} features.
     </div>
   </div>
@@ -47,7 +49,8 @@ export default {
       wmsLayers: [],
       filterLayer: "admin1",
       dataLayer: null,
-      selectedLayer: null
+      selectedLayer: null,
+      filtering: false
     };
   },
   computed: {
@@ -129,7 +132,9 @@ export default {
     },
     clearSelectedLayer() {
       this.$root.$emit("clear-filter", this.dataLayer);
-      if (this.selectedLayer) this.selectedLayer.setStyle(filterStyle);
+      if (this.selectedLayer) {
+        this.selectedLayer.setStyle(filterStyle);
+      }
       this.selectedLayer = null;
       this.dataLayer = null;
       this.clearFilteredLayers();
@@ -140,12 +145,6 @@ export default {
         layer.removeFrom(this.map);
       });
       this.wmsLayers = [];
-      this.featureGroup.eachLayer(layer => {
-        layer.eachLayer(lyr => {
-          lyr.redraw();
-        });
-      });
-      this.map.invalidateSize();
     },
     getLayer(typename) {
       return this.mapLayers.find(layer => {
@@ -153,18 +152,19 @@ export default {
       });
     },
     async filterData() {
+      this.filtering = true;
       this.clearFilteredLayers();
       this.$root.$emit("filter-wms", this.dataLayer);
       const wkt = WKT.convert(this.selectedLayer.toGeoJSON().geometry);
       const query = "CQL_FILTER=WITHIN(the_geom, " + wkt + ")";
       const layer = this.getLayer(this.dataLayer);
-      const filtered = filterWMSLayer(this, layer, query);
+      const filtered = await filterWMSLayer(this, layer, query);
       const data = await filterWFSLayer(this, layer, query);
       this.$store.dispatch("analysis/saveFilteredData", data);
       filtered.addTo(this.map);
       this.wmsLayers.push(filtered);
-      this.map.fitBounds(this.selectedLayer.getBounds());
-      this.map.invalidateSize();
+      // this.map.fitBounds(this.selectedLayer.getBounds());
+      this.filtering = false;
     },
     async describeFeature(typename) {
       const data = await describeFeatureType(typename);
