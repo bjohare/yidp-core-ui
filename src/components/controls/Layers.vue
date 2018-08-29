@@ -99,13 +99,13 @@ export default {
     this.loadLayers();
     const _vm = this;
     this.$root.$on("filter-wms", typename => {
-      let layer = this.getLayer(typename);
-      layer.removeFrom(this.map);
+      let layer = _vm.getLayer(typename);
+      layer.removeFrom(_vm.map);
     });
     this.$root.$on("clear-filter", typename => {
       if (typename) {
-        let wmsLayer = this.getLayer(typename);
-        wmsLayer.addTo(this.map);
+        let wmsLayer = _vm.getLayer(typename);
+        wmsLayer.addTo(_vm.map);
       }
     });
   }

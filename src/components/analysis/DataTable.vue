@@ -18,8 +18,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import { filterWMSLayer } from "@/components/maps/wms";
-import * as L from "leaflet";
 
 export default {
   props: ["show", "map", "mapConfig"],
@@ -59,11 +57,12 @@ export default {
       // console.log(item, index, $event);
     },
     filterWMS(filter) {
-      const typename = this.featureDescription.typeName;
-      const layer = this.getLayer("geonode:" + typename);
+      // const typename = this.featureDescription.typeName;
+      // const layer = this.getLayer("geonode:" + typename);
       this.filter = filter;
       const query = this.getFilterQuery();
       this.$store.dispatch("analysis/saveQuery", query);
+      this.$root.$emit("filter-datatable");
     },
     getFilterQuery() {
       let props = [];
@@ -77,6 +76,7 @@ export default {
     clearFilter() {
       this.filter = "";
       this.$store.dispatch("analysis/saveQuery", null);
+      this.$root.$emit("clear-datatable-filter");
     }
   }
 };

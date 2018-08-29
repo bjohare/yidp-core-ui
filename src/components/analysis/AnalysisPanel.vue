@@ -34,11 +34,7 @@
 import { Stretch } from "vue-loading-spinner";
 import axios from "axios";
 import * as L from "leaflet";
-import {
-  filterStyle,
-  selectedFilterStyle,
-  highlightStyle
-} from "@/components/maps/styles";
+import { filterStyle, selectedFilterStyle } from "@/components/maps/styles";
 import { filterWMSLayer } from "@/components/maps/wms";
 import { filterWFSLayer, describeFeatureType } from "./wfs";
 import { mapGetters } from "vuex";
@@ -60,7 +56,7 @@ export default {
   },
   watch: {
     query(query) {
-      this.runQuery(query);
+      // this.runQuery(query);
     }
   },
   computed: {
@@ -102,6 +98,9 @@ export default {
           });
           layer.on("click", e => {
             this.selectFilter(e.target);
+            if (this.dataLayer) {
+              this.filterSpatial();
+            }
           });
         }
       };
@@ -175,6 +174,7 @@ export default {
       const query = "CQL_FILTER=WITHIN(the_geom, " + wkt + ")";
       this.$store.dispatch("analysis/saveSpatialQuery", query);
       this.map.fitBounds(this.selectedLayer.getBounds());
+      this.runQuery(this.query);
     },
     async runQuery(query) {
       this.filtering = true;
@@ -231,6 +231,12 @@ export default {
     });
     this.$root.$on("map-destroy", () => {
       _vm.clearSelectedLayer();
+    });
+    this.$root.$on("filter-datatable", () => {
+      _vm.runQuery(_vm.query);
+    });
+    this.$root.$on("clear-datatable-filter", () => {
+      _vm.runQuery(_vm.query);
     });
   }
 };
