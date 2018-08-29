@@ -5,7 +5,8 @@ const initialState = function() {
     selectedFeature: null,
     dataLayer: null,
     query: null,
-    filteredData: null
+    filteredData: null,
+    featureDescription: null
   };
 };
 
@@ -26,6 +27,9 @@ const mutations = {
   },
   resetState(state) {
     this.state = initialState();
+  },
+  saveFeatureDescription(state, featureDescription) {
+    state.featureDescription = featureDescription;
   }
 };
 
@@ -41,6 +45,9 @@ const getters = {
   },
   getFilteredData: state => {
     return state.filteredData;
+  },
+  getFeatureDescription: state => {
+    return state.featureDescription;
   }
 };
 

@@ -1,6 +1,6 @@
 import * as L from "leaflet";
 
-import { geoserverAxios } from "../../store/axios";
+import { geonodeAxios } from "../../store/axios";
 
 const mapDefaults = {
   zoom: 7,
@@ -71,13 +71,13 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
     this.featureInfo = options.featureInfo;
     this.data = options.data;
     this.vm = vm;
+    this.access_token = vm.$store.state.authentication.accessToken.access_token;
   },
   createTile(coords, done) {
-    const wmsUrl = this.getTileUrl(coords);
+    const wmsUrl =
+      this.getTileUrl(coords) + "&access_token=" + this.access_token;
     const img = document.createElement("img");
-    // TODO: switch to geonodeAxios and test access_token works..
-    // const url = this._url;
-    geoserverAxios({
+    geonodeAxios({
       method: "post",
       url: wmsUrl,
       responseType: "blob",
@@ -104,9 +104,9 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
       this.featureInfo !== ({} || undefined)
         ? this.featureInfo.getFeatureInfo
         : null;
-    let url = this.getFeatureInfoUrl(evt.latlng);
-    // TODO: switch to geonodeAxios and test access_token works..
-    geoserverAxios.get(url).then(response => {
+    let url =
+      this.getFeatureInfoUrl(evt.latlng) + "&access_token=" + this.access_token;
+    geonodeAxios.get(url).then(response => {
       if (response.data && response.data.features.length > 0) {
         let feature = {
           title: layer.title,

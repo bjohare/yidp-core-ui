@@ -10,7 +10,7 @@
         </div>
       </SplitArea>
       <SplitArea id="datapane" :size="dataHeight">
-        <app-data-table :show="showDataPane"></app-data-table>
+        <app-data-table :show="showDataPane" :mapConfig="mapConfig" :map="map"></app-data-table>
       </SplitArea>
     </Split>
   </div>

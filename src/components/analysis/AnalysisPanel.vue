@@ -34,7 +34,11 @@
 import { Stretch } from "vue-loading-spinner";
 import axios from "axios";
 import * as L from "leaflet";
-import { filterStyle, selectedFilterStyle } from "@/components/maps/styles";
+import {
+  filterStyle,
+  selectedFilterStyle,
+  highlightStyle
+} from "@/components/maps/styles";
 import { filterWMSLayer } from "@/components/maps/wms";
 import { filterWFSLayer, describeFeatureType } from "./wfs";
 import { mapGetters } from "vuex";
@@ -50,10 +54,19 @@ export default {
       filterLayer: "admin1",
       dataLayer: null,
       selectedLayer: null,
-      filtering: false
+      filtering: false,
+      geoJSONLayer: null
     };
   },
+  watch: {
+    query(query) {
+      // this.filterDataTable(query);
+    }
+  },
   computed: {
+    accessToken() {
+      return this.$store.state.authentication.accessToken.access_token;
+    },
     options() {
       let options = [];
       let layers = this.$store.state.maps.layers.slice();
@@ -69,7 +82,8 @@ export default {
       return this.$store.state.maps.layers;
     },
     ...mapGetters({
-      filteredData: "analysis/getFilteredData"
+      filteredData: "analysis/getFilteredData",
+      query: "analysis/getQuery"
     })
   },
   methods: {
@@ -145,6 +159,10 @@ export default {
         layer.removeFrom(this.map);
       });
       this.wmsLayers = [];
+      if (this.geoJSONLayer) {
+        this.geoJSONLayer.removeFrom(this.map);
+        this.geoJSONLayer = null;
+      }
     },
     getLayer(typename) {
       return this.mapLayers.find(layer => {
@@ -157,17 +175,53 @@ export default {
       this.$root.$emit("filter-wms", this.dataLayer);
       const wkt = WKT.convert(this.selectedLayer.toGeoJSON().geometry);
       const query = "CQL_FILTER=WITHIN(the_geom, " + wkt + ")";
+      this.$store.dispatch("analysis/saveQuery", query);
       const layer = this.getLayer(this.dataLayer);
       const filtered = await filterWMSLayer(this, layer, query);
-      const data = await filterWFSLayer(this, layer, query);
+      const data = await filterWFSLayer(layer, query, this.accessToken);
+      console.log(data);
+      this.addGeoJSONLayer(data);
       this.$store.dispatch("analysis/saveFilteredData", data);
       filtered.addTo(this.map);
       this.wmsLayers.push(filtered);
       // this.map.fitBounds(this.selectedLayer.getBounds());
       this.filtering = false;
     },
+    async filterDataTable(query) {
+      const layer = this.getLayer(this.dataLayer);
+      const filtered = await filterWMSLayer(this, layer, query);
+      const data = await filterWFSLayer(layer, query, this.accessToken);
+      this.clearFilteredLayers();
+      filtered.addTo(this.map);
+      this.wmsLayers.push(filtered);
+    },
     async describeFeature(typename) {
-      const data = await describeFeatureType(typename);
+      this.featureDescription = null;
+      const data = await describeFeatureType(typename, this.accessToken);
+      this.$store.dispatch(
+        "analysis/saveFeatureDescription",
+        data.featureTypes[0]
+      );
+    },
+    addGeoJSONLayer(data) {
+      const _vm = this;
+      const options = {
+        // style: highlightStyle,
+        onEachFeature: (feature, layer) => {
+          layer.on("click", e => {
+            _vm.$root.$emit("feature-selected", e.target.feature);
+          });
+        },
+        pointToLayer: function(feature, latlng) {
+          return L.circleMarker(latlng, {
+            radius: 10,
+            opacity: 0,
+            fillOpacity: 0
+          });
+        }
+      };
+      let layer = L.geoJSON(data, options);
+      layer.addTo(this.map);
     }
   },
   components: {

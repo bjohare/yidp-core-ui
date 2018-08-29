@@ -21,3 +21,7 @@ export const saveFilteredData = ({ commit }, payload) => {
 export const clearFilteredData = ({ commit }) => {
   commit("saveFilteredData", null);
 };
+
+export const saveFeatureDescription = ({ commit }, payload) => {
+  commit("saveFeatureDescription", payload);
+};

@@ -1,8 +1,9 @@
 import { geonodeAxios } from "../../store/axios";
 import { geoserverEndpoints } from "../../store/endpoints";
 import * as L from "leaflet";
+import { access } from "fs";
 
-export const filterWFSLayer = async (vm, layer, query) => {
+export const filterWFSLayer = async (layer, query, access_token) => {
   let wfsParams = {
     service: "WFS",
     request: "GetFeature",
@@ -12,7 +13,11 @@ export const filterWFSLayer = async (vm, layer, query) => {
     crsName: "EPSG:4326",
     count: 200
   };
-  const url = geoserverEndpoints.wfsUrl + L.Util.getParamString(wfsParams);
+  const url =
+    geoserverEndpoints.wfsUrl +
+    L.Util.getParamString(wfsParams) +
+    "&access_token=" +
+    access_token;
   const response = await geonodeAxios({
     method: "post",
     url: url,
@@ -22,7 +27,7 @@ export const filterWFSLayer = async (vm, layer, query) => {
   return response.data;
 };
 
-export const describeFeatureType = async typename => {
+export const describeFeatureType = async (typename, access_token) => {
   let wfsParams = {
     service: "WFS",
     request: "DescribeFeatureType",
@@ -30,7 +35,11 @@ export const describeFeatureType = async typename => {
     version: "1.0.0",
     outputFormat: "application/json"
   };
-  const url = geoserverEndpoints.wfsUrl + L.Util.getParamString(wfsParams);
+  const url =
+    geoserverEndpoints.wfsUrl +
+    L.Util.getParamString(wfsParams) +
+    "&access_token=" +
+    access_token;
   const response = await geonodeAxios.get(url);
   return response.data;
 };

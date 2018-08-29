@@ -4,7 +4,7 @@
       <b-col md="4">
         <b-form-group horizontal label="Filter" class="mb-3">
           <b-input-group>
-            <b-form-input v-model="filter" placeholder="Type to Search" />
+            <b-form-input placeholder="Type to Search" :value="filter" @change="filterWMS"/>
             <b-input-group-append>
               <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
             </b-input-group-append>
@@ -12,14 +12,17 @@
         </b-form-group>
       </b-col>
     </b-row>
-    <b-table small :items="items"></b-table>
+    <b-table small :items="items" @row-hovered="hover" :filter="filter">
+    </b-table>
   </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
+import { filterWMSLayer } from "@/components/maps/wms";
+import * as L from "leaflet";
 
 export default {
-  props: ["show"],
+  props: ["show", "map", "mapConfig"],
   data() {
     return {
       filter: null
@@ -27,7 +30,10 @@ export default {
   },
   computed: {
     ...mapGetters({
-      filteredData: "analysis/getFilteredData"
+      filteredData: "analysis/getFilteredData",
+      featureDescription: "analysis/getFeatureDescription",
+      query: "analysis/getQuery",
+      mapLayers: "maps/getLayers"
     }),
     items() {
       let items = [];
@@ -38,11 +44,36 @@ export default {
     }
   },
   methods: {
+    getLayer(typename) {
+      return this.mapLayers.find(layer => {
+        return layer.typename === typename;
+      });
+    },
     handleEvents($event, type) {
       if ($event.type === "click" || $event.type === "dblclick") {
         $event.preventDefault();
       }
       $event.stopPropagation();
+    },
+    hover(item, index, $event) {
+      // console.log(item, index, $event);
+    },
+    filterWMS(filter) {
+      const typename = this.featureDescription.typeName;
+      const layer = this.getLayer("geonode:" + typename);
+      this.filter = filter;
+      const query = this.getFilterQuery();
+      this.$store.dispatch("analysis/saveQuery", query);
+    },
+    getFilterQuery() {
+      let props = [];
+      this.featureDescription.properties.forEach(prop => {
+        props.push(prop.name);
+      });
+      const query = props.join(" ILIKE '%" + this.filter + "%' OR ");
+      return (
+        this.query + encodeURI(" AND EVENT_TYPE LIKE '%" + this.filter + "%'")
+      );
     }
   }
 };
