@@ -12,8 +12,16 @@
         </b-form-group>
       </b-col>
     </b-row>
-    <b-table small :items="items" @row-hovered="hover" :filter="filter">
-    </b-table>
+    <b-row>
+      <b-table small :items="items" @row-hovered="hover" :filter="filter"
+            :per-page="perPage" :current-page="currentPage">
+      </b-table>
+    </b-row>
+    <b-row v-if="totalRows > perPage">
+      <b-col md="6" class="mb-2">
+        <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="m-2" />
+      </b-col>
+    </b-row>
   </div>
 </template>
 <script>
@@ -23,7 +31,9 @@ export default {
   props: ["show", "map", "mapConfig"],
   data() {
     return {
-      filter: null
+      filter: null,
+      perPage: 20,
+      currentPage: 1
     };
   },
   computed: {
@@ -39,6 +49,9 @@ export default {
         items.push(feature.properties);
       });
       return items;
+    },
+    totalRows() {
+      return this.items.length;
     }
   },
   methods: {
@@ -89,7 +102,6 @@ export default {
   font-weight: 500;
   width: 100%;
   height: 100%;
-  opacity: 0.95;
   padding: 1rem;
   color: black !important;
 }

@@ -100,10 +100,10 @@ L.TileLayer.WMS_AUTH = L.TileLayer.WMS.extend({
   },
   getFeatureInfo: function(evt) {
     let layer = this;
-    let featureInfo =
-      this.featureInfo !== ({} || undefined)
-        ? this.featureInfo.getFeatureInfo
-        : null;
+    let featureInfo = null;
+    if (this.featureInfo !== null && this.featureInfo !== undefined) {
+      featureInfo = this.featureInfo.getFeatureInfo;
+    }
     let url =
       this.getFeatureInfoUrl(evt.latlng) + "&access_token=" + this.access_token;
     geonodeAxios.get(url).then(response => {
@@ -179,7 +179,7 @@ export const loadWMSLayer = (vm, layer) => {
   return wmsLayer;
 };
 
-export const filterWMSLayer = (vm, layer, query) => {
+export const filterWMSLayer = async (vm, layer, query) => {
   const wmsUrl = vm.mapConfig.wmsBaseUrl;
   let wmsParams = {
     layers: layer.typename,

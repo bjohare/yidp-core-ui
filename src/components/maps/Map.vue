@@ -44,7 +44,8 @@ export default {
   },
   computed: {
     showPopover() {
-      return this.selectedFeatures.length > 0 && !this.isAnalysisActive;
+      // return this.selectedFeatures.length > 0 && !this.isAnalysisActive;
+      return this.selectedFeatures.length > 0;
     },
     mapHeight() {
       return this.showDataPane ? 60 : 100;
@@ -112,12 +113,14 @@ export default {
     this.loadBaseLayers();
   },
   created() {
+    const _vm = this;
     this.$root.$on("feature-selected", feature => {
-      const lyr = this.$store.getters["maps/getLayer"](feature.typename);
+      console.log(feature);
+      const lyr = _vm.$store.getters["maps/getLayer"](feature.typename);
       if (lyr && lyr.checked) {
-        this.selectedFeatures.push(feature);
-        this.selectedFeatures.reverse();
-        this.addSelectedIndicator();
+        _vm.selectedFeatures.push(feature);
+        _vm.selectedFeatures.reverse();
+        _vm.addSelectedIndicator();
       }
     });
     this.$root.$on("changed::tab", $event => {
@@ -140,5 +143,6 @@ export default {
 #datapane {
   overflow: auto;
   background-color: white;
+  opacity: 0.8;
 }
 </style>

@@ -33,11 +33,16 @@ const mutations = {
   saveFilteredData(state, filteredData) {
     state.filteredData = filteredData;
   },
-  resetState(state) {
-    this.state = initialState();
-  },
   saveFeatureDescription(state, featureDescription) {
     state.featureDescription = featureDescription;
+  },
+  resetState(state) {
+    state.selectedFeature = null;
+    state.dataLayer = null;
+    state.spatialQuery = null;
+    state.query = null;
+    state.filteredData = null;
+    state.featureDescription = null;
   }
 };
 

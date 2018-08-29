@@ -22,7 +22,7 @@
         </b-form-select>
       </b-form-group>
       <b-button v-if="dataLayer !== null " variant="primary" @click="filterSpatial">Filter Data</b-button>
-      <b-button v-if="filteredData" variant="danger" class="ml-2" @click="clearSelectedLayer">Clear Filters</b-button>
+      <b-button v-if="filteredData" variant="danger" class="ml-2" @click="clearSelectedLayer">Reset Filters</b-button>
     </div>
     <app-spinner v-if="filtering"></app-spinner>
     <div id="filteredData" class="alert alert-info" v-if="filteredData && !filtering">
@@ -53,11 +53,6 @@ export default {
       filtering: false,
       geoJSONLayer: null
     };
-  },
-  watch: {
-    query(query) {
-      // this.runQuery(query);
-    }
   },
   computed: {
     accessToken() {
@@ -148,7 +143,7 @@ export default {
       this.selectedLayer = null;
       this.dataLayer = null;
       this.clearFilteredLayers();
-      this.$store.dispatch("analysis/saveFilteredData", null);
+      this.$store.dispatch("analysis/resetState");
     },
     clearFilteredLayers() {
       this.wmsLayers.forEach(layer => {
@@ -169,6 +164,7 @@ export default {
       this.$root.$emit("filter-wms", this.dataLayer);
       this.$store.dispatch("analysis/resetQuery");
       const wkt = WKT.convert(this.selectedLayer.toGeoJSON().geometry);
+
       // query within for points only..
       // not sure how to do poly filtering yet..
       const query = "CQL_FILTER=WITHIN(the_geom, " + wkt + ")";
@@ -180,16 +176,17 @@ export default {
       this.filtering = true;
       this.clearFilteredLayers();
       const layer = this.getLayer(this.dataLayer);
-      const filtered = await filterWMSLayer(this, layer, query);
-      const data = await filterWFSLayer(layer, query, this.accessToken);
-      this.addGeoJSONLayer(data);
-      this.$store.dispatch("analysis/saveFilteredData", data);
-      filtered.addTo(this.map);
-      this.wmsLayers.push(filtered);
-      this.filtering = false;
+      filterWFSLayer(layer, query, this.accessToken).then(data => {
+        this.addGeoJSONLayer(data);
+        this.$store.dispatch("analysis/saveFilteredData", data);
+        this.filtering = false;
+      });
+      filterWMSLayer(this, layer, query).then(filtered => {
+        filtered.addTo(this.map);
+        this.wmsLayers.push(filtered);
+      });
     },
     async describeFeature(typename) {
-      this.featureDescription = null;
       const data = await describeFeatureType(typename, this.accessToken);
       this.$store.dispatch(
         "analysis/saveFeatureDescription",
@@ -201,15 +198,18 @@ export default {
       const options = {
         // style: highlightStyle,
         onEachFeature: (feature, layer) => {
-          layer.on("click", e => {
-            _vm.$root.$emit("feature-selected", e.target.feature);
-          });
+          // layer.on("click", e => {
+          //   let feature = e.target.feature;
+          //   feature["typename"] = this.dataLayer;
+          //   _vm.$root.$emit("feature-selected", feature);
+          // });
         },
         pointToLayer: function(feature, latlng) {
           return L.circleMarker(latlng, {
             radius: 10,
             opacity: 0,
-            fillOpacity: 0
+            fillOpacity: 0,
+            zIndex: 450
           });
         }
       };
@@ -228,6 +228,7 @@ export default {
         this.featureGroup.addTo(_vm.map);
       } else this.featureGroup.removeFrom(_vm.map);
       _vm.clearSelectedLayer();
+      _vm.$store.dispatch("analysis/resetState");
     });
     this.$root.$on("map-destroy", () => {
       _vm.clearSelectedLayer();

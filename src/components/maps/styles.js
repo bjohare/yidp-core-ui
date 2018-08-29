@@ -34,7 +34,8 @@ export const filterStyle = {
   opacity: 1,
   fillOpacity: 0.01,
   stroke: true,
-  fill: true
+  fill: true,
+  zIndex: 300
 };
 
 export const selectedFilterStyle = {

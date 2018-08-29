@@ -9,6 +9,9 @@
           <i v-if="isActive" class="fa fa-check-circle fa-lg mt-2 text-success"></i>
         </div>
       </span>
+      <div v-if="layer.thumbnail_url" class="d-flex float-right">
+        <img class="thumb m-2" :src="layer.thumbnail_url" width="100px" height="100px"/>
+      </div>
       <span><strong>{{ layer.category__gn_description }}</strong></span> |
       <span><strong>{{ layer.supplemental_information }}</strong></span>
       <p v-line-clamp="{

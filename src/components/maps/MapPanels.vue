@@ -69,6 +69,7 @@ export default {
       this.$store.dispatch("geonode/resetState");
       this.$store.dispatch("projects/resetState");
       this.$store.dispatch("authentication/logout");
+      this.$store.dispatch("analysis/resetState");
     }
   },
   components: {

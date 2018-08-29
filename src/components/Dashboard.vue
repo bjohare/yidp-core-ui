@@ -63,7 +63,6 @@
        above to recieve email notifications, and always be up to date.
      </div>
      <div class="col-3">
-
      </div>
    </div>
   </div>
@@ -124,11 +123,6 @@ hr {
 }
 .text-white {
   color: white;
-}
-.ethnic-background {
-  background: #b19269 url("/assets/dashboard/bottompattern-tile.png");
-  background-repeat: repeat-x;
-  height: 30px;
 }
 .col-1,
 .col-2,

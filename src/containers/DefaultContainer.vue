@@ -119,7 +119,7 @@ export default {
 </script>
 <style scoped>
 .ethnic-background {
-  background-image: url("/assets/dashboard/bottompattern-tile-temp.png");
+  background-image: url("/assets/dashboard/bottompattern-tile.png");
   background-repeat: repeat-x;
   background-color: #b19269;
   height: 100%;
