@@ -4,6 +4,7 @@ const initialState = function() {
   return {
     selectedFeature: null,
     dataLayer: null,
+    spatialQuery: null,
     query: null,
     filteredData: null,
     featureDescription: null
@@ -19,8 +20,15 @@ const mutations = {
   saveDataLayer(state, dataLayer) {
     state.dataLayer = dataLayer;
   },
+  saveSpatialQuery(state, query) {
+    state.spatialQuery = query;
+  },
   saveQuery(state, query) {
     state.query = query;
+  },
+  resetQuery(state) {
+    state.query = null;
+    state.spatialQuery = null;
   },
   saveFilteredData(state, filteredData) {
     state.filteredData = filteredData;
@@ -40,8 +48,12 @@ const getters = {
   getDataLayer: state => {
     return state.dataLayer;
   },
+  getSpatialQuery: state => {
+    return state.spatialQuery;
+  },
   getQuery: state => {
-    return state.query;
+    const q = state.query !== null ? " AND " + state.query : "";
+    return state.spatialQuery + q;
   },
   getFilteredData: state => {
     return state.filteredData;

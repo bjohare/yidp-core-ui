@@ -38,7 +38,7 @@ export default {
   watch: {
     showDataPane() {
       this.$nextTick(() => {
-        this.map.invalidateSize(false);
+        this.map.invalidateSize(true);
       });
     }
   },

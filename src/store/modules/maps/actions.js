@@ -62,7 +62,11 @@ export const buildCatalog = async ({ commit, dispatch }) => {
 };
 
 /* Add a layer to the selected layers. */
-export const addLayer = ({ commit, state, getters }, selectedLayer) => {
+export const addLayer = (
+  { commit, state, getters, rootState },
+  selectedLayer
+) => {
+  const accessToken = rootState.authentication.accessToken.access_token;
   let layer = getters["getLayer"](selectedLayer.typename);
   if (!layer) {
     layer = Object.assign({}, state.layerDefaults);
@@ -70,7 +74,11 @@ export const addLayer = ({ commit, state, getters }, selectedLayer) => {
       layer: selectedLayer.typename
     });
     let wmsUrl = state.mapDefaults.wmsBaseUrl;
-    let legendUrl = wmsUrl + L.Util.getParamString(legendParam);
+    let legendUrl =
+      wmsUrl +
+      L.Util.getParamString(legendParam) +
+      "&access_token=" +
+      accessToken;
     layer.name = selectedLayer.name;
     layer.title = selectedLayer.title;
     layer.abstract = selectedLayer.abstract;

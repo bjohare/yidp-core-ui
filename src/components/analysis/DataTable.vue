@@ -6,7 +6,7 @@
           <b-input-group>
             <b-form-input placeholder="Type to Search" :value="filter" @change="filterWMS"/>
             <b-input-group-append>
-              <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+              <b-btn :disabled="!filter" @click="clearFilter">Clear</b-btn>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
@@ -70,10 +70,13 @@ export default {
       this.featureDescription.properties.forEach(prop => {
         props.push(prop.name);
       });
-      const query = props.join(" ILIKE '%" + this.filter + "%' OR ");
-      return (
-        this.query + encodeURI(" AND EVENT_TYPE LIKE '%" + this.filter + "%'")
-      );
+      // const query = props.join(" ILIKE '%" + this.filter + "%' OR ");
+      // return encodeURI(query);
+      return encodeURI(" Main_Needs ILIKE '%" + this.filter + "%'");
+    },
+    clearFilter() {
+      this.filter = "";
+      this.$store.dispatch("analysis/saveQuery", null);
     }
   }
 };

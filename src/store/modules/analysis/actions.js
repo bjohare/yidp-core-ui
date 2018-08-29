@@ -10,8 +10,16 @@ export const saveDataLayer = ({ commit }, payload) => {
   commit("saveDataLayer", payload);
 };
 
+export const saveSpatialQuery = ({ commit }, payload) => {
+  commit("saveSpatialQuery", payload);
+};
+
 export const saveQuery = ({ commit }, payload) => {
   commit("saveQuery", payload);
+};
+
+export const resetQuery = ({ commit }) => {
+  commit("resetQuery");
 };
 
 export const saveFilteredData = ({ commit }, payload) => {

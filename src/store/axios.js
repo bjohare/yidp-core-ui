@@ -8,4 +8,4 @@ const yidpAxios = axios.create({
   baseURL: "http://yidp.geoweb.io"
 });
 
-export { geonodeAxios, geoserverAxios, yidpAxios };
+export { geonodeAxios, yidpAxios };

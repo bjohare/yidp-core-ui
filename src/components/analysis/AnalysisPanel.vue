@@ -21,7 +21,7 @@
           </option>
         </b-form-select>
       </b-form-group>
-      <b-button v-if="dataLayer !== null" variant="primary" @click="filterData">Filter Data</b-button>
+      <b-button v-if="dataLayer !== null " variant="primary" @click="filterSpatial">Filter Data</b-button>
       <b-button v-if="filteredData" variant="danger" class="ml-2" @click="clearSelectedLayer">Clear Filters</b-button>
     </div>
     <app-spinner v-if="filtering"></app-spinner>
@@ -60,7 +60,7 @@ export default {
   },
   watch: {
     query(query) {
-      // this.filterDataTable(query);
+      this.runQuery(query);
     }
   },
   computed: {
@@ -102,9 +102,6 @@ export default {
           });
           layer.on("click", e => {
             this.selectFilter(e.target);
-            if (this.dataLayer) {
-              this.filterData();
-            }
           });
         }
       };
@@ -169,31 +166,27 @@ export default {
         return layer.typename === typename;
       });
     },
-    async filterData() {
+    async filterSpatial() {
+      this.$root.$emit("filter-wms", this.dataLayer);
+      this.$store.dispatch("analysis/resetQuery");
+      const wkt = WKT.convert(this.selectedLayer.toGeoJSON().geometry);
+      // query within for points only..
+      // not sure how to do poly filtering yet..
+      const query = "CQL_FILTER=WITHIN(the_geom, " + wkt + ")";
+      this.$store.dispatch("analysis/saveSpatialQuery", query);
+      this.map.fitBounds(this.selectedLayer.getBounds());
+    },
+    async runQuery(query) {
       this.filtering = true;
       this.clearFilteredLayers();
-      this.$root.$emit("filter-wms", this.dataLayer);
-      const wkt = WKT.convert(this.selectedLayer.toGeoJSON().geometry);
-      const query = "CQL_FILTER=WITHIN(the_geom, " + wkt + ")";
-      this.$store.dispatch("analysis/saveQuery", query);
       const layer = this.getLayer(this.dataLayer);
       const filtered = await filterWMSLayer(this, layer, query);
       const data = await filterWFSLayer(layer, query, this.accessToken);
-      console.log(data);
       this.addGeoJSONLayer(data);
       this.$store.dispatch("analysis/saveFilteredData", data);
       filtered.addTo(this.map);
       this.wmsLayers.push(filtered);
-      // this.map.fitBounds(this.selectedLayer.getBounds());
       this.filtering = false;
-    },
-    async filterDataTable(query) {
-      const layer = this.getLayer(this.dataLayer);
-      const filtered = await filterWMSLayer(this, layer, query);
-      const data = await filterWFSLayer(layer, query, this.accessToken);
-      this.clearFilteredLayers();
-      filtered.addTo(this.map);
-      this.wmsLayers.push(filtered);
     },
     async describeFeature(typename) {
       this.featureDescription = null;

@@ -9,7 +9,7 @@ export const getGeonodeAxiosConfig = ({ rootState }) => {
   return {
     headers: {
       Authorization:
-        "Bearer " + rootState.authentication.accessToken.acccess_token
+        "Bearer " + rootState.authentication.accessToken.access_token
     }
   };
 };
@@ -84,15 +84,16 @@ export const fetchGeonodeLayer = async ({ dispatch }, id) => {
   return response.data;
 };
 
-export const fetchGeoserverFeatureType = async ({ dispatch }, typename) => {
-  const auth = await dispatch("getGeonodeAxiosConfig");
+export const fetchGeoserverFeatureType = async ({ rootState }, typename) => {
+  const auth = rootState.authentication.accessToken.access_token;
   const response = await geonodeAxios.get(
     geoserverEndpoints.wfsUrl +
       "SERVICE=WFS&VERSION=2.0.0&request=DescribeFeatureType" +
       "&typeNames=" +
       typename +
-      "&outputFormat=application/json",
-    auth
+      "&outputFormat=application/json" +
+      "&access_token=" +
+      auth
   );
   return response.data;
 };
