@@ -2,7 +2,7 @@
 <transition name="fade" mode="out-in">
   <div>
     <b-list-group class="list-group-accent">
-      <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-uppercase small">
+      <b-list-group-item class="list-group-item-accent-danger bg-light text-left font-weight-bold text-uppercase">
         <div v-b-toggle.baseLayers>
           <i style="cursor: pointer;" class="closed fa fa-chevron-down fa-lg float-left mr-3"></i>
           <i style="cursor: pointer;" class="open fa fa-chevron-up fa-lg float-left mr-3"></i>
@@ -27,8 +27,14 @@
         </b-list-group-item>
       </b-collapse>
       <hr class="transparent mx-3 my-0">
-      <b-list-group-item class="list-group-item-accent-info bg-light text-left font-weight-bold text-uppercase small">
+      <b-list-group-item class="list-group-item-accent-info bg-light text-left font-weight-bold text-uppercase">
         Sectors / Clusters
+        <b-dropdown class="float-right" variant="secondary p-1" right>
+            <template slot="button-content">
+              <i class="fa fa-cog fa-lg"></i>
+            </template>
+            <b-dropdown-item @click="removeLayers">Remove all layers</b-dropdown-item>
+        </b-dropdown>
       </b-list-group-item>
       <div class="m-3" v-if="!showCategories">
         <appSpinner :background="'#4DBD74'"></appSpinner>
@@ -136,6 +142,9 @@ export default {
         return found !== undefined;
       });
       return visible;
+    },
+    removeLayers() {
+      this.$emit("clear-layers");
     }
   },
   created() {

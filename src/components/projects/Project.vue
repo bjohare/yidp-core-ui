@@ -44,7 +44,9 @@
       <div v-if="project.thumbnail_url" class="float-right">
       <img class="thumb ml-3" :src="project.thumbnail_url"/>
       <div class="m-3">
-        <button class="btn btn-success" disabled>Map this Project</button>
+        <router-link :to="{ name: 'Map', params: {id: project.id }}">
+          <button class="btn btn-success">Add Project to Map</button>
+        </router-link>
       </div>
     </div>
     </div>

@@ -4,7 +4,7 @@
       <template slot="title">
         Catalog
       </template>
-      <app-layer-control :mapConfig="mapConfig" :map="map" @toggle-layer="toggleLayer"></app-layer-control>
+      <app-layer-control :mapConfig="mapConfig" :map="map" @toggle-layer="toggleLayer" @clear-layers="clearLayers"></app-layer-control>
     </b-tab>
     <b-tab id="legend" ref="legend">
       <template slot="title">
@@ -89,6 +89,14 @@ export default {
       return this.wmsLayers.find(layer => {
         return layer.typename === typename;
       });
+    },
+    clearLayers() {
+      console.log("clearing layers..");
+      const layers = this.$store.getters["maps/getLayers"];
+      layers.forEach(layer => {
+        this.removeLayer(layer);
+      });
+      this.$router.push({ path: "/map/default" });
     }
   },
   components: {
