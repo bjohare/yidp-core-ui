@@ -44,8 +44,8 @@ export default {
   },
   computed: {
     showPopover() {
-      // return this.selectedFeatures.length > 0 && !this.isAnalysisActive;
-      return this.selectedFeatures.length > 0;
+      return this.selectedFeatures.length > 0 && !this.isAnalysisActive;
+      // return this.selectedFeatures.length > 0;
     },
     mapHeight() {
       return this.showDataPane ? 60 : 100;
@@ -115,7 +115,6 @@ export default {
   created() {
     const _vm = this;
     this.$root.$on("feature-selected", feature => {
-      console.log(feature);
       const lyr = _vm.$store.getters["maps/getLayer"](feature.typename);
       if (lyr && lyr.checked) {
         _vm.selectedFeatures.push(feature);

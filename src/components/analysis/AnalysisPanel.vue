@@ -1,5 +1,5 @@
 <template>
-  <div class="message p-3">
+  <div class="p-3">
     <div class="mb-3 mr-3">
       <b-form-group label="Filter by:">
         <b-form-radio-group stacked name="layers" v-for="(layer, index) in layers" :key="index" v-model="filterLayer">
@@ -9,10 +9,10 @@
       <div v-if="!selectedLayer">Select a feature on the map.</div>
       <div class="mt-2 mb-2" v-if="selectedLayer">
         <strong>Filter by: </strong><em>{{ selectedLayer.feature.properties.name_en }}</em>
-        <i class="fa fa-close fa-sm ml-2" @click="clearSelectedLayer"></i>
+        <i class="fa fa-close fa-sm ml-2" @click="resetFilters"></i>
       </div>
       <b-form-group label="Select data layer:" class="h5" v-if="selectedLayer">
-        <b-form-select class="mb-3" v-model="dataLayer" @input="describeFeature">
+        <b-form-select v-model="dataLayer" @input="describeFeature">
           <template slot="first">
             <option :value="null" disabled>-- Select the data to filter --</option>
           </template>
@@ -22,11 +22,23 @@
         </b-form-select>
       </b-form-group>
       <b-button v-if="dataLayer !== null " variant="primary" @click="filterSpatial">Filter Data</b-button>
-      <b-button v-if="filteredData" variant="danger" class="ml-2" @click="clearSelectedLayer">Reset Filters</b-button>
+      <b-button v-if="filteredData" variant="danger" class="ml-2" @click="resetFilters">Reset Filters</b-button>
     </div>
     <app-spinner v-if="filtering"></app-spinner>
-    <div id="filteredData" class="alert alert-info" v-if="filteredData && !filtering">
-     Found {{ filteredData.totalFeatures }} features.
+    <div v-if="filteredData && filteredData.features.length > 1">
+      <b-form-group label="Summarize by:" class="h5">
+        <b-form-select class="" v-model="aggregateByProp" @input="aggregate">
+          <template slot="first">
+            <option :value="null" disabled>-- Select the attribute to summarize --</option>
+          </template>
+          <option v-for="(attribute, index) in attributes" :key="index" :value="attribute.value">
+            {{ attribute.text }}
+          </option>
+        </b-form-select>
+      </b-form-group>
+      <div v-if="aggregated">
+        <app-chart :data="aggregated"></app-chart>
+      </div>
     </div>
   </div>
 </template>
@@ -38,6 +50,7 @@ import { filterStyle, selectedFilterStyle } from "@/components/maps/styles";
 import { filterWMSLayer } from "@/components/maps/wms";
 import { filterWFSLayer, describeFeatureType } from "./wfs";
 import { mapGetters } from "vuex";
+import appChart from "./Chart.vue";
 
 import WKT from "terraformer-wkt-parser";
 export default {
@@ -51,8 +64,24 @@ export default {
       dataLayer: null,
       selectedLayer: null,
       filtering: false,
-      geoJSONLayer: null
+      geoJSONLayer: null,
+      aggregateByProp: null,
+      aggregated: null
     };
+  },
+  watch: {
+    filteredData() {
+      this.aggregated = null;
+      if (this.aggregateByProp) {
+        this.aggregate();
+      }
+    },
+    aggregateByProp() {
+      this.aggregated = null;
+      if (this.aggregateByProp) {
+        this.aggregate();
+      }
+    }
   },
   computed: {
     accessToken() {
@@ -75,7 +104,18 @@ export default {
     ...mapGetters({
       filteredData: "analysis/getFilteredData",
       query: "analysis/getQuery"
-    })
+    }),
+    attributes() {
+      let attributes = [];
+      if (this.filteredData) {
+        const props = this.filteredData.features[0].properties;
+        for (let name in props) {
+          let opt = { value: name, text: name };
+          attributes.push(opt);
+        }
+      }
+      return attributes;
+    }
   },
   methods: {
     async loadAnalysisLayers() {
@@ -125,7 +165,7 @@ export default {
     selectLayer(layer) {
       this.featureGroup.clearLayers();
       this.featureGroup.addLayer(layer.layer);
-      this.clearSelectedLayer();
+      this.resetFilters();
     },
     selectFilter(layer) {
       if (this.selectedLayer) {
@@ -135,13 +175,15 @@ export default {
       layer.setStyle(selectedFilterStyle);
       layer.bringToFront();
     },
-    clearSelectedLayer() {
+    resetFilters() {
       this.$root.$emit("clear-filter", this.dataLayer);
       if (this.selectedLayer) {
         this.selectedLayer.setStyle(filterStyle);
       }
       this.selectedLayer = null;
       this.dataLayer = null;
+      this.aggregateByProp = null;
+      this.aggregated = null;
       this.clearFilteredLayers();
       this.$store.dispatch("analysis/resetState");
     },
@@ -161,15 +203,22 @@ export default {
       });
     },
     async filterSpatial() {
+      let query = "";
       this.$root.$emit("filter-wms", this.dataLayer);
       this.$store.dispatch("analysis/resetQuery");
-      const wkt = WKT.convert(this.selectedLayer.toGeoJSON().geometry);
-
-      // query within for points only..
-      // not sure how to do poly filtering yet..
-      const query = "CQL_FILTER=WITHIN(the_geom, " + wkt + ")";
+      const featureType = this.getDataFeatureType();
+      if (["Point", "Linestring", "MultiLinestring"].includes(featureType)) {
+        const wkt = WKT.convert(this.selectedLayer.toGeoJSON().geometry);
+        query = "CQL_FILTER=WITHIN(the_geom, " + wkt + ")";
+      } else {
+        const filterProp = this.filterLayer + "pcod";
+        const filterValue = this.selectedLayer.feature.properties[filterProp];
+        if (filterValue) {
+          query = "CQL_FILTER=" + filterProp + " = '" + filterValue + "'";
+          console.log(query);
+        }
+      }
       this.$store.dispatch("analysis/saveSpatialQuery", query);
-      this.map.fitBounds(this.selectedLayer.getBounds());
       this.runQuery(this.query);
     },
     async runQuery(query) {
@@ -196,13 +245,13 @@ export default {
     addGeoJSONLayer(data) {
       const _vm = this;
       const options = {
-        // style: highlightStyle,
+        style: { opacity: 0, fillOpacity: 0 },
         onEachFeature: (feature, layer) => {
-          // layer.on("click", e => {
-          //   let feature = e.target.feature;
-          //   feature["typename"] = this.dataLayer;
-          //   _vm.$root.$emit("feature-selected", feature);
-          // });
+          const props = JSON.stringify(feature.properties, null, " ").replace(
+            /[\{\}"]/g,
+            ""
+          );
+          layer.bindPopup("<pre>" + props + "</pre>");
         },
         pointToLayer: function(feature, latlng) {
           return L.circleMarker(latlng, {
@@ -214,11 +263,34 @@ export default {
         }
       };
       let layer = L.geoJSON(data, options);
+      this.geoJSONLayer = layer;
       layer.addTo(this.map);
+    },
+    getDataFeatureType() {
+      const featureDescription = this.$store.getters[
+        "analysis/getFeatureDescription"
+      ];
+      const props = featureDescription.properties;
+      const geom = props.find(prop => {
+        return prop.name === "the_geom";
+      });
+      const featureType = geom.localType;
+      return featureType;
+    },
+    async aggregate() {
+      const _vm = this;
+      if (this.filteredData) {
+        const data = await this.$store.dispatch(
+          "analysis/aggregateProperty",
+          _vm.aggregateByProp
+        );
+        this.aggregated = data;
+      }
     }
   },
   components: {
-    appSpinner: Stretch
+    appSpinner: Stretch,
+    appChart
   },
   created() {
     const _vm = this;
@@ -227,11 +299,10 @@ export default {
       if ($event.tabs[$event.currentTab].id === "analysis") {
         this.featureGroup.addTo(_vm.map);
       } else this.featureGroup.removeFrom(_vm.map);
-      _vm.clearSelectedLayer();
-      _vm.$store.dispatch("analysis/resetState");
+      _vm.resetFilters();
     });
     this.$root.$on("map-destroy", () => {
-      _vm.clearSelectedLayer();
+      _vm.resetFilters();
     });
     this.$root.$on("filter-datatable", () => {
       _vm.runQuery(_vm.query);
@@ -253,5 +324,8 @@ export default {
 }
 label.custom-control-label::after {
   margin-bottom: 10px;
+}
+.bar {
+  fill: #625d8d;
 }
 </style>

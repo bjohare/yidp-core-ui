@@ -11,6 +11,11 @@
           </b-input-group>
         </b-form-group>
       </b-col>
+      <b-col md="8">
+        <div id="filteredData" class="alert alert-info w-50 float-right">
+          Found {{ items.length }} features.
+        </div>
+      </b-col>
     </b-row>
     <b-row>
       <b-table small :items="items" @row-hovered="hover" :filter="filter"
@@ -70,8 +75,6 @@ export default {
       // console.log(item, index, $event);
     },
     filterWMS(filter) {
-      // const typename = this.featureDescription.typeName;
-      // const layer = this.getLayer("geonode:" + typename);
       this.filter = filter;
       const query = this.getFilterQuery();
       this.$store.dispatch("analysis/saveQuery", query);

@@ -28,8 +28,8 @@ export const highlightStyle = {
 };
 
 export const filterStyle = {
-  color: "blue",
-  fillColor: "blue",
+  color: "#6699ff",
+  fillColor: "#6699ff",
   weight: 2,
   opacity: 1,
   fillOpacity: 0.01,
