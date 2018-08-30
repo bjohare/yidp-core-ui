@@ -37,7 +37,15 @@
         <img class="img-fluid" src="/assets/dashboard/slideshow-left-image.png"/>
       </div>
       <div class="col-3">
-        <img class="img-fluid" src="/assets/dashboard/slideshow-box.png"/>
+        <b-carousel id="slideshow"
+        controls indicators
+        style="text-shadow: 1px 1px 2px #333;" :interval="4000">
+          <b-carousel-slide
+            text="Nulla vitae elit libero, a pharetra augue mollis interdum.">
+            <img slot="img" class="d-block img-fluid w-100"
+             src="/assets/dashboard/slideshow-box.png" alt="image slot">
+          </b-carousel-slide>
+        </b-carousel>
       </div>
       <div class="col-3">
         <div class="description text-light p-3">
