@@ -9,9 +9,9 @@
       {{ map.abstract }}
     </p>
 
-    <router-link :to="{ name: 'Map', params: {id: map.id }}">
+    <router-link :to="{ name: 'Project', params: {id: map.id }}">
       <b-button variant="primary">
-        Open this Map
+        Open this Project
       </b-button>
     </router-link>
     <em slot="footer">
