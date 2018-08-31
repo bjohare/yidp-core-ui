@@ -111,12 +111,9 @@ export default {
     attributes() {
       let attributes = [];
       if (this.filteredData) {
-        const layer = this.getLayer(this.dataLayer);
-        if (
-          layer.featureInfo !== undefined &&
-          layer.featureInfo.hasOwnProperty("getFeatureInfo")
-        ) {
-          const propNames = layer.featureInfo.getFeatureInfo.propertyNames;
+        const featureInfo = this.getFeatureInfo();
+        if (featureInfo) {
+          const propNames = featureInfo.propertyNames;
           for (let name in propNames) {
             let opt = { value: name, text: propNames[name] };
             attributes.push(opt);
@@ -133,6 +130,17 @@ export default {
     }
   },
   methods: {
+    getFeatureInfo() {
+      const layer = this.getLayer(this.dataLayer);
+      if (
+        layer !== undefined &&
+        layer.featureInfo !== undefined &&
+        layer.featureInfo.hasOwnProperty("getFeatureInfo")
+      ) {
+        return layer.featureInfo.getFeatureInfo;
+      }
+      return null;
+    },
     getProperties(feature, fields, propertyNames) {
       let props = {};
       for (var prop in fields) {
