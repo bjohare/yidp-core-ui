@@ -10,7 +10,7 @@
         </div>
       </span>
       <div v-if="layer.thumbnail_url" class="d-flex float-right">
-        <img class="thumb m-2" :src="layer.thumbnail_url" width="100px" height="100px"/>
+        <img class="thumb m-2" :src="layer.thumbnail_url" width="200px" height="150px"/>
       </div>
       <span><strong>{{ layer.category__gn_description }}</strong></span> |
       <span><strong>{{ layer.supplemental_information }}</strong></span>
