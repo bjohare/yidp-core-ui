@@ -70,6 +70,9 @@ export default {
     };
   },
   watch: {
+    dataLayer() {
+      this.$store.dispatch("analysis/saveDataLayer", this.dataLayer);
+    },
     filteredData() {
       this.aggregated = null;
       if (this.aggregateByProp) {
