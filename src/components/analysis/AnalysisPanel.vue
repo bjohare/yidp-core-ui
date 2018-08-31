@@ -70,6 +70,9 @@ export default {
     };
   },
   watch: {
+    dataLayer() {
+      this.$store.dispatch("analysis/saveDataLayer", this.dataLayer);
+    },
     filteredData() {
       this.aggregated = null;
       if (this.aggregateByProp) {
@@ -108,6 +111,18 @@ export default {
     attributes() {
       let attributes = [];
       if (this.filteredData) {
+        const layer = this.getLayer(this.dataLayer);
+        if (
+          layer.featureInfo !== undefined &&
+          layer.featureInfo.hasOwnProperty("getFeatureInfo")
+        ) {
+          const propNames = layer.featureInfo.getFeatureInfo.propertyNames;
+          for (let name in propNames) {
+            let opt = { value: name, text: propNames[name] };
+            attributes.push(opt);
+          }
+          return attributes;
+        }
         const props = this.filteredData.features[0].properties;
         for (let name in props) {
           let opt = { value: name, text: name };
@@ -118,6 +133,15 @@ export default {
     }
   },
   methods: {
+    getProperties(feature, fields, propertyNames) {
+      let props = {};
+      for (var prop in fields) {
+        let fieldName = fields[prop];
+        let propName = propertyNames[fieldName];
+        props[propName] = feature.properties[fieldName];
+      }
+      return props;
+    },
     async loadAnalysisLayers() {
       let layers = [];
       layers[0] = await axios.get("/assets/layers/yem_admin_0.geojson");

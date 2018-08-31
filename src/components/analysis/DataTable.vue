@@ -45,10 +45,25 @@ export default {
     ...mapGetters({
       filteredData: "analysis/getFilteredData",
       featureDescription: "analysis/getFeatureDescription",
+      dataLayer: "analysis/getDataLayer",
       query: "analysis/getQuery",
       mapLayers: "maps/getLayers"
     }),
     items() {
+      let layer = this.getLayer(this.dataLayer);
+      if (
+        layer.featureInfo !== undefined &&
+        layer.featureInfo.hasOwnProperty("getFeatureInfo")
+      ) {
+        let fields = layer.featureInfo.getFeatureInfo.fields;
+        let propertyNames = layer.featureInfo.getFeatureInfo.propertyNames;
+        let items = [];
+        this.filteredData.features.forEach(feature => {
+          let properties = this.getProperties(feature, fields, propertyNames);
+          items.push(properties);
+        });
+        return items;
+      }
       let items = [];
       this.filteredData.features.forEach(feature => {
         items.push(feature.properties);
@@ -60,6 +75,15 @@ export default {
     }
   },
   methods: {
+    getProperties(feature, fields, propertyNames) {
+      let props = {};
+      for (var prop in fields) {
+        let fieldName = fields[prop];
+        let propName = propertyNames[fieldName];
+        props[propName] = feature.properties[fieldName];
+      }
+      return props;
+    },
     getLayer(typename) {
       return this.mapLayers.find(layer => {
         return layer.typename === typename;

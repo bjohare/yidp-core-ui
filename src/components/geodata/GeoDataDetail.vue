@@ -16,7 +16,7 @@
         </div>
       </span>
       <div v-if="layer.thumbnail_url" class="d-flex float-right">
-        <img class="thumb m-2" :src="layer.thumbnail_url" width="100px" height="100px"/>
+        <img class="thumb m-2" :src="layer.thumbnail_url" width="250px" height="150px"/>
       </div>
       <div class="d-flex">
         <strong>{{ layer.category.gn_description }}</strong> &nbsp;|&nbsp;
