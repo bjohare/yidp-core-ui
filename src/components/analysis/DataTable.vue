@@ -2,24 +2,32 @@
   <div id="dataTable" v-if="show" @click.native="handleEvents" @mousewheel.native="handleEvents" @dblclick.native="handleEvents">
     <b-row>
       <b-col md="4">
-        <b-form-group horizontal label="Filter" class="mb-3">
-          <b-input-group>
-            <b-form-input placeholder="Type to Search" :value="filter" @change="filterWMS"/>
-            <b-input-group-append>
-              <b-btn :disabled="!filter" @click="clearFilter">Clear</b-btn>
-            </b-input-group-append>
-          </b-input-group>
+        <b-form-group horizontal label="Filter by:" class="h5">
+          <b-form-select class="" v-model="filterAttribute">
+            <option v-for="(attribute, index) in attributes" :key="index" :value="attribute.value">
+              {{ attribute.text }}
+            </option>
+          </b-form-select>
         </b-form-group>
       </b-col>
-      <b-col md="8">
+      <b-col md="4">
+        <b-form-group class="">
+          <b-form-select class="" v-model="filterValue">
+            <option v-for="(value, index) in uniqueValues" :key="index" :value="value.value">
+              {{ value.text }}
+            </option>
+          </b-form-select>
+        </b-form-group>
+      </b-col>
+      <b-col md="4">
+        <b-button variant="danger" :disabled="filterAttribute === null && filterValue === null" @click="clearFilter">Clear Filters</b-button>
         <div id="filteredData" class="alert alert-info w-50 float-right fixed">
           Found {{ items.length }} features.
         </div>
       </b-col>
     </b-row>
     <b-row>
-      <b-table small :items="items" @row-hovered="hover" :filter="filter"
-            :per-page="perPage" :current-page="currentPage">
+      <b-table small hover :items="items" :per-page="perPage" :current-page="currentPage">
       </b-table>
     </b-row>
     <b-row v-if="totalRows > perPage">
@@ -31,6 +39,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import * as _ from "lodash";
 
 export default {
   props: ["show", "map", "mapConfig"],
@@ -38,8 +47,21 @@ export default {
     return {
       filter: null,
       perPage: 20,
-      currentPage: 1
+      currentPage: 1,
+      filterAttribute: null,
+      filterValue: null,
+      uniqueValues: null
     };
+  },
+  watch: {
+    filterAttribute(attribute) {
+      this.getUniqueValues();
+    },
+    filterValue() {
+      if (this.filterAttribute !== null && this.filterValue !== null) {
+        this.filterWMS();
+      }
+    }
   },
   computed: {
     ...mapGetters({
@@ -50,13 +72,10 @@ export default {
       mapLayers: "maps/getLayers"
     }),
     items() {
-      let layer = this.getLayer(this.dataLayer);
-      if (
-        layer.featureInfo !== undefined &&
-        layer.featureInfo.hasOwnProperty("getFeatureInfo")
-      ) {
-        let fields = layer.featureInfo.getFeatureInfo.fields;
-        let propertyNames = layer.featureInfo.getFeatureInfo.propertyNames;
+      const featureInfo = this.getFeatureInfo();
+      if (featureInfo) {
+        let fields = featureInfo.fields;
+        let propertyNames = featureInfo.propertyNames;
         let items = [];
         this.filteredData.features.forEach(feature => {
           let properties = this.getProperties(feature, fields, propertyNames);
@@ -70,11 +89,57 @@ export default {
       });
       return items;
     },
+    attributes() {
+      let attributes = [];
+      if (this.filteredData) {
+        const featureInfo = this.getFeatureInfo();
+        if (featureInfo) {
+          const propNames = featureInfo.propertyNames;
+          for (let name in propNames) {
+            let opt = { value: name, text: propNames[name] };
+            attributes.push(opt);
+          }
+          return attributes;
+        }
+        const props = this.filteredData.features[0].properties;
+        for (let name in props) {
+          let opt = { value: name, text: name };
+          attributes.push(opt);
+        }
+      }
+      return attributes;
+    },
     totalRows() {
       return this.items.length;
     }
   },
   methods: {
+    getUniqueValues() {
+      let values = [];
+      this.filteredData.features.forEach(feature => {
+        let props = feature.properties;
+        let val = props[this.filterAttribute];
+        values.push(val);
+      });
+      const uniqueValues = _.uniq(values);
+      let opts = [];
+      for (let value in uniqueValues) {
+        let opt = { value: uniqueValues[value], text: uniqueValues[value] };
+        opts.push(opt);
+      }
+      this.uniqueValues = opts;
+    },
+    getFeatureInfo() {
+      const layer = this.getLayer(this.dataLayer);
+      if (
+        layer !== undefined &&
+        layer.featureInfo !== undefined &&
+        layer.featureInfo.hasOwnProperty("getFeatureInfo")
+      ) {
+        return layer.featureInfo.getFeatureInfo;
+      }
+      return null;
+    },
     getProperties(feature, fields, propertyNames) {
       let props = {};
       for (var prop in fields) {
@@ -95,26 +160,21 @@ export default {
       }
       $event.stopPropagation();
     },
-    hover(item, index, $event) {
-      // console.log(item, index, $event);
-    },
-    filterWMS(filter) {
-      this.filter = filter;
+    filterWMS() {
       const query = this.getFilterQuery();
       this.$store.dispatch("analysis/saveQuery", query);
       this.$root.$emit("filter-datatable");
     },
     getFilterQuery() {
-      let props = [];
-      this.featureDescription.properties.forEach(prop => {
-        props.push(prop.name);
-      });
-      // const query = props.join(" ILIKE '%" + this.filter + "%' OR ");
-      // return encodeURI(query);
-      return encodeURI(" Main_Needs ILIKE '%" + this.filter + "%'");
+      if (this.filterAttribute === null && this.filterValue === null) {
+        return null;
+      }
+      const query = this.filterAttribute + " = " + "'" + this.filterValue + "'";
+      return encodeURI(query);
     },
     clearFilter() {
-      this.filter = "";
+      this.filterValue = null;
+      this.filterAttribute = null;
       this.$store.dispatch("analysis/saveQuery", null);
       this.$root.$emit("clear-datatable-filter");
     }
