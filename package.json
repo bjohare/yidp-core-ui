@@ -38,6 +38,7 @@
     "ol-mapbox-style": "^3.0.1",
     "perfect-scrollbar": "^1.4.0",
     "randomcolor": "^0.5.3",
+    "serve": "^10.0.0",
     "simple-line-icons": "^2.4.1",
     "simple-oauth2": "^2.2.0",
     "terraformer": "^1.0.9",

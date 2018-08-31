@@ -12,7 +12,7 @@
         </b-form-group>
       </b-col>
       <b-col md="8">
-        <div id="filteredData" class="alert alert-info w-50 float-right">
+        <div id="filteredData" class="alert alert-info w-50 float-right fixed">
           Found {{ items.length }} features.
         </div>
       </b-col>
