@@ -133,10 +133,10 @@ export default {
       this.loading = true;
       const id = this.$route.params.id;
       this.layer = await this.$store.dispatch("geonode/fetchGeonodeLayer", id);
-      this.featureType = await this.$store.dispatch(
-        "geonode/fetchGeoserverFeatureType",
-        this.layer.typename
-      );
+     // this.featureType = await this.$store.dispatch(
+     //   "geonode/fetchGeoserverFeatureType",
+     //   this.layer.typename
+     // );
       this.loading = false;
       const vm = this;
       this.$nextTick().then(function() {

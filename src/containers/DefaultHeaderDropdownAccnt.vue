@@ -12,7 +12,7 @@
         <b-dropdown-item to="/geodata">
           <i class="cui-note icons font-1xl d-inline mt-4"/> GeoData
         </b-dropdown-item>
-        <b-dropdown-item to="/maps/default">
+        <b-dropdown-item to="/map/default">
             <i class="cui-map icons font-1xl d-inline mt-4"/> Map
         </b-dropdown-item>
         <b-dropdown-item to="/documents">
